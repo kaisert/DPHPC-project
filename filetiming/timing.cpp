@@ -10,21 +10,24 @@ using namespace std;
 
 
 FILE* getTestFile() {
-    FILE* fp = fopen("test", "r"); //local file
+    FILE* fp = fopen("/mnt/hostfs/bakadi/test.bin", "r"); //file on Xeon Phi
     if(!fp) {
-        //file on Xeon Phi
-        fp = fopen("/mnt/hostfs/bakadi/test", "r");
+        fp = fopen("test", "r"); //local fallback file
     }
 
     return fp;
 }
+
 
 //Activate the define to test without potentially sequential prefetching
 //
 // #define ONLYPARALLEL
 
 //chunk size for testing
-const long chunkSize = 2L*(1024*1024*1024)/240; //4*1024*1024; /* bytes */
+const long fileSize = 2L*(1024*1024*1024);//16*1024*1024;// /* bytes */
+const int bufsize = 512*1024;
+//TODO 2MiB (or even below) might segfault the stack on our server -> use pointer & new char[]
+
 
 
 int main(int argc, char** argv)
@@ -42,12 +45,16 @@ int main(int argc, char** argv)
     benchmark.start();
 
     int c;
-    long int count = 0;    
-    const int bufsize = 2*1024*1024;
+    uint32_t crcSequential = 0;
+    long int count = 0;
     char buf[bufsize];
     while ((c = fread(&buf[0], sizeof(buf[0]), bufsize, fp)) != 0) {
         count += c;
+            
+        for (int i=0;i<c;i+=4)
+            crcSequential += *(reinterpret_cast<uint32_t*>(&buf[i]));
     }
+
     
 
 
@@ -56,26 +63,47 @@ int main(int argc, char** argv)
     benchmark.printSummary();
 
 
+    if (count != fileSize)
+    {
+        printf("\nWARNING: Specified fileSize does not match with the real file.\n\n");
+        //fileSize = count;
+    }
+
     if (ferror(fp))
         puts("I/O error while reading");
  
     fclose(fp);
-
 #endif
+
 
     /* parallel file read test */
 
     int nthreads,tid;
 
+    uint32_t crcParallel = 0;
+
     benchmark.start();
-    #pragma omp parallel private(nthreads, tid)
+    #pragma omp parallel private(nthreads, tid) shared(crcParallel)
     {
         tid = omp_get_thread_num();
         nthreads = omp_get_num_threads();
 
+
+        long int chunkSize = fileSize/nthreads;
+
+        if (fileSize % nthreads != 0)
+            ++chunkSize;
+
         if (tid == 0) {
-            printf("Parallel file read of %ld bytes (distributed among %d threads) started.\n", chunkSize*nthreads, nthreads);
+            if (chunkSize % 4 != 0)
+                printf("chunkSize needs to be a multiple of 4 for the CRCs to be computed correctly.\n");
+
+            if (fileSize % nthreads != 0)
+                printf("chunkSize has been adapted to %ld.\n", chunkSize);
+            
+            printf("Parallel file read of %ld bytes (chunks of %ld each for %d threads) started.\n", fileSize, chunkSize, nthreads);
         }
+
 
         TicToc parallelBenchmark(tid);
 
@@ -84,25 +112,31 @@ int main(int argc, char** argv)
             parallelBenchmark.start();
             fseek(fp, tid*chunkSize, SEEK_SET);
             
-
             int c;
-            long int count = 0;    
-            const int bufsize = 2*1024*1024;
+            uint32_t crcLocal = 0;
+            long int count = 0;
             char buf[bufsize];
             while ((c = fread(&buf[0], sizeof(buf[0]), bufsize, fp)) != 0 && count < chunkSize) {
                 count += c;
+                    
+                for (int i=0;i<c;i+=4)
+                    crcLocal += *(reinterpret_cast<uint32_t*>(&buf[i]));
             }
 
             
             parallelBenchmark.stop("file read completed");
             //printf("%ld bytes read from file in thread %i.\n", count, tid);
             parallelBenchmark.printSummary();
-            
+
+            #pragma omp critical
+            {
+                crcParallel += crcLocal;
+                //printf("Thread %i computed its chunk CRC: 0x%x\n", tid, crcLocal);
+            }
             
             if (count < chunkSize)
-                printf("Thread %i read less than chunk size: %ld of %ld bytes. (seek() beyond EOF?)\n", tid, count, chunkSize);
+                printf("Thread %i read less than chunk size: %ld of %ld bytes.\n  (last incomplete chunk or seek() beyond EOF?)\n", tid, count, chunkSize);
                 
-
 
             if (ferror(fp))
                 puts("I/O error while reading");
@@ -115,6 +149,21 @@ int main(int argc, char** argv)
 
     benchmark.stop("total time for parallel file read");
     benchmark.printSummary();
+
+#ifdef ONLYPARALLEL
+    printf("\nParallel CRC: 0x%x\n", crcParallel);
+#else     
+    if (crcSequential == crcParallel)
+        printf("\nBoth CRCs matched: 0x%x\n", crcSequential);
+    else
+    {
+        printf("\nCRCs did not match:\n0x%x (sequential) vs. \n0x%x (parallel)\n", crcSequential, crcParallel);
+        printf("Please make sure that:\n");
+        printf("- the file size is divisible by the computed chunk size\n");
+        printf("- chunk and file size is a multiple of 4\n");
+        printf("- number of bytes read are the same\n");
+    }
+#endif
 
     return 0;
 }
