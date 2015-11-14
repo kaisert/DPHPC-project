@@ -74,4 +74,4 @@ def generate_query_tree(fname):
             r.rec_add_query(query, no_queries)
             no_queries += 1
     f.close()
-    return r, no_queries 
+    return r
