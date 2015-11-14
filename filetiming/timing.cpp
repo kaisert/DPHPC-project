@@ -24,10 +24,8 @@ FILE* getTestFile() {
 // #define ONLYPARALLEL
 
 //chunk size for testing
-const long fileSize = 2L*(1024*1024*1024);//16*1024*1024;// /* bytes */
-const int bufsize = 512*1024;
-//TODO 2MiB (or even below) might segfault the stack on our server -> use pointer & new char[]
-
+const long fileSize = 2L*(1024*1024*1024);//16*(1024*1024);// /* bytes */
+const int bufsize = 2*1024*1024;
 
 
 int main(int argc, char** argv)
@@ -37,7 +35,7 @@ int main(int argc, char** argv)
 #ifndef ONLYPARALLEL
     FILE* fp = getTestFile();
     if(!fp) {
-        perror("File opening failed");
+        perror("File opening failed for test file");
         return EXIT_FAILURE;
     }
  
@@ -47,8 +45,8 @@ int main(int argc, char** argv)
     int c;
     uint32_t crcSequential = 0;
     long int count = 0;
-    char buf[bufsize];
-    while ((c = fread(&buf[0], sizeof(buf[0]), bufsize, fp)) != 0) {
+    char* buf = new char[bufsize];
+    while ((c = fread(buf, sizeof(buf[0]), bufsize, fp)) != 0) {
         count += c;
             
         for (int i=0;i<c;i+=4)
@@ -95,11 +93,12 @@ int main(int argc, char** argv)
             ++chunkSize;
 
         if (tid == 0) {
+            if (fileSize % nthreads != 0)
+                printf("chunkSize has been ceiled to %ld to read the whole file\n", chunkSize);
+
             if (chunkSize % 4 != 0)
                 printf("chunkSize needs to be a multiple of 4 for the CRCs to be computed correctly.\n");
-
-            if (fileSize % nthreads != 0)
-                printf("chunkSize has been adapted to %ld.\n", chunkSize);
+                //e.g. use a 2GiB file and set omp num_threads(256)
             
             printf("Parallel file read of %ld bytes (chunks of %ld each for %d threads) started.\n", fileSize, chunkSize, nthreads);
         }
@@ -109,14 +108,14 @@ int main(int argc, char** argv)
 
         FILE* fp = getTestFile();
         if(fp) {
-            parallelBenchmark.start();
-            fseek(fp, tid*chunkSize, SEEK_SET);
-            
             int c;
             uint32_t crcLocal = 0;
             long int count = 0;
-            char buf[bufsize];
-            while ((c = fread(&buf[0], sizeof(buf[0]), bufsize, fp)) != 0 && count < chunkSize) {
+            char* buf = new char[bufsize];
+
+            parallelBenchmark.start();
+            fseek(fp, tid*chunkSize, SEEK_SET);
+            while ((c = fread(buf, sizeof(buf[0]), bufsize, fp)) != 0 && count < chunkSize) {
                 count += c;
                     
                 for (int i=0;i<c;i+=4)
@@ -161,7 +160,6 @@ int main(int argc, char** argv)
         printf("Please make sure that:\n");
         printf("- the file size is divisible by the computed chunk size\n");
         printf("- chunk and file size is a multiple of 4\n");
-        printf("- number of bytes read are the same\n");
     }
 #endif
 

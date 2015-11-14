@@ -11,7 +11,7 @@ class TicToc
     protected:
         list<time_point<high_resolution_clock>> times;
         list<string> msg; //list of messages to identify times
-        int threadID; //positive number identifying the thread
+        int threadID; //non-negative number identifying the thread
 
     public:
         TicToc() {
@@ -19,7 +19,7 @@ class TicToc
         }
 
         /**
-         * Initialize the benchmarking with a positivie unique thread ID
+         * Initialize the benchmarking with a non-negative unique thread ID
          */
         TicToc(int threadID) {
             TicToc::threadID = threadID;
