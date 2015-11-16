@@ -42,7 +42,7 @@ int main(int argc, char** argv)
 
     benchmark.start();
 
-    int c;
+    long int c;
     uint32_t crcSequential = 0;
     long int count = 0;
     char* buf = new char[bufsize];
@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 
         FILE* fp = getTestFile();
         if(fp) {
-            int c;
+            long int c;
             uint32_t crcLocal = 0;
             long int count = 0;
             char* buf = new char[bufsize];
