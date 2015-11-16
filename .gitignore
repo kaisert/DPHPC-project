@@ -58,3 +58,8 @@ docs/_build/
 # PyBuilder
 target/
 
+# XQuery2NFA stuff
+*.dfwd
+*.dbk
+*.tokens
+*.tmp
