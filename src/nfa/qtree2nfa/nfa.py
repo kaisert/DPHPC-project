@@ -17,9 +17,9 @@ def eps_closure(_q):
         return q.eps_closure()
 
 
-def asterisk_label():
+def asterisk_label(token_set):
     def _asterisk_label(t):
-        return True
+        return t in token_set
     _asterisk_label.label = '*'
     return _asterisk_label
 
@@ -32,8 +32,8 @@ def token_label(_t):
 
 
 def other_label(labels):
-    _labels = filter(lambda l: l.label != '[o]', labels)
     def _other_label(t):
+        _labels = filter(lambda l: l.label != '[o]', labels)
         return not any(l(t) for l in _labels)
     _other_label.label = '[o]'
     return _other_label
@@ -46,7 +46,16 @@ class EpsNFANode(object):
         self.eps_transitions = {True: set(), False: set()}
         #self.transitions = dict() # t -> list of transitions
 
-    def add_transition(self, t, n, direction=True):
+
+    def _add_transition(self, label, n, direction=True):
+        self.transitions[direction].add( (label, n) )
+
+
+    def _add_eps_transition(self, n, direction=True):
+        self.eps_transitions[direction].add(n)
+
+
+    def add_transition(self, t, n, token_set, direction=True):
         """
         There are three types of transitions:
         1. eps-transitions ('.')
@@ -59,15 +68,20 @@ class EpsNFANode(object):
         transitions = self.transitions[direction]
 
         if t == '.':
-            eps_transitions.add(n)
-        elif t == '*':
-            transitions.add( (asterisk_label(), n) )
-        elif t == '[o]':
-            transitions.add( (other_label(self.label_set(direction)), n ) )
+            eps_transitions.add( n );
+            if direction:
+                n._add_eps_transition( self, False );
         else:
-            transitions.add( (token_label(t), n) )
-        if direction:
-            n.add_transition(t, self, not direction)
+            if t == '*':
+                label_function = asterisk_label(token_set)
+            elif t == '[o]':
+                label_function = other_label(self.label_set(direction))
+            else:
+                label_function = token_label(t)
+            transitions.add( (label_function, n) )
+            if direction:
+                n._add_transition( label_function, self, False )
+
 
     def label_set(self, direction=True):
         return set([t[0] for t in self.transitions[direction]])
@@ -140,7 +154,7 @@ def enum_states(nr, no_queries):
     return state_id[0], state_mapping
 
 
-def gen_rec_node(t, target_node=None):
+def gen_rec_node(t, token_set, target_node=None):
     """
        -- * --
        |     |
@@ -152,10 +166,10 @@ def gen_rec_node(t, target_node=None):
        ( )
     """
     rec_node = EpsNFANode()
-    rec_node.add_transition('*', rec_node)
+    rec_node.add_transition('*', rec_node, token_set)
     if target_node is None:
         target_node = EpsNFANode()
-    rec_node.add_transition(t, target_node)
+    rec_node.add_transition(t, target_node, token_set)
     return rec_node
 
 
@@ -164,7 +178,7 @@ def qtree2eps_nfa(qr):
     @param qr: root of the query tree
     """
     max_query = [-1]
-    def qtree2eps_nfa_rec(qn, nn):
+    def qtree2eps_nfa_rec(qn, nn, token_set):
         """
         @param qn: current query tree node
         @param nn: current nfa node
@@ -175,13 +189,16 @@ def qtree2eps_nfa(qr):
                 max_query[0] = child.matching
             new_node = EpsNFANode(accepting=child.matching)
             if typ == '//':
-                nn.add_transition(EPS, gen_rec_node(tag, new_node))
+                nn.add_transition(EPS, gen_rec_node(tag, token_set, new_node),
+                        token_set)
             else:
-                nn.add_transition(tag, new_node)
-            qtree2eps_nfa_rec(child, new_node)
+                nn.add_transition(tag, new_node, token_set)
+            qtree2eps_nfa_rec(child, new_node, token_set)
 
     nr = EpsNFANode()
-    qtree2eps_nfa_rec(qr, nr)
+    token_set = qtree.extract_token_set(qr)
+    print token_set
+    qtree2eps_nfa_rec(qr, nr, token_set)
 
     no_queries = max_query[0]+1
 
@@ -191,15 +208,15 @@ def qtree2eps_nfa(qr):
     q_N.state_id = no_states
 
     for q in state_mapping.values():
-        q.add_transition('[o]', q_N)
+        q.add_transition('[o]', q_N, token_set)
 
-    q_N.add_transition('[o]', q_N)
+    q_N.add_transition('[o]', q_N, token_set)
     state_mapping[q_N.state_id] = q_N
 
-    return nr, no_states, no_queries, state_mapping
+    return nr, no_states+1, no_queries, state_mapping
 
 
-def gen_delta_push(qr):
+def gen_nfa_delta(qr):
     """
     This function returns a function delta: int x string -> set of ints
     
@@ -209,14 +226,14 @@ def gen_delta_push(qr):
     no_queries = 0
     def count_accepting_states(n):
         if n.state_id >= 0 and n.state_id < no_queries:
-            print n.state_id
             no_accepting_states[0] += 1
 
     eps_nfa_root, no_states, no_queries, state_mapping = qtree2eps_nfa(qr)
     eps_nfa_root.visit_rec(count_accepting_states) # sanity check
 
-    def delta_push(q, t):
-        return set([_q.state_id for _q in state_mapping[q].closed_delta(t)])
+    def delta_push(q, t, direction=True):
+        return set([_q.state_id for _q in state_mapping[q].closed_delta(t,
+            direction)])
 
     print "no. states: ", no_states
     print "no. accepting states: ", no_accepting_states[0]
@@ -225,8 +242,72 @@ def gen_delta_push(qr):
     return eps_nfa_root, delta_push, no_states
 
 
-def print_delta_push(delta_push, no_states, qr):
+def enumerate_inputs(no_states, qr):
     tokens = sorted(list(qtree.extract_token_set(qr)))
-    for q in xrange(0, no_states+1):
+    tokens.append('[u]')
+    for q in xrange(0, no_states):
         for t in tokens:
-            print "({0}, {1}) -> {2}".format(q, t, str(delta_push(q, t)))
+            yield q, t
+
+
+def print_delta_push(delta_push, no_states, qr, direction=True):
+    for q, t in enumerate_inputs(no_states, qr):
+        print "({0}, {1}) -> {2}".format(q, t, str(delta_push(q, t,
+            direction)))
+
+def gen_delta_table(nr, delta, no_states, qr, direction=True):
+    no_tokens = len(qtree.extract_token_set(qr))+1
+    # all known tokens plus the 'unknown' token
+
+    offset = 0
+    offset_map = dict()
+    set_table = list()
+    offset_table = list()
+
+    delta_table = list()
+
+    for q, t in enumerate_inputs(no_states, qr):
+        target_set = tuple(sorted(list(delta(q, t, direction))))
+        if target_set in offset_map:
+            offset_table.append(offset_map[target_set])
+        else:
+            offset_table.append(offset)
+            offset_map[target_set] = offset
+            set_table.extend([len(target_set)] + list(target_set))
+            offset += len(target_set) + 1
+
+    delta_table.append(no_states) # number of states
+    delta_table.append(no_tokens) # number of tokens
+    delta_table.append(nr.state_id) # start state
+    delta_table.extend(offset_table) # offset table
+    delta_table.extend(set_table) # table containing the sets
+
+    assert len(delta_table) == 3 + no_states * no_tokens + len(set_table)
+    return delta_table
+
+
+def print_delta_table(delta_table, qr):
+    """
+    only used for sanity checking
+    """
+    tokens = sorted(list(qtree.extract_token_set(qr)))
+    tokens.append('[u]')
+
+    token_map = dict(zip( range(len(tokens)), tokens ))
+
+    no_states = delta_table[0]
+    no_tokens = delta_table[1]
+    
+    offset_table = delta_table[3 : 3 + no_states * no_tokens]
+    set_table = delta_table[3+no_states * no_tokens : len(delta_table)]
+
+    print len(offset_table), offset_table
+    print set_table
+    for (q, t) in ((i,j) for i in xrange(no_states) for j in xrange(no_tokens)):
+        print q, t
+        target_offset = offset_table[q * no_tokens + t]
+        target_set_length = set_table[target_offset]
+        target_set = set_table[target_offset+1 :
+                target_offset+1+target_set_length]
+        
+        print "({0}, {1}) -> {2}".format(q, t, target_set)

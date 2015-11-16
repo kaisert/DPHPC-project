@@ -43,7 +43,8 @@ class QTreeNode(object):
         s = ""
         depth = depth
         for transition, child in self.children.items():
-            s = s + depth*"    " + str(transition) + ' ' + str(child.matching) + '\n'
+            s = "{0}{1}{2} {3}\n".format(s, depth*"    ", str(transition),
+                    str(child.matching))
             s = s + child.__str__(depth=depth+1)
         return s
 
@@ -63,6 +64,11 @@ def extract_token_set(qr, exclude_ast=True):
     if exclude_ast:
         s.remove('*')
     return s
+
+
+def extract_token_list(qr, exclude_ast=True):
+    return sorted(extract_token_set(qr))
+
 
 def generate_query_tree(fname):
     f = open(fname, 'r')
