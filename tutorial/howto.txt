@@ -1,0 +1,8 @@
+To compile use the command:
+$ icc -mmic -fopenmp test.c -o test.mic
+
+To submit the script to be run on the Xeon Phi use:
+$ sbatch ./test.sh
+
+The output will appear in a file called slurm-{jobnumber}.out 
+when the job has finished.
