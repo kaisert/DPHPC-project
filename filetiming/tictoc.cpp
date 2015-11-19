@@ -1,6 +1,7 @@
 #include <iostream>
 #include <chrono>
 #include <list>
+#include <string>
 
 using namespace std;
 using namespace std::chrono;
@@ -50,22 +51,24 @@ class TicToc
          * Prints a default summary of all measurement times 
          */
         void printSummary() {
+            
+            list<time_point<high_resolution_clock>>::iterator i = times.begin();
             time_point<high_resolution_clock> start = times.front();
-            times.pop_front();
 
-            for (list<time_point<high_resolution_clock>>::iterator i = times.begin(); i != times.end(); ++i) {
-                
+
+            list<string>::iterator msgiterator = msg.begin();
+            for (++i; i != times.end(); ++i) {
                 long int t = duration_cast<nanoseconds>(*i-start).count();
-
                 char buf[1000];
                 if (threadID >= 0)
-                    sprintf(buf, "At %ld ns (~%ld ms): %s in thread %d.\n", t, t/1000000, msg.front().c_str(), threadID);
+                    sprintf(buf, "At %ld ns (~%ld ms): %s in thread %d.\n", t, t/1000000, msgiterator->c_str(), threadID);
                 else
-                    sprintf(buf, "At %ld ns (~%ld ms): %s.\n", t, t/1000000, msg.front().c_str());
+                    sprintf(buf, "At %ld ns (~%ld ms): %s.\n", t, t/1000000, msgiterator->c_str());
 
-                cout << buf; //for (some) thread-safety
 
-                msg.pop_front();
+                printf("%s", buf); //for (some) thread-safety
+
+                ++msgiterator;
             }
         }
 };
