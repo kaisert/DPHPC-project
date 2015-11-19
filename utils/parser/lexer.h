@@ -1,51 +1,30 @@
-#ifndef PARSER_LEXER_H
-#define PARSER_LEXER_H
+#ifndef LEXER_H
+#define LEXER_H
 
-#include<string>
-#include<functional>
-#include<iterator>
+#include<stdlib.h>
 
-#include"Tag.h"
+typedef enum{
+	START_TAG,
+	END_TAG,
+	START_END_TAG,
+	NULL_TAG
+} TagType;
 
-namespace Parser {
 
-    class Lexer {
-    public:
-        Lexer(char *first, char *last);
+struct Tag {
+	char * begin;
+	char * end_of_id;
+	char * end;
+	TagType type;
+};
+typedef struct Tag Tag;
 
-        /*
-         * Lexes and returns the next Tag
-         */
-        Tag get_next();
-    private:
-        const Tag null_tag_ = Tag(Tag::NULL_TAG, NULL, NULL, NULL);
 
-        char * first;
-        char * last;
+typedef struct Lexer {
+	char * begin;
+	char * end;
+} Lexer;
 
-        Tag::Type lex_tag_type();
-
-        /*
-         * lexes a tag name
-         */
-        void lex_name();
-
-        /*
-         * lexes tag arguments
-         */
-        void lex_arguments();
-
-        /*
-         * lexes xml text
-         */
-        void lex_text();
-
-        /*
-         * checks whether c is an xml separator
-         */
-        bool is_separator(char c);
-    };
-}
+extern int get_next_tag(Lexer * const, Tag *);
 
 #endif
-
