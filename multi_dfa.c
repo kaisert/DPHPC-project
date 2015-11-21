@@ -10,6 +10,7 @@ int main(int argc, char** argv) {
     chunker_load_file_content();
     int num_chunks = -1;
     char ** chunks = chunker_compute_chunks(&num_chunks);
+
     
 	Map *map = alloc_map("todo");
 
@@ -17,7 +18,7 @@ int main(int argc, char** argv) {
     #pragma omp parallel firstprivate(map,chunks,num_chunks)
     {
 		int tid = omp_get_thread_num();
-        
+
         if (tid > num_chunks)
             printf("WARNING more threads than chunks.\n");
         else {
@@ -32,8 +33,6 @@ int main(int argc, char** argv) {
 		        int size = t.end - t.begin;
 		        printf("thread: %d, tag: %.*s, type: %d\n", tid, size, t.begin, t.type);
 	        }
-
-            printf("parsing done\n");
         }
     }
 

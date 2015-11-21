@@ -70,8 +70,7 @@ char** chunker_compute_chunks(int * n_chunks) {
 
     char ** chunks = (char **) calloc(num_chunks+1, sizeof(char*));
     chunks[0] = chunker_buf;
-    chunks[num_chunks] = chunker_buf + chunker_filesize + 1; //last chunk ends at EOF+1
-
+    chunks[num_chunks] = chunker_buf + chunker_filesize; //last chunk ends at EOF+1
 
     long chunk_size = chunker_filesize/num_chunks;
     if (chunker_filesize % num_chunks != 0)
@@ -83,12 +82,12 @@ char** chunker_compute_chunks(int * n_chunks) {
 
 
     chunker_buf[chunker_filesize] = '<'; //prevent chunk computation from overshooting
-    
+
     int i;
     if (num_chunks/num_threads > 200)
     {
         #pragma omp parallel for \
-                    schedule(static,num_chunks/num_threads)
+                    schedule(static,num_chunks/num_threads) shared(chunks)
         for (i=1;i < num_chunks; ++i)
         {
             char * locbuf = chunker_buf + chunk_size * i;
@@ -99,18 +98,23 @@ char** chunker_compute_chunks(int * n_chunks) {
 
             //printf("locbuf of chunk %i set to %ld in thread %d\n", 
             //        i, (long) (locbuf - chunker_buf), omp_get_thread_num());
+
+            chunks[i] = locbuf;
         }
     } else {
         for (i=1;i < num_chunks; ++i)
         {
             char * locbuf = chunker_buf + chunk_size * i;
 
-            while (*locbuf++ != '<') { /*no other work necessary*/; }
+            while (*locbuf++ != '<')
+                /*no other work necessary*/;
 
             --locbuf; //reset to position of '<'
 
             //printf("locbuf of chunk %i set to %ld.\n", 
             //        i, (long) (locbuf - chunker_buf));
+
+            chunks[i] = locbuf;
         }
     }
 
@@ -122,7 +126,7 @@ void chunker_print_chunk(int i, char* start, char* end) {
     do
     {
         putchar(*start);
-    } while(start++ != end);
+    } while(++start != end);
     printf("\n==== end chunk %d ====\n", i);
 }
 
