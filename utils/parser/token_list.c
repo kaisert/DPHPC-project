@@ -6,14 +6,14 @@ void destroy_token_list(TokenList * list)
 	free(list);
 }
 
-TokenList * alloc_token_list()
+TokenList * alloc_token_list(char * path)
 {
 	TokenList * token_list = malloc(sizeof(TokenList));
 	
 	FILE *fp;
 	uint32_t size;
 
-	fp = fopen("/home/tobias/i_ti_eytsch/m1/dphpc/git/implementation/utils/parser/tokens.txt", "r");
+	fp = fopen(path, "r");
 	if(!fp)
 	{
 	//	fputs("File error");
