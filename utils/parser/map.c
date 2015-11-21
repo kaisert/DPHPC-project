@@ -53,11 +53,11 @@ uint32_t get_value(const Key const* key, const Map const * map)
 	return map->size + 1;
 }
 
-Map * alloc_map()
+Map * alloc_map(char * path)
 {
 	Map * map = malloc(sizeof(Map));
 	map->size = 0;
-	map->token_list = * (alloc_token_list());
+	map->token_list = * (alloc_token_list(path));
 	char * tokens = map->token_list.tokens;
 	int length = map->token_list.tokens_length;
 	for(char * c = tokens; (c - tokens) < length; ++c)
