@@ -1,6 +1,5 @@
 #include <omp.h>
-#include "Chunker.c"
-#include "Chunker.c"
+#include "chunker.c"
 
 
 int main(int argc, char** argv)
@@ -10,7 +9,8 @@ int main(int argc, char** argv)
 
     chunker_load_file_content();
 
-    char ** chunks = chunker_compute_chunks(-1);
+    int num_chunks = -1;
+    char ** chunks = chunker_compute_chunks(&num_chunks);
     
     free(chunks);
     chunker_cleanup();
