@@ -10,14 +10,16 @@ def tag2alphabet(nfa, tag):
         return set(nfa.alphabet)
     return set([tag])
 
-def qtree2nfa(qt):
-    token_set = qtree.extract_token_set(qt)
-    no_queries = find_max_query(qt) + 1
+def qtree2nfa(qt, alphabet=None):
+    if alphabet is None:
+        alphabet = qtree.extract_token_set(qt)
+        alphabet.add('[u]') # the unknown token
 
-    token_set.add('[u]') # the unknown token
+    no_queries = find_max_query(qt) + 1
     
-    nfa = fa.FiniteAutomaton(alphabet=token_set, states=None,
-            default_state_id=lambda fa: no_queries + len(fa.states)-len(fa.accepting))
+    nfa = fa.FiniteAutomaton(alphabet=alphabet, states=None,
+            default_state_id=(lambda fa: no_queries + len(fa.states)-
+                len(fa.accepting)))
 
     def qtree2eps_nfa_rec(qtn, q_parent=None, label=None):
         state_id, accepting = None, False

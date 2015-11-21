@@ -62,7 +62,8 @@ def extract_token_set(qr, exclude_ast=True):
         return s
     s = extract_token_set_rec(qr, set())
     if exclude_ast:
-        s.remove('*')
+        if '*' in s:
+            s.remove('*')
     return s
 
 
@@ -70,14 +71,19 @@ def extract_token_list(qr, exclude_ast=True):
     return sorted(extract_token_set(qr))
 
 
-def generate_query_tree(fname):
+def query_list(fname):
     f = open(fname, 'r')
-    r = QTreeNode()
-    no_queries = 0
     for line in f:
         query = list(split_query(line.rstrip()))
-        if len(query) > 0:
-            r.rec_add_query(query, no_queries)
-            no_queries += 1
+        yield query
     f.close()
+
+
+def generate_query_tree(query_list):
+    r = QTreeNode()
+    no_queries = 0
+    for query in query_list:
+        if len(query) > 0:
+            r.rec_add_query(list(query), no_queries)
+            no_queries += 1
     return r

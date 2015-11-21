@@ -11,7 +11,7 @@ def _label_union(transitions, q):
     q = _ensure_set(q)
 
     res = set()
-    for q_u in q:
+    for q_u in q.intersection(transitions.keys()):
         res.update(*transitions[q_u].values())
 
     return res
@@ -40,7 +40,7 @@ def _delta(transitions, q, t):
     res = set()
     for q_u in q: 
         for q_v, label in transitions[q_u].items():
-            if t < label:
+            if t <= label:
                 res.add(q_v)
     return res
 
@@ -122,11 +122,17 @@ class FiniteAutomaton(object):
         assert (isinstance(label, set) and label <= self.alphabet) or (label is None)
         assert label is not None or q_u != q_v
 
+        if label is not None and len(label) == 0:
+            return 
+
         for inv in [False, True]:
             transitions = self.transitions[inv]
             if q_u not in transitions:
                 transitions[q_u] = dict()
-            transitions[q_u][q_v] = label
+            if q_v not in transitions[q_u]:
+                transitions[q_u][q_v] = label
+            else:
+                transitions[q_u][q_v].update(label)
             q_u, q_v = q_v, q_u
 
 
@@ -141,8 +147,8 @@ class FiniteAutomaton(object):
         """
         if q is a set, this function calculates the 
         """
-        q == _ensure_set(q)
-        t == _ensure_set(t)
+        q = _ensure_set(q)
+        t = _ensure_set(t)
         assert t < self.alphabet
         assert q < self.states
 
@@ -154,7 +160,7 @@ class FiniteAutomaton(object):
 
 
     def label_union(self, q, inv=False):
-        q == _ensure_set(q)
+        q = _ensure_set(q)
         assert q < self.states
         return _label_union(self.transitions[inv], q)
 
@@ -171,7 +177,16 @@ class FiniteAutomaton(object):
     def unique_out_transitions(self, q, inv=False):
         return _unique_out_transitions(self.transitions[inv], self.alphabet, q)
     
-    
+   
+    def are_labels_unique(self, q, inv=False):
+        transitions = self.transitions[inv]
+        if q in transitions:
+            labels = filter(lambda l: l is not None, transitions[q].values())
+            return (len(labels) < 2 or len(set.intersection(
+                *([self.alphabet] + labels))) == 0)
+        return True
+
+
     def __str__(self, inv=False):
         s = "Alphabet:\n"
         for t in self.alphabet:
@@ -222,12 +237,12 @@ def nfa2dfa(nfa):
     while len(working_set) > 0:
         q = next(iter(working_set))
         working_set.remove(q)
-        print 'processing state', q 
+        #print 'processing state', q 
         for q_set, label_intersection in nfa.unique_out_transitions(set(q)):
-            print '   q_set', q_set
+            #print '   q_set', q_set
             q_closed = nfa.eclosure(q_set)
-            print '   q_closed', q_closed
-            print '   label intersection', label_intersection
+            #print '   q_closed', q_closed
+            #print '   label intersection', label_intersection
             accepting = nfa.is_accepting(q_closed)
 
             q_new = set2tuple(q_closed)
@@ -240,5 +255,13 @@ def nfa2dfa(nfa):
             if q_new not in done_set:
                 working_set.add(q_new)
         done_set.add(q)
+
+    err_state = dfa.new_state(accepting=False, start_state=False, state_id=
+            (len(dfa.states), ))
+
+    for q in dfa.states.difference(set([err_state])):
+        dfa.add_transition(q, err_state, dfa.other_label(q))
+
+    dfa.add_transition(err_state, err_state, dfa.alphabet)
 
     return dfa
