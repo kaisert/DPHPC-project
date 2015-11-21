@@ -15,7 +15,7 @@ qr = qtree.generate_query_tree(query_list)
 nr = qtree_nfa.qtree2nfa(qr)
 alphabet = nr.alphabet
 
-out_list = [len(query_list), len(alphabet)]
+file_header = [len(query_list), len(alphabet)]
 
 sorted_alphabet = sorted(alphabet.difference(set([UNKNOWN_TOKEN])))
 #alphabet_relabeling = dict(zip(sorted_alphabet, xrange(len(sorted_alphabet))))
@@ -27,6 +27,8 @@ for letter in sorted_alphabet:
 f_alpha.close()
 
 sorted_alphabet.append(UNKNOWN_TOKEN)
+
+state_table = list()
 
 for query in query_list:
     print '## Processing query', query
@@ -49,13 +51,13 @@ for query in query_list:
 
     sorted_states = [q[0][1] for q in sorted_states]
 
-    out_list.append(len(dfa.states))
+    file_header.append(len(dfa.states))
     for q in sorted_states:
         for t in sorted_alphabet:
             q_t = dfa.delta(q, t)
-            out_list.append(state_relabeling[next(iter(q_t))])
+            state_table.append(state_relabeling[next(iter(q_t))])
 
 f_multi_dfa = open(fname_multi_dfa, 'w')
-for i in out_list:
+for i in file_header + state_table:
     f_multi_dfa.write('{0}\n'.format(i))
 f_multi_dfa.close()
