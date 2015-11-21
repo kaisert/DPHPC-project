@@ -20,12 +20,13 @@ out_list = [len(query_list), len(alphabet)]
 sorted_alphabet = sorted(alphabet.difference(set([UNKNOWN_TOKEN])))
 #alphabet_relabeling = dict(zip(sorted_alphabet, xrange(len(sorted_alphabet))))
 #alphabet_relabeling[UNKNOWN_TOKEN] = len(sorted_alphabet)
-sorted_alphabet.append(UNKNOWN_TOKEN)
 
 f_alpha = open(fname_alpha, 'w')
 for letter in sorted_alphabet:
     f_alpha.write('{0}\n'.format(letter))
 f_alpha.close()
+
+sorted_alphabet.append(UNKNOWN_TOKEN)
 
 for query in query_list:
     print '## Processing query', query
