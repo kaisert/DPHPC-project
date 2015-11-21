@@ -16,6 +16,7 @@ Parser * alloc_parser(char * begin, char * end)
 	Parser * prs = malloc(sizeof(Parser));
 	init_lexer(prs, begin, end);
 	prs->remaining_token_exists = 0;
+	return prs;
 }
 
 void destroy_parser(Parser * prs)
