@@ -18,6 +18,9 @@ token_t *__multi_dfa_state_table;
  */
 int init_multi_dfa(FILE* f, multi_dfa_t* multi_dfa) {
     int i, dfa_size, table_size = 0;
+    
+    multi_dfa->dfa_list = NULL;
+    __multi_dfa_state_table = NULL;
 
     fscan_int(f, &(multi_dfa->no_dfa));
     fscan_int(f, &__multi_dfa_alphabet_size);
@@ -67,6 +70,10 @@ state_t delta(dfa_t dfa, state_t state, token_t t) {
  * free_multi_dfa
  */
 void free_multi_dfa(multi_dfa_t* multi_dfa) {
-    free(__multi_dfa_state_table);
-    free(multi_dfa->dfa_list);
+    if(multi_dfa) {
+        if(multi_dfa->dfa_list)
+            free(multi_dfa->dfa_list);
+        if(__multi_dfa_state_table)
+            free(__multi_dfa_state_table);
+    }
 }
