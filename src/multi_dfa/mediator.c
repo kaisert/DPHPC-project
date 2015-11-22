@@ -10,10 +10,10 @@ Tokenstream * parse_file(const char *path_xml, const char *path_tokens, int n_th
 	Tokenstream * t_streams = malloc(n_threads * sizeof(Tokenstream));
 	for(int i = 0; i < n_threads; ++i)
 	{
-		create_tokenstream(t_streams + i, 1024 * 1024 * 4 / sizeof(Token)); //4MB per tokenstream
+		create_tokenstream(t_streams + i, (1024 * 1024 * 4) / sizeof(Token)); //4MB per tokenstream
 		if(i != n_threads -1)
 		{
-			t_streams[i].next = t_streams + 1;
+			t_streams[i].next = &t_streams[i+1];
 		}
 	}
 	
