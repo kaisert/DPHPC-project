@@ -6,7 +6,6 @@ int is_separator(char c) {
 		   c == 0xD ||
 		   c == 0xA;
 }
-
 TagType lex_type(Lexer * const lxr)
 {
 	TagType type;

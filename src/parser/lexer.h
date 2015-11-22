@@ -26,4 +26,5 @@ typedef struct Lexer {
 
 extern int get_next_tag(Lexer * const, Tag *);
 
+
 #endif

@@ -53,7 +53,7 @@ uint32_t get_value(const Key const* key, const Map const * map)
 	return map->size + 1;
 }
 
-Map * alloc_map(char * path)
+Map * alloc_map(const char * path)
 {
 	Map * map = malloc(sizeof(Map));
 	map->size = 0;
@@ -90,3 +90,15 @@ void destroy_map(Map * map)
 	free(map->map);
 	free(map);
 }
+
+void print_map(Map *map)
+{	
+	printf("map size: %d\n", map->size);
+	for(int i = 0; i < map->size; ++i)
+	{
+		int ksize = map->map[i].key.end - map->map[i].key.begin;
+		printf("key: %.*s, value: %d\n", ksize, map->map[i].key.begin, map->map[i].value);
+	}
+}
+
+
