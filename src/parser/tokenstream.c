@@ -18,7 +18,7 @@ void create_tokenstream(Tokenstream *ts, uint32_t size) {
 	return 1;
 }*/
 
-Token * get_token(Tokenstream * ts, Token * current)
+Token * ts_get_token(Tokenstream * ts, Token * current)
 {
 	if(current == NULL)
 	{

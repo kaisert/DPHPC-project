@@ -10,7 +10,7 @@ int main(void)
 	{
 		if((t = ts_get_token(ts, t)) != NULL)
 		{
-			printf("tokentype: %d, token: %.*s\n", t->type, t->end - t->begin, t->begin);
+			printf("tokentype: %d, token: %.*s\n", t->type, (int) (t->end - t->begin), t->begin);
 		}
 		else
 		{
