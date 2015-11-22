@@ -96,3 +96,6 @@ target/
 
 # Debug files
 *.dSYM/
+
+**/*_local/*
+*_local.*
