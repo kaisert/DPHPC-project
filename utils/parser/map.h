@@ -21,7 +21,8 @@ typedef struct Map {
 	int size;
 } Map;
 
-extern Map * alloc_map(char *);
+extern Map * alloc_map(const char *);
 extern uint32_t get_value(const Key const*, const Map const *);
 extern void destroy_map(Map *);
+extern void print_map(Map *);
 #endif
