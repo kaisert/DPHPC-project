@@ -44,5 +44,5 @@ TokenList * alloc_token_list(const char * path)
 
 void print_token(Token *t)
 {
-	printf("Token: %d, size: %d", t->type, t->end - t->begin);
+	printf("Token: %d, size: %ld", t->type, t->end - t->begin);
 }
