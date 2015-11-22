@@ -22,18 +22,13 @@ Tokenstream * parse_file(const char *path_xml, const char *path_tokens, int n_th
 
 	int tid;
 	Parser * parser;
-//#pragma omp parallel num_threads(n_threads) private(tid, parser)
+//#pragma omp parallel num_threads(n_threads) firstprivate(map,chunks,num_chunks) private(tid, parser)
 	{
 		tid = omp_get_thread_num() % n_threads;
+		tid = 0;
 		char * chunk_begin, * chunk_end;
 		chunk_begin = chunks[tid];
-		if(tid == n_threads -1)
-		{
-			chunk_end = chunks[0] + chunker_filesize;
-		} else 
-		{
-			chunk_end = chunks[tid + 1];
-		}
+		chunk_end = chunks[tid + 1];
 
 		parser = alloc_parser(chunk_begin, chunk_end);
 		init_parser(parser, map);
