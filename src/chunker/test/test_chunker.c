@@ -1,5 +1,5 @@
 #include <omp.h>
-#include "chunker.c"
+#include "../chunker.h"
 
 
 int main(int argc, char** argv)

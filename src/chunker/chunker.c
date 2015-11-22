@@ -1,11 +1,4 @@
-#ifndef CHUNKER_C
-#define CHUNKER_C
-
-#include <omp.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-typedef unsigned long int uint64_t;
+#include "chunker.h"
 
 FILE * chunker_file;
 char* chunker_buf;
@@ -140,5 +133,3 @@ void chunker_cleanup() {
  
     fclose(chunker_file);
 }
-
-#endif
