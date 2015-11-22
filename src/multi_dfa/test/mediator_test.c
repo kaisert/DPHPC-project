@@ -14,7 +14,7 @@ void main(void)
 		}
 		else
 		{
-			if(ts->next = NULL)
+			if((ts->next = NULL))
 				break;
 			ts = ts->next;
 			t = NULL;

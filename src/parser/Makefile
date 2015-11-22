@@ -2,7 +2,7 @@ CC = gcc
 
 CFLAGS = -g -Wall -c
 
-all: parser.o lexer.o map.o token_list.o
+all: parser.o lexer.o map.o token_list.o tokenstream.o
 
 parser.o:
 	$(CC) $(CFLAGS) parser.c

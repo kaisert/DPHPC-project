@@ -2,10 +2,10 @@
 #define MEDIATOR_H
 #include<omp.h>
 #include"../chunker/chunker.h"
-#include"token_list.h"
-#include"map.h"
-#include"parser.h"
-#include"tokenstream.h"
+#include"../parser/token_list.h"
+#include"../parser/map.h"
+#include"../parser/parser.h"
+#include"../parser/tokenstream.h"
 
 extern Tokenstream * parse_file(const char *, const char*, int);
 
