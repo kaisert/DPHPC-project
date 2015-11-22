@@ -1,6 +1,6 @@
 CC = gcc
 
-CFLAGS = -g -Wall -c
+CFLAGS = -std=c99 -Wall -c -g 
 
 all: parser.o lexer.o map.o token_list.o tokenstream.o
 
