@@ -3,13 +3,10 @@
 void destroy_token_list(TokenList * list)
 {
 	free(list->tokens);
-	free(list);
 }
 
-TokenList * alloc_token_list(const char * path)
+void init_token_list(TokenList *token_list, const char * path)
 {
-	TokenList * token_list = malloc(sizeof(TokenList));
-	
 	FILE *fp;
 	uint32_t size;
 
@@ -39,7 +36,6 @@ TokenList * alloc_token_list(const char * path)
 	fclose(fp);
 	
 	token_list->tokens_length = size;
-	return token_list;
 }
 
 void print_token(Token *t)

@@ -15,8 +15,9 @@ typedef struct TokenList {
 	int tokens_length;
 } TokenList;
 
-TokenList * alloc_token_list(const char *);
+void init_token_list(TokenList *, const char *);
 void print_token(Token *);
+void destroy_token_list(TokenList *);
 
 
 #endif

@@ -57,7 +57,7 @@ Map * alloc_map(const char * path)
 {
 	Map * map = malloc(sizeof(Map));
 	map->size = 0;
-	map->token_list = * (alloc_token_list(path));
+	init_token_list(&map->token_list, path);
 	char * tokens = map->token_list.tokens;
 	int length = map->token_list.tokens_length;
 	for(char * c = tokens; (c - tokens) < length; ++c)
@@ -87,7 +87,9 @@ Map * alloc_map(const char * path)
 
 void destroy_map(Map * map)
 {
-	free(map->map);
+	destroy_token_list(&map->token_list);
+	if(map->map != NULL)
+		free(map->map);
 	free(map);
 }
 
