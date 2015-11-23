@@ -33,12 +33,12 @@ Tokenstream * parse_file(const char *path_xml, const char *path_tokens, int n_th
 		parser = alloc_parser(chunk_begin, chunk_end);
 		init_parser(parser, map);
 		Tokenstream * ts = t_streams + tid; 
-		Token * current = get_new_token_pointer(&ts, NULL);
+		Token * current = get_new_token_pointer(&ts);
 		int i = 0;
 		while(get_next_token(parser, current) == 1)
 		{
 			printf("%d\n", i++);
-			current = get_new_token_pointer(&ts, current);
+			current = get_new_token_pointer(&ts);
 		}
 	}
 
