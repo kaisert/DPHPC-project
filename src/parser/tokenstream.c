@@ -36,4 +36,18 @@ Token * ts_get_token(Tokenstream * ts, Token * current)
 	return current + 1;
 }
 
-extern Token* get_new_token_pointer(Tokenstream **);
+extern Token* get_new_token_pointer(Tokenstream **ts);
+
+/*
+ * destroys all tokenstreams connected to ts
+ */
+void destroy_tokenstreams(Tokenstream *ts)
+{
+    while(ts != NULL)
+    {
+        free(ts->begin);
+        Tokenstream * temp = ts;
+        ts = ts->next;
+        free(temp);
+    }
+}

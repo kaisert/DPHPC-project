@@ -10,10 +10,18 @@ typedef struct Tokenstream {
 	struct Tokenstream * next;
 } Tokenstream;
 
-Token * ts_get_token(Tokenstream *, Token *);
+/*
+ * returns the next token after current.
+ * returns null when stream is finished.
+ */
+Token * ts_get_token(Tokenstream *ts, Token *current);
 
-void create_tokenstream(Tokenstream *,uint32_t);
+extern void create_tokenstream(Tokenstream *ts, uint32_t size);
 
+/*
+ * destroy all tokenstreams connected to ts
+ */
+extern void destroy_tokenstreams(Tokenstream *ts);
 inline Token * get_new_token_pointer(Tokenstream ** ts)
 {
     Tokenstream* current_ts = *ts;
