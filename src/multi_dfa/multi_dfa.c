@@ -7,7 +7,7 @@ int fscan_int(FILE* f, int* p) {
 }
 
 int __multi_dfa_alphabet_size;
-token_t *__multi_dfa_state_table;
+token_type_t *__multi_dfa_state_table;
 
 /*
  * init_multi_dfa
@@ -16,7 +16,7 @@ token_t *__multi_dfa_state_table;
  *
  * THIS FUNCTION IS NOT THREAD-SAFE.
  */
-int init_multi_dfa(FILE* f, multi_dfa_t* multi_dfa) {
+int multi_dfa_init(FILE* f, multi_dfa_t* multi_dfa) {
     int i, table_size = 0;
     
     multi_dfa->dfa_list = NULL;
@@ -68,7 +68,7 @@ int init_multi_dfa(FILE* f, multi_dfa_t* multi_dfa) {
  *
  * the transition function for a dfa
  */
-state_t delta(dfa_t dfa, state_t state, token_t t) {
+state_t multi_dfa_delta(dfa_t dfa, state_t state, token_type_t t) {
     if(state < 0) { // accepting states are encoded as negative values
         state = -state - 1;
     }
@@ -78,7 +78,7 @@ state_t delta(dfa_t dfa, state_t state, token_t t) {
 /*
  * free_multi_dfa
  */
-void free_multi_dfa(multi_dfa_t* multi_dfa) {
+void multi_dfa_free(multi_dfa_t* multi_dfa) {
     if(multi_dfa) {
         if(multi_dfa->dfa_list) free(multi_dfa->dfa_list);
         if(multi_dfa->start_states) free(multi_dfa->start_states);
