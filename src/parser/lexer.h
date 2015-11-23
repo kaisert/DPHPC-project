@@ -18,13 +18,12 @@ struct Tag {
 };
 typedef struct Tag Tag;
 
-
 typedef struct Lexer {
 	char * begin;
 	char * end;
 } Lexer;
 
-extern int get_next_tag(Lexer * const, Tag *);
+extern int get_next_tag(Lexer * const lxr, Tag * tag);
 
 
 #endif

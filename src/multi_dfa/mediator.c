@@ -10,7 +10,7 @@ Tokenstream * parse_file(const char *path_xml, const char *path_tokens, int n_th
 	Tokenstream * t_streams = malloc(n_threads * sizeof(Tokenstream));
 	for(int i = 0; i < n_threads; ++i)
 	{
-		create_tokenstream(t_streams + i, (1024) / sizeof(Token)); //4MB per tokenstream
+		create_tokenstream(t_streams + i, (1024) / sizeof(Token)); //1KB per tokenstream
 		if(i != n_threads -1)
 		{
 			t_streams[i].next = &t_streams[i+1];
@@ -18,14 +18,14 @@ Tokenstream * parse_file(const char *path_xml, const char *path_tokens, int n_th
 	}
 	
 	Map * map = alloc_map(path_tokens);
-	print_map(map);
+//	print_map(map);
 
 	int tid;
 	Parser * parser;
-//#pragma omp parallel num_threads(n_threads) firstprivate(map,chunks,num_chunks) private(tid, parser)
+#pragma omp parallel num_threads(n_threads) firstprivate(map,chunks) private(tid, parser)
 	{
-//		tid = omp_get_thread_num() % n_threads;
-		tid = 0;
+		tid = omp_get_thread_num() % n_threads;
+//		tid = 0;
 		char * chunk_begin, * chunk_end;
 		chunk_begin = chunks[tid];
 		chunk_end = chunks[tid + 1];
@@ -38,7 +38,9 @@ Tokenstream * parse_file(const char *path_xml, const char *path_tokens, int n_th
 		{
 			current = get_new_token_pointer(&ts);
 		}
+		free(parser);
 	}
-
+	free(chunks);
+	destroy_map(map);
 	return t_streams;
 }
