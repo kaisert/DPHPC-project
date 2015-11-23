@@ -17,13 +17,17 @@ token_t *__multi_dfa_state_table;
  * THIS FUNCTION IS NOT THREAD-SAFE.
  */
 int init_multi_dfa(FILE* f, multi_dfa_t* multi_dfa) {
-    int i, dfa_size, table_size = 0;
+    int i, table_size = 0;
     
     multi_dfa->dfa_list = NULL;
+    multi_dfa->start_states = NULL;
     __multi_dfa_state_table = NULL;
 
     fscan_int(f, &(multi_dfa->no_dfa));
     fscan_int(f, &__multi_dfa_alphabet_size);
+
+    multi_dfa->start_states = (state_t*) malloc(
+            multi_dfa->no_dfa * sizeof(state_t));
 
     printf("dfas %i\n", multi_dfa->no_dfa);
     multi_dfa->alphabet_size = __multi_dfa_alphabet_size;
@@ -31,9 +35,14 @@ int init_multi_dfa(FILE* f, multi_dfa_t* multi_dfa) {
     int dfa_offsets[multi_dfa->no_dfa];
 
     for( i = 0; i < multi_dfa->no_dfa; ++i ) {
-        dfa_offsets[i] = table_size;
+        int dfa_size = 0, q_start = 0;
+        
         fscan_int(f, &dfa_size);
+        fscan_int(f, &q_start);
+
+        dfa_offsets[i] = table_size;
         table_size += dfa_size * multi_dfa->alphabet_size;
+        multi_dfa->start_states[i] = q_start;
     }
 
     __multi_dfa_state_table = (state_t*) malloc(table_size * sizeof(state_t));
@@ -71,9 +80,8 @@ state_t delta(dfa_t dfa, state_t state, token_t t) {
  */
 void free_multi_dfa(multi_dfa_t* multi_dfa) {
     if(multi_dfa) {
-        if(multi_dfa->dfa_list)
-            free(multi_dfa->dfa_list);
-        if(__multi_dfa_state_table)
-            free(__multi_dfa_state_table);
+        if(multi_dfa->dfa_list) free(multi_dfa->dfa_list);
+        if(multi_dfa->start_states) free(multi_dfa->start_states);
+        if(__multi_dfa_state_table) free(__multi_dfa_state_table);
     }
 }
