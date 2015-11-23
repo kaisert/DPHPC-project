@@ -10,11 +10,12 @@ int main(void)
 	{
 		if((t = ts_get_token(ts, t)) != NULL)
 		{
-			printf("tokentype: %d, token: %.*s\n", t->type, (int) (t->end - t->begin), t->begin);
+			printf("med: tokentype: %d, token: %.*s\n", t->type, (int) (t->end - t->begin), t->begin);
 		}
 		else
 		{
-			if((ts->next = NULL))
+			printf("next tokenstream\n");
+			if((ts->next == NULL))
 				break;
 			ts = ts->next;
 			t = NULL;

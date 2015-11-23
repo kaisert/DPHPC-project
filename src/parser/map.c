@@ -29,9 +29,9 @@ void sort_map(Map * map)
 
 uint32_t get_value(const Key const* key, const Map const * map)
 {
-	uint32_t last = map->size - 1;
-	uint32_t first = 0;
-	uint32_t middle = map->size / 2;
+	int last = map->size - 1;
+	int first = 0;
+	int middle = map->size / 2;
 	
 	while(first <= last)
 	{

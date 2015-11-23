@@ -2,6 +2,11 @@
 
 void create_tokenstream(Tokenstream *ts, uint32_t size) {
 	ts->begin = malloc(sizeof(Token) * size);
+	if(ts->begin == NULL) 
+	{
+		printf("Error, when allocating new tokenstream\n");
+		exit(0);
+	}
 	ts->end = ts->begin;
 	ts->size = size;
 	ts->next = NULL;
@@ -28,7 +33,7 @@ Token * ts_get_token(Tokenstream * ts, Token * current)
 	{
 		return NULL;
 	}
-	return current++;
+	return current + 1;
 }
 
 extern Token* get_new_token_pointer(Tokenstream **);
