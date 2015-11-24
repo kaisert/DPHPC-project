@@ -1,12 +1,16 @@
 #include<omp.h>
 #include<stdio.h>
-#include<unistd.h>
+#include<fcntl.h>
 #include<sys/stat.h>
 #include<sys/types.h>
 #include<sys/mman.h>
 
+#include<token_list.h>
+#include<tokenstream.h>
 #include<parser.h>
 #include<bufsplit.h>
+
+#include"multi_dfa.h"
 
 #define STACK_SIZE 256
 
@@ -31,13 +35,13 @@ int main(int argc, char* argv[]) {
     // init multi_dfa
     FILE* f_multi_dfa = fopen(ARG_DFA, "r");
     if(!f_multi_dfa) panic("could not open multi_dfa file.");
-    multidfa_init(f_multi_dfa, &multi_dfa);
+    multi_dfa_init(f_multi_dfa, &multi_dfa);
     fclose(f_multi_dfa);
 
     fd_xml = open(ARG_XML, O_RDONLY);
     if(fd_xml < 0) panic("could not open xml file.");
     fstat(fd_xml, &f_xml_stat);
-    xml_len = (size_t) f_xml_stat.st_stize;
+    xml_len = (size_t) f_xml_stat.st_size;
 
     char* xml_buf =
     mmap(   0,                   // address
@@ -52,11 +56,11 @@ int main(int argc, char* argv[]) {
     n_threads = multi_dfa.no_dfa;
 
     // chunk xml stream
-    char** chunks[n_threads+1];
+    char* chunks[n_threads+1];
     no_chunks = bufsplit_split_xml_stream(xml_buf, xml_len, n_threads, chunks);
 
     // we want at least as many (meaningful) chunks as threads
-    if(no_chunks != no_threads) panic("your xml is too small!");
+    if(no_chunks != n_threads) panic("your xml is too small!");
    
     // initialize token stream
 	Tokenstream token_stream[n_threads];
@@ -84,7 +88,7 @@ int main(int argc, char* argv[]) {
 
 		parser = alloc_parser(chunk_begin, chunk_end);
 		init_parser(parser, map);
-		Tokenstream * ts_iter = t_streams + tid; 
+		Tokenstream * ts_iter = token_stream + tid; 
 		Token * current = get_new_token_pointer(&ts_iter);
 		while(get_next_token(parser, current) == 1)
 		{
@@ -98,12 +102,12 @@ int main(int argc, char* argv[]) {
     // run dfas
     // start measurements
 
-#pragma omp parallel num_threads(n_threads) firstprivate(ts)
+#pragma omp parallel num_threads(n_threads) firstprivate(token_stream)
     {
         Tokenstream* ts_iter = token_stream;
         int tid = omp_get_thread_num() % n_threads;
-        state_t q_cur = multi_dfa->start_states[tid];
-        dfa_t dfa = multi_dfa->dfa_list[tid];
+        state_t q_cur = multi_dfa.start_states[tid];
+        dfa_t dfa = multi_dfa.dfa_list[tid];
 
         // allocate stack
         int stack_pos = 0;
@@ -111,7 +115,6 @@ int main(int argc, char* argv[]) {
         dfa_stack[stack_pos++] = q_cur;
 
         // iterate over tokenstream
-        
         while(ts_iter != NULL) {
             Token* t = ts_iter->begin;
 
@@ -120,7 +123,7 @@ int main(int argc, char* argv[]) {
                     if(stack_pos > 0)
                         stack_pos--;
                 } else if(t->type > 0) {
-                    dfa_stack[stack_pos+1] = multidfa_delta(
+                    dfa_stack[stack_pos+1] = multi_dfa_delta(
                             dfa, dfa_stack[stack_pos], t->type);
                     stack_pos++;
                 }
