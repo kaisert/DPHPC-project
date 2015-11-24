@@ -20,6 +20,7 @@ extern void create_tokenstream(Tokenstream *ts, uint32_t size);
 
 extern Tokenstream* tokenstream_init(size_t buf_size);
 extern Tokenstream* tokenstream_append(Tokenstream* ts);
+extern void tokenstream_rewind(Tokenstream* ts);
 
 /*
  * destroy all tokenstreams connected to ts

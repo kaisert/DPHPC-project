@@ -85,3 +85,9 @@ Tokenstream* tokenstream_append(Tokenstream* ts) {
 
     return ts_new;
 }
+
+void tokenstream_rewind(Tokenstream* ts) {
+    if(ts->end > ts->begin) {
+        ts->end--;
+    }
+}

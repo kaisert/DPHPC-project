@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
     char* chunks[n_threads+1];
     no_chunks = bufsplit_split_xml_stream(xml_buf, xml_len, n_threads, chunks);
 
-    printf("%d\n", no_chunks);
+    // printf("%d\n", no_chunks);
     // we want at least as many (meaningful) chunks as threads
     if(no_chunks != n_threads) panic("your xml is too small!");
    
@@ -68,15 +68,9 @@ int main(int argc, char* argv[]) {
 	Tokenstream* token_stream[n_threads];
     token_stream[0] = tokenstream_init((4096) / sizeof(Token));
 
-	for(int i = 0; i < n_threads; ++i)
+	for(int i = 1; i < n_threads; ++i)
 	{
-        if( i > 0 )
-            token_stream[i] = tokenstream_append(token_stream[i-1]);
-
-		if(i != n_threads -1)
-		{
-			token_stream[i]->next = token_stream[i+1];
-		}
+        token_stream[i] = tokenstream_append(token_stream[i-1]);
 	}
 
     // tokenize
@@ -91,6 +85,7 @@ int main(int argc, char* argv[]) {
 		chunk_begin = chunks[tid];
 		chunk_end = chunks[tid + 1];
 
+        printf("tid: %d\n", tid);
 		parser = alloc_parser(chunk_begin, chunk_end);
 		init_parser(parser, map);
 		Tokenstream * ts_iter = token_stream[tid]; 
@@ -99,6 +94,7 @@ int main(int argc, char* argv[]) {
 		{
 			current = get_new_token_pointer(&ts_iter);
 		}
+        tokenstream_rewind(ts_iter);
 		free(parser);
 	}
 	
@@ -107,7 +103,7 @@ int main(int argc, char* argv[]) {
     // run dfas
     // start measurements
 
-#pragma omp parallel num_threads(n_threads) firstprivate(token_stream)
+#pragma omp parallel num_threads(n_threads) firstprivate(token_stream, multi_dfa)
     {
         Tokenstream* ts_iter = token_stream[0];
         int tid = omp_get_thread_num() % n_threads;
@@ -123,6 +119,7 @@ int main(int argc, char* argv[]) {
         while(ts_iter != NULL) {
             Token* t = ts_iter->begin;
 
+            
             while(t != ts_iter->end) {
                 if(t->type < 0) {
                     if(stack_pos > 0) {
