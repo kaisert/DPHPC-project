@@ -7,7 +7,7 @@ int bufsplit_split_xml_stream(
         char** offsets) {
 
     int chunk_count = 0;
-    char* cur = stream, cur_chunk = stream, end = stream + len;
+    char* cur = stream, *cur_chunk = stream, *end = stream + len;
     size_t min_chunk_len = len/no_chunks;
 
     while(cur != end) {
