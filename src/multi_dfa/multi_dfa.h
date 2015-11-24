@@ -15,10 +15,10 @@ typedef struct {
     int alphabet_size;
 } multi_dfa_t;
 
-extern int init_multi_dfa(FILE* f, multi_dfa_t* multi_dfa);
+extern int multi_dfa_init(FILE* f, multi_dfa_t* multi_dfa);
 
-extern state_t delta(dfa_t dfa, state_t state, token_type_t t);
+extern state_t multi_dfa_delta(dfa_t dfa, state_t state, token_type_t t);
 
-extern void free_multi_dfa(multi_dfa_t* multi_dfa);
+extern void multi_dfa_free(multi_dfa_t* multi_dfa);
 
 #endif
