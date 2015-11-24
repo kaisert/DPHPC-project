@@ -29,7 +29,7 @@ int multi_dfa_init(FILE* f, multi_dfa_t* multi_dfa) {
     multi_dfa->start_states = (state_t*) malloc(
             multi_dfa->no_dfa * sizeof(state_t));
 
-    printf("dfas %i\n", multi_dfa->no_dfa);
+    //printf("dfas %i\n", multi_dfa->no_dfa);
     multi_dfa->alphabet_size = __multi_dfa_alphabet_size;
     
     int dfa_offsets[multi_dfa->no_dfa];
