@@ -1,44 +1,106 @@
 #include<omp.h>
-#include<parser.h>
 #include<stdio.h>
+#include<unistd.h>
+#include<sys/stat.h>
+#include<sys/types.h>
+#include<sys/mman.h>
+
+#include<parser.h>
+#include<bufsplit.h>
 
 #define STACK_SIZE 256
 
+#define panic(msg) \
+  do { perror(msg); exit(EXIT_FAILURE); } while (0)
 
 /*
  * ./a.out <xml> <tokens> <dfa> <output_file>
  */
 int main(int argc, char* argv[]) {
-    if(argc < 5) {
-        perror("not enough parameters to main().");
-        exit(1);
-    }
-    
+    if(argc < 5) panic("not enough parameters to main().");
+#define ARG_XML argv[1]
+#define ARG_TOKENS argv[2]
+#define ARG_DFA argv[3]
+#define ARG_OUTPUT argv[4]
+
     multi_dfa_t multi_dfa;
+    int fd_xml, n_threads, no_chunks;
+    struct stat f_xml_stat;
+    off_t xml_len;
 
     // init multi_dfa
-    FILE* f_multi_dfa = fopen(argv[3], "r");
-    if(!f_multi_dfa) {
-        perror("could not open multi_dfa file.");
-        exit(1);
-    }
+    FILE* f_multi_dfa = fopen(ARG_DFA, "r");
+    if(!f_multi_dfa) panic("could not open multi_dfa file.");
     multidfa_init(f_multi_dfa, &multi_dfa);
     fclose(f_multi_dfa);
 
-    int n_threads = multi_dfa.no_dfa;
+    fd_xml = open(ARG_XML, O_RDONLY);
+    if(fd_xml < 0) panic("could not open xml file.");
+    fstat(fd_xml, &f_xml_stat);
+    xml_len = (size_t) f_xml_stat.st_stize;
 
-    // read xml stream
-    // chunk xml
-    // tokenize -> tokenstream
-    // parse file
-    Tokenstream* ts = parse_file(argv[1], argv[2], n_threads);
+    char* xml_buf =
+    mmap(   0,                   // address
+            xml_len,             // length
+            PROT_READ,           // prot flags
+            0,                   // 
+            fd_xml,              // file decriptor
+            0);                  // offset in file
+    if(xml_buf == MAP_FAILED) panic("could not map file");
+    
+
+    n_threads = multi_dfa.no_dfa;
+
+    // chunk xml stream
+    char** chunks[n_threads+1];
+    no_chunks = bufsplit_split_xml_stream(xml_buf, xml_len, n_threads, chunks);
+
+    // we want at least as many (meaningful) chunks as threads
+    if(no_chunks != no_threads) panic("your xml is too small!");
+   
+    // initialize token stream
+	Tokenstream token_stream[n_threads];
+	for(int i = 0; i < n_threads; ++i)
+	{
+		create_tokenstream(&token_stream[i], (4096) / sizeof(Token));
+
+		if(i != n_threads -1)
+		{
+			token_stream[i].next = &token_stream[i+1];
+		}
+	}
+
+    // tokenize
+	Map * map = alloc_map(ARG_TOKENS);
+#pragma omp parallel num_threads(n_threads) firstprivate(map, chunks, token_stream)
+	{
+        int tid;
+		char * chunk_begin, * chunk_end;
+        Parser * parser;
+
+		tid = omp_get_thread_num() % n_threads;
+		chunk_begin = chunks[tid];
+		chunk_end = chunks[tid + 1];
+
+		parser = alloc_parser(chunk_begin, chunk_end);
+		init_parser(parser, map);
+		Tokenstream * ts_iter = t_streams + tid; 
+		Token * current = get_new_token_pointer(&ts_iter);
+		while(get_next_token(parser, current) == 1)
+		{
+			current = get_new_token_pointer(&ts_iter);
+		}
+		free(parser);
+	}
+	
+    destroy_map(map);
 
     // run dfas
     // start measurements
 
 #pragma omp parallel num_threads(n_threads) firstprivate(ts)
     {
-        Tokenstream* ts_iter = ts;
+        Tokenstream* ts_iter = token_stream;
         int tid = omp_get_thread_num() % n_threads;
         state_t q_cur = multi_dfa->start_states[tid];
         dfa_t dfa = multi_dfa->dfa_list[tid];
@@ -75,7 +137,7 @@ int main(int argc, char* argv[]) {
         perror("could not open output file.");
     }
     
-    Tokenstream* ts_iter = ts;
+    Tokenstream* ts_iter = token_stream;
     while(ts_iter != NULL) {
         Token* t = ts_iter->begin;
         while(t != ts_iter->end) {
@@ -88,6 +150,6 @@ int main(int argc, char* argv[]) {
 
     fclose(f_output);
     // destroy tokenstream
-    destroy_tokenstream(ts);
+    destroy_tokenstream(token_stream);
     // tobias will write a function
 }
