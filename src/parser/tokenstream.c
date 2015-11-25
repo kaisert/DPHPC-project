@@ -81,6 +81,7 @@ Tokenstream* tokenstream_append(Tokenstream* ts) {
     if(ts != NULL) {
         ts_new = (Tokenstream*) malloc(sizeof(Tokenstream));
         create_tokenstream(ts_new, ts->size);
+        ts->next = ts_new;
     }
 
     return ts_new;
