@@ -6,7 +6,8 @@
 typedef enum{
 	START_TAG,
 	END_TAG,
-	START_END_TAG
+	START_END_TAG,
+    XML_DECLARATION
 } TagType;
 
 

@@ -1,4 +1,4 @@
-#include"lexer.h"
+#include"lexer.h" 
 
 int is_separator(char c) {
 	return c == 0x20 ||
@@ -10,14 +10,19 @@ TagType lex_type(Lexer * const lxr)
 {
 	TagType type;
 	lxr->begin++;
-	if(*(lxr->begin) == '/'){
-		type = END_TAG;
-		lxr->begin++;
-	}
-	else
-	{
-		type = START_TAG;
-	}
+    switch(*(lxr->begin))
+    {
+        case '/':
+            type = END_TAG;
+            lxr->begin++;
+            break;
+        case '?':
+            type = XML_DECLARATION;
+            break;
+        default:
+            type = STRAT_TAG;
+            break;
+    }
 	return type;
 }
 
@@ -53,6 +58,9 @@ int get_next_tag(Lexer * const lxr, Tag * tag)
 				case '<':
 					tag->begin = lxr->begin;
 					tag->type = lex_type(lxr);
+                    if(tag->type = XML_DECLARATION)
+                        break;
+
 					lex_name(lxr);
 					tag->end_of_id = lxr->begin;
 					lex_arguments(lxr);
