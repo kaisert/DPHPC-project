@@ -1,22 +1,8 @@
 #include <omp.h>
 #include <stdio.h>
-#include <iostream>
-#include <cstdio>
-#include <cstdlib>
-#include "tictoc.cpp"
-
-
-using namespace std;
-
-
-FILE* getTestFile() {
-    FILE* fp = fopen("/mnt/hostfs/bakadi/test.bin", "r"); //file on Xeon Phi
-    if(!fp) {
-        fp = fopen("test", "r"); //local fallback file
-    }
-
-    return fp;
-}
+#include <stdio.h>
+#include <stdlib.h>
+#include "tictoc.h"
 
 
 //Activate the define to test without potentially sequential prefetching
@@ -30,35 +16,33 @@ const int bufsize = 2*1024*1024;
 
 int main(int argc, char** argv)
 {
-    TicToc benchmark;
+    struct TicToc benchmark = TicToc_create(-1,10);
 
 #ifndef ONLYPARALLEL
-    FILE* fp = getTestFile();
+    FILE* fp = fopen("/mnt/hostfs/bakadi/test", "r"); //file on Xeon Phi
     if(!fp) {
         perror("File opening failed for test file");
         return EXIT_FAILURE;
     }
  
 
-    benchmark.start();
+    TicToc_start(&benchmark);
 
     long int c;
     uint32_t crcSequential = 0;
     long int count = 0;
-    char* buf = new char[bufsize];
+    char* buf = (char*) calloc(bufsize, sizeof(char));
     while ((c = fread(buf, sizeof(buf[0]), bufsize, fp)) != 0) {
         count += c;
             
         for (int i=0;i<c;i+=4)
-            crcSequential += *(reinterpret_cast<uint32_t*>(&buf[i]));
+            crcSequential += *((uint32_t*) (&buf[i]));
     }
 
     
-
-
-    benchmark.stop("file read completed");
+    TicToc_measure(&benchmark, "file read completed");
     printf("%ld bytes read from file sequentially.\n", count);
-    benchmark.printSummary();
+    TicToc_print_summary(&benchmark);
 
 
     if (count != fileSize)
@@ -80,7 +64,8 @@ int main(int argc, char** argv)
 
     uint32_t crcParallel = 0;
 
-    benchmark.start();
+
+    TicToc_start(&benchmark);
     #pragma omp parallel private(nthreads, tid) shared(crcParallel)
     {
         tid = omp_get_thread_num();
@@ -103,29 +88,30 @@ int main(int argc, char** argv)
             printf("Parallel file read of %ld bytes (chunks of %ld each for %d threads) started.\n", fileSize, chunkSize, nthreads);
         }
 
+        struct TicToc parallelBenchmark = TicToc_create(tid,10);
 
-        TicToc parallelBenchmark(tid);
-
-        FILE* fp = getTestFile();
+        FILE* fp = fopen("/mnt/hostfs/bakadi/test", "r");
         if(fp) {
             long int c;
             uint32_t crcLocal = 0;
             long int count = 0;
-            char* buf = new char[bufsize];
+            char* buf = (char*) calloc(bufsize, sizeof(char));
 
-            parallelBenchmark.start();
+            
+            TicToc_start(&parallelBenchmark);
             fseek(fp, tid*chunkSize, SEEK_SET);
             while ((c = fread(buf, sizeof(buf[0]), bufsize, fp)) != 0 && count < chunkSize) {
                 count += c;
                     
                 for (int i=0;i<c;i+=4)
-                    crcLocal += *(reinterpret_cast<uint32_t*>(&buf[i]));
+                    crcLocal += *((uint32_t*) (&buf[i]));
             }
 
             
-            parallelBenchmark.stop("file read completed");
+            TicToc_measure(&parallelBenchmark, "file read completed");
             //printf("%ld bytes read from file in thread %i.\n", count, tid);
-            parallelBenchmark.printSummary();
+            TicToc_print_summary(&parallelBenchmark);
+            TicToc_free(&parallelBenchmark);
 
             #pragma omp critical
             {
@@ -146,8 +132,9 @@ int main(int argc, char** argv)
         }
     }
 
-    benchmark.stop("total time for parallel file read");
-    benchmark.printSummary();
+    TicToc_measure(&benchmark, "total time for parallel file read");
+    TicToc_print_summary(&benchmark);
+    TicToc_free(&benchmark);
 
 #ifdef ONLYPARALLEL
     printf("\nParallel CRC: 0x%x\n", crcParallel);
