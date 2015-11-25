@@ -121,22 +121,30 @@ int main(int argc, char* argv[]) {
 
             
             while(t != ts_iter->end) {
+                if(t - ts_iter->begin < 16) {
+#ifdef DEBUG
+                    printf("token type %d:, pos: %ld, dfa state: %d"
+                            "(pos: \"%.16s...\")\n",
+                            t->type, t->begin - xml_buf, dfa_stack[stack_pos],
+                            t->begin);
+#endif
+                }
                 if(t->type < 0) {
                     if(stack_pos > 0) {
-                        stack_pos--;
                         if(((int) dfa_stack[stack_pos]) < 0) {
                             printf("closing match: %.16s (pos: %ld)\n",
                                     t->begin, t->begin - xml_buf);
                         }
+                        stack_pos--;
                     }
                 } else if(t->type > 0) {
                     dfa_stack[stack_pos+1] = multi_dfa_delta(
                             dfa, dfa_stack[stack_pos], t->type);
+                    stack_pos++;
                     if(dfa_stack[stack_pos] < 0) {
                             printf("open match: %.16s (pos: %ld)\n",
                                     t->begin, t->begin - xml_buf);
                     }
-                    stack_pos++;
                 }
                 t++;
             }

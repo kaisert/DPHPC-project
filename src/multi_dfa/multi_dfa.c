@@ -72,6 +72,9 @@ state_t multi_dfa_delta(dfa_t dfa, state_t state, token_type_t t) {
     if(state < 0) { // accepting states are encoded as negative values
         state = -state - 1;
     }
+    if(t > 0) {
+        t--;
+    }
     return *(dfa + state*__multi_dfa_alphabet_size + t);
 }
 
