@@ -1,4 +1,9 @@
-#include<omp.h>
+#ifdef _OPENMP
+    #include<omp.h>
+#else
+    #define omp_get_thread_num() 0
+#endif
+
 #include<stdio.h>
 #include<fcntl.h>
 #include<unistd.h>
@@ -173,6 +178,7 @@ int main(int argc, char* argv[]) {
     */
 
     close(fd_xml);
+    munmap(xml_buf, xml_len);
     // fclose(f_output);
     // destroy tokenstream
     multi_dfa_free(&multi_dfa);
