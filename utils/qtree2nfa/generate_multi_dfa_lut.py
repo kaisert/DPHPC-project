@@ -52,7 +52,7 @@ for query in query_list:
     sorted_states = [q[0][1] for q in sorted_states]
 
     file_header.append(len(dfa.states))
-    file_header.append(state_relabeling(dfa.start_state))
+    file_header.append(state_relabeling[dfa.start_state])
 
     for q in sorted_states:
         for t in sorted_alphabet:

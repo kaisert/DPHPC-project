@@ -1,7 +1,7 @@
 import re
 from operator import itemgetter
 
-path_element_rx = re.compile('^(//?)([a-zA-Z][_\-A-Za-z0-9]*|\*$|\*/)(.*)$')
+path_element_rx = re.compile('^(//?)([a-zA-Z][_\-A-Za-z0-9]*|\*)(/?.*)$')
 
 
 def split_query(line):
