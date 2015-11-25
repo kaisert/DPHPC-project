@@ -4,8 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef int16_t token_type_t;
+
 typedef struct Token {
-	uint32_t type;
+	token_type_t type;
 	char* begin;
 	char* end;
 } Token;
