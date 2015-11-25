@@ -20,7 +20,7 @@ TagType lex_type(Lexer * const lxr)
             type = XML_DECLARATION;
             break;
         default:
-            type = STRAT_TAG;
+            type = START_TAG;
             break;
     }
 	return type;
@@ -58,7 +58,7 @@ int get_next_tag(Lexer * const lxr, Tag * tag)
 				case '<':
 					tag->begin = lxr->begin;
 					tag->type = lex_type(lxr);
-                    if(tag->type = XML_DECLARATION)
+                    if(tag->type == XML_DECLARATION)
                         break;
 
 					lex_name(lxr);

@@ -70,6 +70,8 @@ int get_next_token(Parser * prs, Token * token)
 			k.end = tag.end_of_id;
 			token->type = ~ (get_value(&k, &(prs->map)));
 			break;
+        case XML_DECLARATION:
+            return -1;
 	}
 	return 1;
 }
