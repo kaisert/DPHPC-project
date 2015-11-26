@@ -18,26 +18,47 @@ void seglist_create(
         size_t buf_size,
         size_t elem_size);
 
+
+/*
+ * seglist_configure_compression
+ *
+ * Use this function to configure compression.
+ *
+ */
+void seglist_configure_compression(
+            compression_init_func_t compr_init_func,
+            compression_func_t      compr_deflate_func,
+            compression_func_t      compr_inflate_func,
+            compression_free_func_t compr_free_func,
+        );
+
+
 seglist_seg_t seglist_create_segment( // create new segment
         seglist);
 
+/*
 void seglist_append(        // only operates on segment seg
         seglist_seg_t* seg,
         void* elem);
+*/
 
 size_t seglist_append_n(    // only operates on segment seg
         seglist_seg_t* seg,
         void* chunk,
         size_t n);
 
+
 size_t seglist_flush(seglist_seg_t* seg); // flushes a segment
+
 
 void seglist_create_read_iter(  // creates a read iterator for the entire list
         seglist_read_iter_t* read_iter,
         seglist_t seglist);
 
+/*
 void* seglist_get_next(
         seglist_read_iter_t* read_iter);
+*/
 
 size_t seglist_get_next_n(
         seglist_read_iter_t* read_iter,
