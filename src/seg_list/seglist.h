@@ -12,7 +12,6 @@ typedef struct {
 typedef void* seglist_seg_t;
 typedef void* seglist_read_iter_t;
 
-
 //
 void seglist_create(
         seglist_t* seglist,
@@ -28,8 +27,10 @@ void seglist_append(        // only operates on segment seg
 
 size_t seglist_append_n(    // only operates on segment seg
         seglist_seg_t* seg,
-        void* elem,
+        void* chunk,
         size_t n);
+
+size_t seglist_flush(seglist_seg_t* seg); // flushes a segment
 
 void seglist_create_read_iter(  // creates a read iterator for the entire list
         seglist_read_iter_t* read_iter,
@@ -40,7 +41,7 @@ void* seglist_get_next(
 
 size_t seglist_get_next_n(
         seglist_read_iter_t* read_iter,
-        void **start,
+        void *chunk,
         size_t n);
 
 #endif
