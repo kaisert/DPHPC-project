@@ -27,7 +27,7 @@ void sort_map(Map * map)
 	qsort(map->map, map->size, sizeof(KeyValuePair), (int (*)(const void*, const void*))compare_key_value_p);
 }
 
-uint32_t get_value(const Key const* key, const Map const * map)
+uint32_t get_value(const Key* key, const Map* map)
 {
 	int last = map->size - 1;
 	int first = 0;
