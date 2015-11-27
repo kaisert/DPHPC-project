@@ -11,6 +11,7 @@ typedef struct deflated_dts_struct {
     char*  end;
     char*  buf_end;
     char   compression_buffer[COMPRESSION_CACHE_SIZE * sizeof(token_t)];
+    compression_stream_t* compr_stream;
     struct deflated_dts_struct* next;
 } dts_t;
 
@@ -27,7 +28,7 @@ typedef struct dts_read_iter_struct {
  *
  */
 dts_t* dts_create_buffer(
-        dts_t* dts
+        dts_t* dts ///
         );
 
 
@@ -49,15 +50,15 @@ void dts_init_read_iter(  // creates a read iterator for the entire list
         );
 
 
-size_t dts_next_n(
-        dts_ri_t* read_iter,
-        token_t *chunk,
-        size_t n
+size_t dts_next_n( /// returns the number of tokens written to chunk
+        dts_ri_t* read_iter, /// read iterator
+        token_t *chunk,      /// chunk
+        size_t n             /// number of requested tokens
         );
 
 
-void dts_free(
-        dts_t* dts
+void dts_free( /// frees all resources
+        dts_t* dts /// pointer to tokenstream
         );
 
 #endif
