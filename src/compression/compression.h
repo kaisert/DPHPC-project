@@ -24,54 +24,47 @@
 typedef struct compression_stream_struct {
     // General API
     size_t in_available;
-    char* in;
+    uint8_t* in;
     size_t out_available;
-    char* out;
+    uint8_t* out;
     // Specific to implementation
     void* stream_state;
 } compression_stream_t;
 
 
-typedef void* (*compression_init_func_t) (compression_stream_t*);
-typedef int (*compression_func_t) (compression_stream_t*, bool);
-typedef void (*compression_free_func_t) (void*, bool) ;
+typedef int (*compression_init_func_t) (compression_stream_t*);
+typedef int (*compression_func_t) (compression_stream_t*, int);
+typedef void (*compression_end_func_t) (compression_stream_t*) ;
 
+typedef struct compression_api_struct {
+    compression_init_func_t compression_deflate_init;
+    compression_init_func_t compression_inflate_init;
+    compression_func_t compression_deflate;
+    compression_func_t compression_inflate;
+    compression_end_func_t compression_end_deflate;
+    compression_end_func_t compression_end_inflate;
+    unsigned long reserved;
+} compression_api_t;
 
 /*
- * All functions return code for state. Positive values indicate succes and
- * possibly and special state. Negative values indicate an error state.
+ * The compression_api_t is an abstract type which acts as an interface to
+ * conrete compression implementations. Hence, if you want to create a module
+ * which provides zlib compression function, you would create a function called
  *
- * For _init()-funtions, the user is responsible for the memory management of
- * the structure that is passed to the function.
+ * extern void compression_zlib_api(compression_api_t *compression_api);
+ *
+ * It is completely up to the provider of a concrete compression module how the
+ * abstract compression API is initialized.
+ *
+ * Example: Let the above function be the API construction for a zlib-module,
+ * then a user would initialize an deflate stream as follows:
+ *
+ * compression_api_t compression_api;
+ * compression_stream_t compression_stream;
+ *
+ * compression_zlib_api(&compr_api);
+ *
+ * compr_api.compression_deflate_init(&compression_stream);
  */
 
-extern int compression_inflate_init( /// initializes handle for inflation
-        compression_stream_t* compression_stream
-        );
-
-
-extern int compression_deflate_init( /// initializes handle for deflation
-        compression_stream_t* compression_stream
-        );
-
-
-extern int compression_deflate( /// returns error state
-        compression_stream_t* compr_stream,
-        int flags /// e.g., COMPR_FLUSH
-        );
-
-
-extern int compression_inflate(  /// returns error state
-        compression_stream_t* compr_stream,
-        int flags
-        );
-
-
-extern void compression_inflate_end( /// 
-        compression_stream_t* compr_stream
-        );
-
-extern void compression_deflate_end( /// 
-        compression_stream_t* compr_stream
-        );
 #endif
