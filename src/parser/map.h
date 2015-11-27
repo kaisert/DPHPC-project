@@ -22,7 +22,7 @@ typedef struct Map {
 } Map;
 
 extern Map * alloc_map(const char *path);
-extern uint32_t get_value(const Key const* key, const Map const * map);
+extern uint32_t get_value(const Key * key, const Map * map);
 extern void destroy_map(Map * map);
 extern void print_map(Map * map);
 
