@@ -13,7 +13,7 @@ void init_parser(Parser *prs, Map *map)
 
 Parser * alloc_parser(char * begin, char * end)
 {
-	Parser * prs = malloc(sizeof(Parser));
+	Parser * prs = static_cast<Parser*>(malloc(sizeof(Parser)));
 	init_lexer(prs, begin, end);
 	prs->remaining_token_exists = 0;
 	return prs;
@@ -52,7 +52,7 @@ int get_next_token(Parser * prs, Token * token)
 	Key k;
 	switch(tag.type)
 	{
-		case START_END_TAG:
+		case START_END_TAG: {
 			k.begin = tag.begin + 1;
 			k.end = tag.end_of_id;
 			uint32_t type = get_value(&k, &(prs->map));
@@ -60,18 +60,22 @@ int get_next_token(Parser * prs, Token * token)
 			prs->remaining_token.begin = tag.begin;
 			prs->remaining_token.end = tag.end;
 			prs->remaining_token_exists = 1;
-		case START_TAG:
+            }
+		case START_TAG: {
 			k.begin = tag.begin + 1;
 			k.end = tag.end_of_id;
 			token->type = get_value(&k, &(prs->map));
 			break;
-		case END_TAG:
+                            }
+		case END_TAG:{
 			k.begin = tag.begin + 2;
 			k.end = tag.end_of_id;
 			token->type = ~ (get_value(&k, &(prs->map)));
 			break;
-        case XML_DECLARATION:
+                     }
+        case XML_DECLARATION: {
             return -1;
+                              }
 	}
 	return 1;
 }

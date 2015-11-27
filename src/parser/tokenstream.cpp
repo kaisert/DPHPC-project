@@ -1,7 +1,7 @@
 #include"tokenstream.h"
 
 void create_tokenstream(Tokenstream *ts, uint32_t size) {
-	ts->begin = malloc(sizeof(Token) * size);
+	ts->begin = static_cast<Token*>(malloc(sizeof(Token) * size));
 	if(ts->begin == NULL) 
 	{
 		printf("Error, when allocating new tokenstream\n");

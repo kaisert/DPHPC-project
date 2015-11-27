@@ -49,13 +49,14 @@ int main(int argc, char* argv[]) {
     fstat(fd_xml, &f_xml_stat);
     xml_len = (off_t) f_xml_stat.st_size;
 
-    char* xml_buf =
+    char* xml_buf = static_cast<char*>(
     mmap(   NULL,                  // address
             xml_len,               // length
             PROT_READ,             // prot flags
             MAP_FILE | MAP_SHARED, // flags
             fd_xml,                // file decriptor
-            0);                    // offset in file
+            0)                     // offset in file
+    );
     if(xml_buf == MAP_FAILED) panic("mmap failed: ");
     
 

@@ -55,7 +55,7 @@ uint32_t get_value(const Key const* key, const Map const * map)
 
 Map * alloc_map(const char * path)
 {
-	Map * map = malloc(sizeof(Map));
+	Map * map = static_cast<Map*>(malloc(sizeof(Map)));
 	map->size = 0;
 	init_token_list(&map->token_list, path);
 	char * tokens = map->token_list.tokens;

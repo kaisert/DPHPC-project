@@ -21,7 +21,7 @@ void init_token_list(TokenList *token_list, const char * path)
 	size = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	token_list->tokens = malloc(sizeof(char) * size);
+	token_list->tokens = static_cast<char*>(malloc(sizeof(char) * size));
 	if(!token_list->tokens)
 	{
 	//	fputs ("Memory error");
