@@ -102,3 +102,14 @@ target/
 
 # idea stuff
 **/.idea/*
+
+# cmake stuff
+
+**/CMakeFiles/*
+CMakeCache.txt
+cmake_install.cmake
+src/Makefile
+
+# bin shit
+
+src/DPHPC15
