@@ -1,23 +1,23 @@
-CC = gcc
+CC = g++
 
-CFLAGS = -std=c99 -Wall -c -g 
+CFLAGS = -std=c++11 -Wall -c -g 
 
 all: parser.o lexer.o map.o token_list.o tokenstream.o
 
 parser.o:
-	$(CC) $(CFLAGS) parser.c
+	$(CC) $(CFLAGS) parser.cpp
 
 lexer.o:
-	$(CC) $(CFLAGS) lexer.c
+	$(CC) $(CFLAGS) lexer.cpp
 
 map.o:
-	$(CC) $(CFLAGS) map.c
+	$(CC) $(CFLAGS) map.cpp
 
 token_list.o:
-	$(CC) $(CFLAGS) token_list.c
+	$(CC) $(CFLAGS) token_list.cpp
 
 tokenstream.o:
-	$(CC) $(CFLAGS) tokenstream.c
+	$(CC) $(CFLAGS) tokenstream.cpp
 	
 clean:
 	$(RM) *.o
