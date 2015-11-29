@@ -99,3 +99,6 @@ target/
 
 **/*_local/*
 *_local.*
+
+# idea stuff
+**/.idea/*
