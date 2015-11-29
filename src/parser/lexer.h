@@ -24,7 +24,7 @@ typedef struct Lexer {
 	char * end;
 } Lexer;
 
-extern int get_next_tag(Lexer * const lxr, Tag * tag);
+extern int get_next_tag(Lexer * lxr, Tag * tag);
 
 
 #endif

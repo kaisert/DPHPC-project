@@ -1,30 +1,31 @@
 #include"parser.h"
 
-void init_lexer(Parser *prs, char * begin, char *end)
+void init_lexer(Lexer &lxr, char * begin, char *end)
 {
-	prs->lxr.begin = begin;
-	prs->lxr.end = end;
+	lxr.begin = begin;
+	lxr.end = end;
 }
 
-void init_parser(Parser *prs, Map *map)
+Parser::Parser(char * begin, char * end, Map * map)
+    :map(map)
 {
-	prs->map = *map;
+    init_lexer(lxr, begin, end);
 }
 
-Parser * alloc_parser(char * begin, char * end)
+/*Parser * alloc_parser(char * begin, char * end)
 {
 	Parser * prs = static_cast<Parser*>(malloc(sizeof(Parser)));
 	init_lexer(prs, begin, end);
 	prs->remaining_token_exists = 0;
 	return prs;
-}
+}*/
 
-void destroy_parser(Parser * prs)
+/*void destroy_parser(Parser * prs)
 {
 	free(prs);
-}
+}*/
 
-int get_next_token(Parser * prs, Token * token)
+/*int get_next_token(Parser * prs, Token * token)
 {
 	if(prs == NULL)
 		return -1;
@@ -78,4 +79,4 @@ int get_next_token(Parser * prs, Token * token)
                               }
 	}
 	return 1;
-}
+}*/

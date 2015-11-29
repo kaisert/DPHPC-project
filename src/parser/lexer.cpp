@@ -42,7 +42,7 @@ void lex_arguments(Lexer * const lxr)
 		lxr->begin++;
 }
 
-int get_next_tag(Lexer * const lxr, Tag * tag)
+int get_next_tag(Lexer * lxr, Tag * tag)
 {
 	if(lxr == NULL)
 		return -1;
