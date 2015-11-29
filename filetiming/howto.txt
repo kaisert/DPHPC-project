@@ -1,8 +1,8 @@
 Local compilation:
-g++ -g -std=c99 -fopenmp -Wall -pedantic timing.c tictoc.c -o timing.o
+g++ -g -std=c++11 -fopenmp -Wall -pedantic timing.cpp tictoc.cpp -o timing.o
 
 Xeon Phi compilation and run:
-icc -std=c99 -mmic -fopenmp timing.c tictoc.c -o timing.o
+icc -std=c++11 -mmic -fopenmp tictoc.cpp timing.cpp -o timing.o
 sbatch ./test.sh 
 
 
