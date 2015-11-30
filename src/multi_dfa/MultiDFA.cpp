@@ -3,7 +3,6 @@
 //
 
 #include "MultiDFA.h"
-#include<iostream>
 
 using namespace std;
 

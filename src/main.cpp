@@ -152,7 +152,7 @@ int main(int argc, char* argv[]) {
             char* buf_offset = offset_streams[match->chunk_index][match->token_index];
             uint64_t file_offset = reinterpret_cast<uint64_t>(buf_offset)
                     - reinterpret_cast<uint64_t>(xml_buf);
-            of_results << query << ", " << (match->token_type < 0 ? "c" : "o") << ", " << file_offset << endl;
+            of_results << query << ", " << file_offset << ", " << (match->token_type < 0 ? "c" : "o") << endl;
         }
     }
 
