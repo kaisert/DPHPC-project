@@ -32,7 +32,8 @@ public:
         strm.zalloc = Z_NULL;
         strm.zfree = Z_NULL;
         strm.opaque = Z_NULL;
-        //int ret = deflateInit(&strm, /* level */ 5);
+        //int ret = 
+        deflateInit(&strm, /* level */ 5);
         //if (ret != Z_OK)
         //    printf("WARNING: initialization of zlib stream failed.\n");
     }
