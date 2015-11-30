@@ -9,12 +9,10 @@ using namespace std;
 
 MultiDFA::MultiDFA(string &fname) {
     ifstream is_dfas(fname);
-    cout << fname << endl;
     int no_dfas, alphabet_size, dfa_size, q_start, q;
 
     is_dfas >> no_dfas >> alphabet_size;
 
-    cout << no_dfas << " " << alphabet_size << endl;
     for(int i = 0; i < no_dfas; ++i) {
         is_dfas >> dfa_size >> q_start;
 
@@ -28,11 +26,6 @@ MultiDFA::MultiDFA(string &fname) {
             is_dfas >> q;
             dfa->_state_table[j] = static_cast<state_t>(q);
         }
-        cout << "begin state table: " << endl;
-        for(auto k = dfa->_state_table.begin(); k != dfa->_state_table.end(); ++k) {
-            cout << *k << endl;
-        }
-        cout << "end of state tabel: " << endl;
     }
 }
 

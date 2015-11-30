@@ -5,6 +5,7 @@
 #endif
 
 #include<iostream>
+#include<fstream>
 
 #include<fcntl.h>
 #include<unistd.h>
@@ -16,10 +17,17 @@
 #include"chunker/bufsplit.h"
 
 #include"multi_dfa/MultiDFA.h"
+#include "timing/GlobalTicToc.h"
 
 #define STACK_SIZE 256
 
 using namespace std;
+
+struct Match {
+    token_type_t token_type;
+    uint32_t chunk_index;
+    uint32_t token_index;
+};
 
 #define panic(msg) \
   do { perror(msg); exit(EXIT_FAILURE); } while (0)
@@ -37,16 +45,16 @@ int main(int argc, char* argv[]) {
     struct stat f_xml_stat;
     off_t xml_len;
 
+    GlobalTicToc globalTicToc;
+
     // init mdfa
     string fname_dfas = string(ARG_DFA);
     MultiDFA multiDFA(fname_dfas);
 
-    cout << "mapping file..." << endl;
     fd_xml = open(ARG_XML, O_RDWR);
     if(fd_xml < 0) panic("could not open xml file.");
     fstat(fd_xml, &f_xml_stat);
     xml_len = (off_t) f_xml_stat.st_size;
-
 
 
     char* xml_buf = static_cast<char*>(
@@ -76,6 +84,7 @@ int main(int argc, char* argv[]) {
 
     // tokenize
     Map * map = alloc_map(ARG_TOKENS);
+    globalTicToc.start_phase();
 #pragma omp parallel num_threads(n_threads) firstprivate(map, chunks, token_stream)
     {
         int tid;
@@ -92,82 +101,68 @@ int main(int argc, char* argv[]) {
         auto backiter_off = back_inserter(offset_streams.at(tid));
         parser.parse(backiter_ts, backiter_off);
     }
-
+    globalTicToc.stop_phase("tokenizer");
     destroy_map(map);
 
-    vector<vector<uint64_t > > matching_offsets(n_threads);
+    vector<vector<Match> > matches(n_threads);
     // run dfas
     // start measurements
+    globalTicToc.start_phase();
 #pragma omp parallel num_threads(n_threads) firstprivate(token_stream, multi_dfa)
     {
         int tid = omp_get_thread_num() % n_threads;
         MultiDFA::DFA* dfa = multiDFA.get_dfa(tid);
         MultiDFA::state_t q_cur = dfa->start_state();
 
-        auto my_matches = matching_offsets.at(tid);
+        auto my_matches = matches.at(tid);
 
-        // allocate stack
-        uint64_t cur_match_off = 0;
+        // allocate/initialize stack
         int stack_pos = 0;
-
         MultiDFA::state_t dfa_stack[STACK_SIZE];
         dfa_stack[stack_pos] = q_cur;
 
-        for(auto ts_i = token_streams.begin(); ts_i != token_streams.end(); ++ts_i) {
-            auto t_end = ts_i->end();
-            for(auto t_i = ts_i->begin(); t_i != t_end; ++t_i) {
-                if(*t_i < 0) {
-                    if(stack_pos > 0) {
-                        if(((int) dfa_stack[stack_pos]) < 0) {
-                            my_matches.push_back(cur_match_off);
+        for(uint32_t i = 0; i != token_streams.size(); ++i) {
+            vector<token_type_t> cur_stream = token_streams[i];
+            for (uint32_t j = 0; j != cur_stream.size(); ++j) {
+                token_type_t cur_token = cur_stream[j];
+                if (cur_token < 0) {
+                    if (stack_pos > 0) {
+                        if (((int) dfa_stack[stack_pos]) < 0) {
+                            my_matches.push_back(Match {cur_token, i, j});
                         }
                         stack_pos--;
                     }
-                } else if(*t_i > 0) {
-                    dfa_stack[stack_pos+1] = (*dfa)(dfa_stack[stack_pos], *t_i);
+                } else if (cur_token > 0) {
+                    dfa_stack[stack_pos + 1] = (*dfa)(dfa_stack[stack_pos], cur_token);
                     stack_pos++;
-                    if(dfa_stack[stack_pos] < 0) {
-                        my_matches.push_back(cur_match_off);
+                    if (dfa_stack[stack_pos] < 0) {
+                        my_matches.push_back(Match {cur_token, i, j});
                     }
                 }
-                cur_match_off++;
             }
         }
+        matches[tid] = my_matches;
     }
+    globalTicToc.stop_phase("matcher");
 
-    /*
-    for(auto query = matching_offsets.begin(); query != matching_offsets.end();
-        ++query) {
-        for(auto match = query->begin(); match != query->end(); ++match) {
-            cout << "match at" <<
-                    reinterpret_cast<uint64_t >((*match - xml_buf)) << endl;
+    ofstream of_results(ARG_OUTPUT);
+
+    for(uint32_t query = 0; query != matches.size(); ++query) {
+        for(auto match = matches[query].begin(); match != matches[query].end(); ++match) {
+            char* buf_offset = offset_streams[match->chunk_index][match->token_index];
+            uint64_t file_offset = reinterpret_cast<uint64_t>(buf_offset)
+                    - reinterpret_cast<uint64_t>(xml_buf);
+            of_results << query << ", " << (match->token_type < 0 ? "c" : "o") << ", " << file_offset << endl;
         }
-    }*/
-
-    // stop measurements
-
-    // output result
-    /*
-    FILE* f_output = fopen(argv[4], "w");
-    if(!f_output) {
-        perror("could not open output file.");
     }
 
-    Tokenstream* ts_iter = token_stream[0];
-    while(ts_iter != NULL) {
-        Token* t = ts_iter->begin;
-        while(t != ts_iter->end) {
-            fprintf(f_output, "%ld, %ld\n", t->begin, t->end);
-            t++;
-        }
-
-        ts_iter = ts_iter->next;
+    cout << "Timing summary:" << endl;
+    for(auto phase = globalTicToc.begin(); phase != globalTicToc.end(); ++phase) {
+        cout << phase->first << ": " << globalTicToc.get_phase_period<chrono::milliseconds>(phase->first) <<
+                " ms" << endl;
     }
-    */
+    cout << "Total Time: " << globalTicToc.get_total_time<chrono::milliseconds>() << " ms" << endl;
 
     close(fd_xml);
     munmap(xml_buf, xml_len);
-    // fclose(f_output);
-    // destroy tokenstream
-    // tobias will write a function
 }
