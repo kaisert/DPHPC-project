@@ -69,6 +69,7 @@ int main(int argc, char* argv[]) {
 
 
     n_threads = multiDFA.size();
+    cout << "n_threads: " << n_threads << endl;
 
     // chunk xml stream
     char* chunks[n_threads+1];
@@ -85,13 +86,14 @@ int main(int argc, char* argv[]) {
     // tokenize
     Map * map = alloc_map(ARG_TOKENS);
     globalTicToc.start_phase();
-#pragma omp parallel num_threads(n_threads) firstprivate(map, chunks, token_stream)
+#pragma omp parallel num_threads(n_threads) firstprivate(map, chunks, token_streams)
     {
         int tid;
         char * chunk_begin, * chunk_end;
 
 
         tid = omp_get_thread_num() % n_threads;
+        cout << "tid: " << tid << endl;
         chunk_begin = chunks[tid];
         chunk_end = chunks[tid + 1];
 
@@ -104,17 +106,19 @@ int main(int argc, char* argv[]) {
     globalTicToc.stop_phase("tokenizer");
     destroy_map(map);
 
+    cout << "got this far " << endl;
+
     vector<vector<Match> > matches(n_threads);
     // run dfas
     // start measurements
     globalTicToc.start_phase();
-#pragma omp parallel num_threads(n_threads) firstprivate(token_stream, multi_dfa)
+#pragma omp parallel num_threads(n_threads) firstprivate(token_streams, multiDFA)
     {
         int tid = omp_get_thread_num() % n_threads;
         MultiDFA::DFA* dfa = multiDFA.get_dfa(tid);
         MultiDFA::state_t q_cur = dfa->start_state();
 
-        auto my_matches = matches.at(tid);
+        auto& my_matches = matches.at(tid);
 
         // allocate/initialize stack
         int stack_pos = 0;
@@ -122,7 +126,7 @@ int main(int argc, char* argv[]) {
         dfa_stack[stack_pos] = q_cur;
 
         for(uint32_t i = 0; i != token_streams.size(); ++i) {
-            vector<token_type_t> cur_stream = token_streams[i];
+            vector<token_type_t> &cur_stream = token_streams[i];
             for (uint32_t j = 0; j != cur_stream.size(); ++j) {
                 token_type_t cur_token = cur_stream[j];
                 if (cur_token < 0) {
@@ -141,9 +145,11 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
-        matches[tid] = my_matches;
-    }
+        //matches[tid] = my_matches;
+    } // matcher
     globalTicToc.stop_phase("matcher");
+
+
 
     ofstream of_results(ARG_OUTPUT);
 
