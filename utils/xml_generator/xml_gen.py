@@ -78,7 +78,6 @@ class XMLFile(object):
 
     def append_meta_structure(self, meta_struct):
         subtrees = map(lambda x: (x[0], x[1]()), meta_struct)
-        print subtrees
         for subtree in subtrees:
             tag = subtree[1]
             # 2 is the min level for arbitrary subtrees
@@ -95,7 +94,6 @@ class XMLFile(object):
         s += fmt.format(*args)
         self.f.write(s)
         self.size += len(s)
-        print("wrote: {0} filesize: {1}".format(s, self.size))
         return tag_offset
 
 
@@ -106,10 +104,8 @@ class XMLFile(object):
     def add_query_match(self, tag, offset, typ):
         query = self.get_query(tag)
         if query in self.query_set:
-            print("match for query ", query, "at ", self.size)
             self.query_set[query].append( (offset, typ) )
         else:
-            print("match for query ", query, "at ", self.size)
             self.query_set[query] = [ (offset, typ) ]
 
 
