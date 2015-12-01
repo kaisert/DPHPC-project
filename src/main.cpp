@@ -26,7 +26,7 @@
 
 #define STACK_SIZE 256
 
-#define STREAM_RESERVE_MEMORY 1<<25
+#define STREAM_RESERVE_MEMORY 1<<22
 
 using namespace std;
 
