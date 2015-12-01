@@ -15,6 +15,7 @@
 #include<unistd.h>
 #include<sys/stat.h>
 #include<sys/mman.h>
+#include <thread>
 
 #include"parser/token_list.h"
 #include"parser/parser.h"
@@ -24,6 +25,8 @@
 #include "timing/GlobalTicToc.h"
 
 #define STACK_SIZE 256
+
+#define STREAM_RESERVE_MEMORY 1<<25
 
 using namespace std;
 
@@ -52,6 +55,10 @@ int main(int argc, char* argv[]) {
 
     GlobalTicToc globalTicToc;
 
+    globalTicToc.start_phase();
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    globalTicToc.stop_phase("00. calibration ;-)");
+
     // init mdfa
     string fname_dfas = string(ARG_DFA);
     MultiDFA multiDFA(fname_dfas);
@@ -71,7 +78,7 @@ int main(int argc, char* argv[]) {
                     0)                     // offset in file
     );
     if(xml_buf == MAP_FAILED) panic("mmap failed: ");
-    globalTicToc.stop_phase("mmap");
+    globalTicToc.stop_phase("01. mmap");
 
     n_threads = omp_get_max_threads();
 
@@ -81,7 +88,7 @@ int main(int argc, char* argv[]) {
     // chunk xml stream
     char* chunks[n_threads+1];
     no_chunks = bufsplit_split_xml_stream(xml_buf, xml_len, n_threads, chunks);
-    globalTicToc.stop_phase("chunking");
+    globalTicToc.stop_phase("02. chunking");
 
     // printf("%d\n", no_chunks);
     // we want at least as many (meaningful) chunks as threads
@@ -91,14 +98,14 @@ int main(int argc, char* argv[]) {
     vector<vector<token_type_t> > token_streams(n_threads);
     for(auto ts_iter = token_streams.begin(); ts_iter != token_streams.end();
             ++ts_iter) {
-        ts_iter->reserve(1<<21);
+        ts_iter->reserve(STREAM_RESERVE_MEMORY);
     }
 
     // initialize offset stream
     vector<vector<char*> > offset_streams(n_threads);
     for(auto of_iter = offset_streams.begin(); of_iter != offset_streams.end();
             ++of_iter) {
-        of_iter->reserve(1<<21);
+        of_iter->reserve(STREAM_RESERVE_MEMORY);
     }
 
     // tokenize
@@ -120,7 +127,7 @@ int main(int argc, char* argv[]) {
         auto backiter_off = back_inserter(offset_streams.at(tid));
         parser.parse(backiter_ts, backiter_off);
     }
-    globalTicToc.stop_phase("tokenizer");
+    globalTicToc.stop_phase("03. tokenizer");
     destroy_map(map);
 
     n_threads = multiDFA.size();
@@ -128,8 +135,16 @@ int main(int argc, char* argv[]) {
     // initialize memory for matches
     vector<vector<Match> > matches(n_threads);
     for(auto it_match = matches.begin(); it_match != matches.end(); ++it_match) {
-        it_match->reserve(1<<21);
+        it_match->reserve(STREAM_RESERVE_MEMORY);
     }
+
+    // count #tokens
+    uint64_t no_tokens = 0;
+    for(auto ts_iter = token_streams.begin(); ts_iter != token_streams.end(); ++ts_iter) {
+        no_tokens += ts_iter->size();
+    }
+
+    cout << "#tokens: " << no_tokens << " (total)";
 
     // run dfas
     // start measurements
@@ -169,7 +184,7 @@ int main(int argc, char* argv[]) {
         }
         //matches[tid] = my_matches;
     } // matcher
-    globalTicToc.stop_phase("matcher");
+    globalTicToc.stop_phase("04. matcher");
 
     if(argc > 4) {
         ofstream of_results(ARG_OUTPUT);
