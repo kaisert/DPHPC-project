@@ -89,7 +89,17 @@ int main(int argc, char* argv[]) {
 
     // initialize token stream
     vector<vector<token_type_t> > token_streams(n_threads);
+    for(auto ts_iter = token_streams.begin(); ts_iter != token_streams.end();
+            ++ts_iter) {
+        ts_iter->reserve(1<<21);
+    }
+
+    // initialize offset stream
     vector<vector<char*> > offset_streams(n_threads);
+    for(auto of_iter = offset_streams.begin(); of_iter != offset_streams.end();
+            ++of_iter) {
+        of_iter->reserve(1<<21);
+    }
 
     // tokenize
     Map * map = alloc_map(ARG_TOKENS);
@@ -114,7 +124,13 @@ int main(int argc, char* argv[]) {
     destroy_map(map);
 
     n_threads = multiDFA.size();
+
+    // initialize memory for matches
     vector<vector<Match> > matches(n_threads);
+    for(auto it_match = matches.begin(); it_match != matches.end(); ++it_match) {
+        it_match->reserve(1<<21);
+    }
+
     // run dfas
     // start measurements
     globalTicToc.start_phase();
