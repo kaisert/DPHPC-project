@@ -75,6 +75,8 @@ int main(int argc, char* argv[]) {
 
     n_threads = omp_get_num_threads();
 
+    cout << "#threads: " << n_threads << endl;
+
     // chunk xml stream
     char* chunks[n_threads+1];
     no_chunks = bufsplit_split_xml_stream(xml_buf, xml_len, n_threads, chunks);
