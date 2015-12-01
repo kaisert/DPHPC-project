@@ -36,7 +36,8 @@ struct Match {
  * ./a.out <xml> <tokens> <dfa> <output_file>
  */
 int main(int argc, char* argv[]) {
-    if(argc < 5) panic("not enough parameters to main().");
+    if(argc < 5) panic("not enough parameters to main(): \
+<XML> <TOKENS> <MDFA> <OUTPUT_LOGFILE>");
 #define ARG_XML argv[1]
 #define ARG_TOKENS argv[2]
 #define ARG_DFA argv[3]
@@ -61,7 +62,7 @@ int main(int argc, char* argv[]) {
             mmap(   NULL,                  // address
                     xml_len,               // length
                     PROT_READ,             // prot flags
-                    MAP_FILE | MAP_SHARED, // flags
+                    MAP_PRIVATE | MAP_POPULATE, // flags
                     fd_xml,                // file decriptor
                     0)                     // offset in file
     );
