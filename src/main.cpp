@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
     GlobalTicToc globalTicToc;
 
     globalTicToc.start_phase();
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    usleep(1000000);
     globalTicToc.stop_phase("00. calibration ;-)");
 
     // init mdfa
