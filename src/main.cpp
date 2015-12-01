@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
     if(xml_buf == MAP_FAILED) panic("mmap failed: ");
     globalTicToc.stop_phase("mmap");
 
-    n_threads = omp_get_num_threads();
+    n_threads = omp_get_max_threads();
 
     cout << "#threads: " << n_threads << endl;
 
