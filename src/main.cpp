@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
     if(xml_buf == MAP_FAILED) panic("mmap failed: ");
 
 
-    n_threads = multiDFA.size();
+    n_threads = omp_get_num_threads();
 
     // chunk xml stream
     char* chunks[n_threads+1];
@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
     globalTicToc.stop_phase("tokenizer");
     destroy_map(map);
 
-
+    n_threads = multiDFA.size();
     vector<vector<Match> > matches(n_threads);
     // run dfas
     // start measurements
