@@ -199,7 +199,9 @@ int main(int argc, char* argv[]) {
             }
         }
     }
-    globalTicToc.stop_phase("write back");
+    globalTicToc.stop_phase("05. write back");
+
+    cout << "XML-File: " << ARG_XML << endl;
 
     cout << "Timing summary:" << endl;
     for(auto phase = globalTicToc.begin(); phase != globalTicToc.end(); ++phase) {
