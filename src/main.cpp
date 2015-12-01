@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
     fstat(fd_xml, &f_xml_stat);
     xml_len = (off_t) f_xml_stat.st_size;
 
-
+    globalTicToc.start_phase();
     char* xml_buf = static_cast<char*>(
             mmap(   NULL,                  // address
                     xml_len,               // length
@@ -71,15 +71,17 @@ int main(int argc, char* argv[]) {
                     0)                     // offset in file
     );
     if(xml_buf == MAP_FAILED) panic("mmap failed: ");
-
+    globalTicToc.stop_phase("mmap");
 
     n_threads = omp_get_num_threads();
 
     cout << "#threads: " << n_threads << endl;
 
+    globalTicToc.start_phase();
     // chunk xml stream
     char* chunks[n_threads+1];
     no_chunks = bufsplit_split_xml_stream(xml_buf, xml_len, n_threads, chunks);
+    globalTicToc.stop_phase("chunking");
 
     // printf("%d\n", no_chunks);
     // we want at least as many (meaningful) chunks as threads
