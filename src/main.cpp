@@ -144,7 +144,7 @@ int main(int argc, char* argv[]) {
         no_tokens += ts_iter->size();
     }
 
-    cout << "#tokens: " << no_tokens << " (total)";
+    cout << "#tokens: " << no_tokens << " (total)" << endl;
 
     // run dfas
     // start measurements
@@ -186,6 +186,7 @@ int main(int argc, char* argv[]) {
     } // matcher
     globalTicToc.stop_phase("04. matcher");
 
+    globalTicToc.start_phase();
     if(argc > 4) {
         ofstream of_results(ARG_OUTPUT);
 
@@ -198,6 +199,7 @@ int main(int argc, char* argv[]) {
             }
         }
     }
+    globalTicToc.stop_phase("write back");
 
     cout << "Timing summary:" << endl;
     for(auto phase = globalTicToc.begin(); phase != globalTicToc.end(); ++phase) {
