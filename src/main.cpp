@@ -40,8 +40,8 @@ struct Match {
  * ./a.out <xml> <tokens> <dfa> <output_file>
  */
 int main(int argc, char* argv[]) {
-    if(argc < 5) panic("not enough parameters to main(): \
-<XML> <TOKENS> <MDFA> <OUTPUT_LOGFILE>");
+    if(argc < 4) panic("not enough parameters to main(): \
+<XML> <TOKENS> <MDFA> [<OUTPUT_LOGFILE>]");
 #define ARG_XML argv[1]
 #define ARG_TOKENS argv[2]
 #define ARG_DFA argv[3]
@@ -151,16 +151,16 @@ int main(int argc, char* argv[]) {
     } // matcher
     globalTicToc.stop_phase("matcher");
 
+    if(argc > 4) {
+        ofstream of_results(ARG_OUTPUT);
 
-
-    ofstream of_results(ARG_OUTPUT);
-
-    for(uint32_t query = 0; query != matches.size(); ++query) {
-        for(auto match = matches[query].begin(); match != matches[query].end(); ++match) {
-            char* buf_offset = offset_streams[match->chunk_index][match->token_index];
-            uint64_t file_offset = reinterpret_cast<uint64_t>(buf_offset)
-                    - reinterpret_cast<uint64_t>(xml_buf);
-            of_results << query << ", " << file_offset << ", " << (match->token_type < 0 ? "c" : "o") << endl;
+        for (uint32_t query = 0; query != matches.size(); ++query) {
+            for (auto match = matches[query].begin(); match != matches[query].end(); ++match) {
+                char *buf_offset = offset_streams[match->chunk_index][match->token_index];
+                uint64_t file_offset = reinterpret_cast<uint64_t>(buf_offset)
+                                       - reinterpret_cast<uint64_t>(xml_buf);
+                of_results << query << ", " << file_offset << ", " << (match->token_type < 0 ? "c" : "o") << endl;
+            }
         }
     }
 
