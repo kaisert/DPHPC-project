@@ -7,6 +7,10 @@
 #include<iostream>
 #include<fstream>
 
+#ifdef __APPLE__
+#define MAP_POPULATE 0
+#endif
+
 #include<fcntl.h>
 #include<unistd.h>
 #include<sys/stat.h>
@@ -70,7 +74,6 @@ int main(int argc, char* argv[]) {
 
 
     n_threads = multiDFA.size();
-    cout << "n_threads: " << n_threads << endl;
 
     // chunk xml stream
     char* chunks[n_threads+1];
@@ -87,14 +90,13 @@ int main(int argc, char* argv[]) {
     // tokenize
     Map * map = alloc_map(ARG_TOKENS);
     globalTicToc.start_phase();
-#pragma omp parallel num_threads(n_threads) firstprivate(map, chunks, token_streams)
+#pragma omp parallel num_threads(n_threads) shared(map, chunks, token_streams)
     {
         int tid;
         char * chunk_begin, * chunk_end;
 
 
         tid = omp_get_thread_num() % n_threads;
-        cout << "tid: " << tid << endl;
         chunk_begin = chunks[tid];
         chunk_end = chunks[tid + 1];
 
@@ -107,13 +109,12 @@ int main(int argc, char* argv[]) {
     globalTicToc.stop_phase("tokenizer");
     destroy_map(map);
 
-    cout << "got this far " << endl;
 
     vector<vector<Match> > matches(n_threads);
     // run dfas
     // start measurements
     globalTicToc.start_phase();
-#pragma omp parallel num_threads(n_threads) firstprivate(token_streams, multiDFA)
+#pragma omp parallel num_threads(n_threads) shared(multiDFA, matches, token_streams)
     {
         int tid = omp_get_thread_num() % n_threads;
         MultiDFA::DFA* dfa = multiDFA.get_dfa(tid);
