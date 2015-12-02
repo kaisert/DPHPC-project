@@ -1,33 +1,30 @@
-//
-// Created by Stefan Dietiker on 29/11/15.
-//
-
 #ifndef DPHPC15_SURPRESSCLOSINGDEFLATOR_H
 #define DPHPC15_SURPRESSCLOSINGDEFLATOR_H
-
-#define MAX_TOKEN_CMPR 15
-#define NULL_TOKEN 0x0000
 
 #include <memory>
 #include <vector>
 #include "../parser/token_list.h"
+#include "BitmaskUtils.h"
 
 #include<iostream>
 
-template<typename iter>
+#define NULL_TOKEN 0x0
+
+template<typename iter, typename bitmask_t, typename cmpr_token_t>
 class SurpressClosingVSizeDeflator {
 public:
-    SurpressClosingVSizeDeflator(int k_token_count, iter it)
-    : out_iterator(it),
-    current_cmpr_token_count(0),
-    k_token_count(k_token_count),
-    token_size(0),
-    current_bit_off(15)
+    SurpressClosingVSizeDeflator(int k_token_count, iter &it)
+        : current_cmpr_token_count(0),
+        token_size(0),
+        current_bitmask_os(BIT_SIZE(bitmask_t) - 1),
+        current_bitmask(0),
+        remaining_token(0),
+        remaining_token_os(BIT_SIZE(cmpr_token_t)),
+        out_iterator(it)
     {
-        int i = k_token_count;
-        while(i >>= 1) token_size++;
+        int i = k_token_count + 1;
+        do{token_size++;} while(i >>= 1);
     }
-
 
     using Token_Type = std::allocator<token_type_t>;
     typedef Token_Type allocator_type;
@@ -44,90 +41,56 @@ public:
 
     void flush()
     {
-        set_bit(&current_bitmask, MAX_TOKEN_CMPR - current_cmpr_token_count);
-        *out_iterator++ = current_bitmask;
-        uint16_t new_push_back = 0;
-        bool new_token_exists = write_token_to_uint16(0x000, &current_push_back,
-                &new_push_back);
-        compressed_tokens.push_back(current_push_back);
-        if(new_token_exists) {
-            compressed_tokens.push_back(new_push_back);
-        }
-        push_back_cmpr_tokens();
+        set_bit(&current_bitmask, BIT_SIZE(bitmask_t) -1 - current_cmpr_token_count);
+        compressed_tokens.push_back(NULL_TOKEN);
+        push_back_tokens(current_bitmask,
+                compressed_tokens,
+                out_iterator,
+                token_size,
+                &remaining_token,
+                &remaining_token_os);
+        *out_iterator++ = remaining_token;
     }
 
     SurpressClosingVSizeDeflator& operator=(token_type_t t)
     {
-        std::cerr << std::hex << t << "\n"; 
-        if(current_cmpr_token_count == MAX_TOKEN_CMPR)
+        if(current_cmpr_token_count == BIT_SIZE(bitmask_t) -1)
         {
-            *out_iterator++ = current_bitmask;
-            push_back_cmpr_tokens();
+            push_back_tokens(current_bitmask, 
+                    compressed_tokens,
+                    out_iterator,
+                    token_size,
+                    &remaining_token,
+                    &remaining_token_os);
             current_cmpr_token_count = 0;
+            compressed_tokens.erase(compressed_tokens.begin(), 
+                    compressed_tokens.end());
         }
         if(t < 0)
         {       
-            unset_bit(&current_bitmask, MAX_TOKEN_CMPR - current_cmpr_token_count);
+            unset_bit(&current_bitmask, 
+                    BIT_SIZE(bitmask_t) -1  - current_cmpr_token_count);
         } else {
-            set_bit(&current_bitmask, MAX_TOKEN_CMPR - current_cmpr_token_count);
-            uint16_t new_push_back = 0;
-            if(write_token_to_uint16(t, &current_push_back, &new_push_back))
-            {
-               compressed_tokens.push_back(current_push_back);
-               current_push_back = new_push_back;
-            }
+            set_bit(&current_bitmask, 
+                    BIT_SIZE(bitmask_t) -1 - current_cmpr_token_count);
+            compressed_tokens.push_back(t);
         }
         current_cmpr_token_count++;
         return *this;
     }
+
 private:
+    int current_cmpr_token_count; //number of token that are compressed but not
+                                  //yet flushed
+    int token_size; //size of the compressed tokens
+    int16_t current_bitmask_os; //current bit offset of bitmask
+    bitmask_t current_bitmask; //current bitmask for (opening/closing)
+    cmpr_token_t remaining_token;
+    int16_t remaining_token_os;
+
+
     iter out_iterator;
-    int current_cmpr_token_count, k_token_count, token_size, current_bit_off;
-    uint16_t current_bitmask, current_push_back;
     std::vector<token_type_t> compressed_tokens;
-
-    void push_back_cmpr_tokens()
-    {
-        for(std::vector<token_type_t>::iterator curr = compressed_tokens.begin();
-                curr != compressed_tokens.end(); ++curr) 
-        {
-            *out_iterator++ = *curr;
-        }
-        compressed_tokens.erase(compressed_tokens.begin(), compressed_tokens.end());
-    }
-
-    inline void set_bit(uint16_t *word, uint8_t bit)
-    {
-        uint16_t mask = 0x0001 << bit;
-        *word |= mask;
-    }
-
-    inline void unset_bit(uint16_t *word, uint8_t bit)
-    {
-        uint16_t mask = ~ (0x0001 << bit);
-        *word &= mask;
-    }
-
-    inline bool write_token_to_uint16(uint16_t token, uint16_t *out1, uint16_t *out2)
-    {
-        if(current_bit_off - token_size < 0)
-        {
-            uint16_t mask2 = ~(0x8000 >> (15 - (token_size - current_bit_off)));
-            uint16_t part1 = token >> (token_size - current_bit_off);
-            uint16_t part2 = (token & mask2) << (15 - (token_size - current_bit_off));
-            *out1 |= part1;
-            *out2 = part2;
-            current_bit_off = 15 - (token_size - current_bitmask);
-            std::cerr << "blubb";
-            return true;
-        } else {
-            current_bit_off -= token_size;
-            *out1 |= token << (current_bit_off);
-            std::cerr << "out: " << std::hex << "0x" << *out1 << "\n";
-            return false;
-        }
-    }
 };
-
 
 #endif //DPHPC15_SURPRESSCLOSINGDEFLATOR_H
