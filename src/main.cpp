@@ -27,7 +27,8 @@
 
 #define STACK_SIZE 256
 
-#define MB (1 << 20)
+#define MB ((unsigned long long) (1 << 20))
+#define DEFAULT_CHUNK_SIZE 8*MB
 #define STREAM_RESERVE_MEMORY (MB)
 
 using namespace std;
@@ -90,7 +91,8 @@ int main(int argc, char* argv[]) {
     // ############ CHUNKING
     globalTicToc.start_phase();
     // chunk xml stream
-    Chunker chunker(xml_buf, xml_len, 8*MB);
+    size_t chunk_size = min(xml_len / n_threads, DEFAULT_CHUNK_SIZE);
+    Chunker chunker(xml_buf, xml_len, chunk_size);
     no_chunks = chunker.no_chunks();
     globalTicToc.stop_phase("02. chunking");
     // ############
@@ -100,14 +102,14 @@ int main(int argc, char* argv[]) {
     if(no_chunks < n_threads) panic("your xml is too small!");
 
     // initialize token stream
-    vector<vector<token_type_t> > token_streams(n_threads);
+    vector<vector<token_type_t> > token_streams(no_chunks);
     for(auto ts_iter = token_streams.begin(); ts_iter != token_streams.end();
             ++ts_iter) {
         ts_iter->reserve(STREAM_RESERVE_MEMORY);
     }
 
     // initialize offset stream
-    vector<vector<char*> > offset_streams(n_threads);
+    vector<vector<char*> > offset_streams(no_chunks);
     for(auto of_iter = offset_streams.begin(); of_iter != offset_streams.end();
             ++of_iter) {
         of_iter->reserve(STREAM_RESERVE_MEMORY);
@@ -132,8 +134,8 @@ int main(int argc, char* argv[]) {
 
             Parser parser(chunk_begin, chunk_end, map);
 
-            auto backiter_ts = back_inserter(token_streams.at(tid));
-            auto backiter_off = back_inserter(offset_streams.at(tid));
+            auto backiter_ts = back_inserter(token_streams.at(chunk_offset + tid));
+            auto backiter_off = back_inserter(offset_streams.at(chunk_offset + tid));
             parser.parse(backiter_ts, backiter_off);
         }
 
