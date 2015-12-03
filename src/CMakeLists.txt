@@ -10,5 +10,5 @@ set(SOURCE_FILES main.cpp compression/SurpressClosingDeflator.cpp compression/Su
         parser/parser.cpp
         chunker/bufsplit.h chunker/bufsplit.cpp
         timing/GlobalTicToc.h timing/GlobalTicToc.cpp
-        multi_dfa/MultiDFA.cpp multi_dfa/MultiDFA.h timing/GlobalTicToc.cpp timing/GlobalTicToc.h)
+        multi_dfa/MultiDFA.cpp multi_dfa/MultiDFA.h timing/GlobalTicToc.cpp timing/GlobalTicToc.h chunker/test/Chunker.cpp chunker/test/Chunker.h)
 add_executable(DPHPC15 ${SOURCE_FILES})

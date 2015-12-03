@@ -23,10 +23,12 @@
 
 #include"multi_dfa/MultiDFA.h"
 #include "timing/GlobalTicToc.h"
+#include "chunker/test/Chunker.h"
 
 #define STACK_SIZE 256
 
-#define STREAM_RESERVE_MEMORY 1<<22
+#define MB (1 << 20)
+#define STREAM_RESERVE_MEMORY (MB)
 
 using namespace std;
 
@@ -49,7 +51,8 @@ int main(int argc, char* argv[]) {
 #define ARG_TOKENS argv[2]
 #define ARG_DFA argv[3]
 #define ARG_OUTPUT argv[4]
-    int fd_xml, n_threads, no_chunks = 0;
+    int fd_xml;
+    size_t no_chunks = 0, chunk_offset = 0, n_threads;
     struct stat f_xml_stat;
     off_t xml_len;
 
@@ -84,15 +87,17 @@ int main(int argc, char* argv[]) {
 
     cout << "#threads: " << n_threads << endl;
 
+    // ############ CHUNKING
     globalTicToc.start_phase();
     // chunk xml stream
-    char* chunks[n_threads+1];
-    no_chunks = bufsplit_split_xml_stream(xml_buf, xml_len, n_threads, chunks);
+    Chunker chunker(xml_buf, xml_len, 8*MB);
+    no_chunks = chunker.no_chunks();
     globalTicToc.stop_phase("02. chunking");
+    // ############
 
     // printf("%d\n", no_chunks);
     // we want at least as many (meaningful) chunks as threads
-    if(no_chunks != n_threads) panic("your xml is too small!");
+    if(no_chunks < n_threads) panic("your xml is too small!");
 
     // initialize token stream
     vector<vector<token_type_t> > token_streams(n_threads);
@@ -108,27 +113,36 @@ int main(int argc, char* argv[]) {
         of_iter->reserve(STREAM_RESERVE_MEMORY);
     }
 
-    // tokenize
+
+    // ############ TOKENIZE
     Map * map = alloc_map(ARG_TOKENS);
     globalTicToc.start_phase();
-#pragma omp parallel num_threads(n_threads) shared(map, chunks, token_streams)
-    {
-        int tid;
-        char * chunk_begin, * chunk_end;
+    while (chunk_offset < no_chunks) {
+        n_threads = min(no_chunks - chunk_offset, n_threads);
+        cout << n_threads << endl;
+#pragma omp parallel num_threads(n_threads) shared(map, chunker, token_streams)
+        {
+            int tid;
+            char *chunk_begin, *chunk_end;
 
 
-        tid = omp_get_thread_num() % n_threads;
-        chunk_begin = chunks[tid];
-        chunk_end = chunks[tid + 1];
+            tid = omp_get_thread_num() % n_threads;
+            chunk_begin = chunker.get_chunk(chunk_offset + tid);
+            chunk_end = chunker.get_chunk(chunk_offset + tid + 1);
 
-        Parser parser(chunk_begin, chunk_end, map);
+            Parser parser(chunk_begin, chunk_end, map);
 
-        auto backiter_ts = back_inserter(token_streams.at(tid));
-        auto backiter_off = back_inserter(offset_streams.at(tid));
-        parser.parse(backiter_ts, backiter_off);
+            auto backiter_ts = back_inserter(token_streams.at(tid));
+            auto backiter_off = back_inserter(offset_streams.at(tid));
+            parser.parse(backiter_ts, backiter_off);
+        }
+
+        chunk_offset += n_threads;
     }
     globalTicToc.stop_phase("03. tokenizer");
     destroy_map(map);
+    // ############ END OF TOKENIZE
+
 
     n_threads = multiDFA.size();
 
