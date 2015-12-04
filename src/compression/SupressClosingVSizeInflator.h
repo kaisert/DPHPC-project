@@ -65,7 +65,7 @@ public:
                     &remaining_bit_count,
                     &bitmask);
             bitmask_remaining = BIT_SIZE(bitmask_t);
-            std::cerr << "bitmask: 0x" << std::hex << bitmask << "\n";
+            //std::cerr << "bitmask: 0x" << std::hex << bitmask << "\n";
         }
 
         token_type_t token;
