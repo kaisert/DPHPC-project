@@ -13,6 +13,10 @@ compression2:
 	make -C ../../../../parser clean
 	make -C ../../../../parser/
 	$(CC) $(FLAGS) -o compression2.bin ../../../../chunker/bufsplit.cpp ../../../../parser/*.o -I ../../../../chunker -I ../../../../parser ../../../SurpressClosingVSizeDeflator.cpp  compression2.cpp
+decompression2:
+	make -C ../../../../parser clean
+	make -C ../../../../parser/
+	$(CC) $(FLAGS) -o decompression2.bin ../../../../chunker/bufsplit.cpp ../../../../parser/*.o -I ../../../../chunker -I ../../../../parser ../../../SurpressClosingVSizeDeflator.cpp  ../../../SupressClosingVSizeInflator.h inflator2.cpp
 clean:
 	$(RM) *.bin
 	

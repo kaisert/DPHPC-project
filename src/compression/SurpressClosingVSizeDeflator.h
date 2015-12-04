@@ -43,6 +43,7 @@ public:
     {
         set_bit(&current_bitmask, BIT_SIZE(bitmask_t) -1 - current_cmpr_token_count);
         compressed_tokens.push_back(NULL_TOKEN);
+        std::cerr << "flushing bitmask: 0x" << std::hex << current_bitmask << "\n";
         push_back_tokens(current_bitmask,
                 compressed_tokens,
                 out_iterator,
@@ -54,8 +55,9 @@ public:
 
     SurpressClosingVSizeDeflator& operator=(token_type_t t)
     {
-        if(current_cmpr_token_count == BIT_SIZE(bitmask_t) -1)
+        if(current_cmpr_token_count == BIT_SIZE(bitmask_t))
         {
+            std::cerr << std::hex << "pushing bitmask: 0x" << unsigned(current_bitmask) << "\n";
             push_back_tokens(current_bitmask, 
                     compressed_tokens,
                     out_iterator,
@@ -65,6 +67,7 @@ public:
             current_cmpr_token_count = 0;
             compressed_tokens.erase(compressed_tokens.begin(), 
                     compressed_tokens.end());
+            current_bitmask = 0;
         }
         if(t < 0)
         {       
