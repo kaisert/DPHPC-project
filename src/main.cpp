@@ -16,6 +16,7 @@
 #include<sys/stat.h>
 #include<sys/mman.h>
 #include <thread>
+#include <unistring/stdint.h>
 
 #include"parser/token_list.h"
 #include"parser/parser.h"
@@ -23,6 +24,12 @@
 
 #include"multi_dfa/MultiDFA.h"
 #include "timing/GlobalTicToc.h"
+
+#include"compression/SurpressClosingVSizeDeflator.h"
+#include"compression/SupressClosingVSizeInflator.h"
+
+typedef uint64_t bitmask_t;
+typedef uint8_t cmpr_token_t;
 
 #define STACK_SIZE 256
 
@@ -95,7 +102,7 @@ int main(int argc, char* argv[]) {
     if(no_chunks != n_threads) panic("your xml is too small!");
 
     // initialize token stream
-    vector<vector<token_type_t> > token_streams(n_threads);
+    vector<vector<cmpr_token_t> > token_streams(n_threads);
     for(auto ts_iter = token_streams.begin(); ts_iter != token_streams.end();
             ++ts_iter) {
         ts_iter->reserve(STREAM_RESERVE_MEMORY);
@@ -125,7 +132,12 @@ int main(int argc, char* argv[]) {
 
         auto backiter_ts = back_inserter(token_streams.at(tid));
         auto backiter_off = back_inserter(offset_streams.at(tid));
-        parser.parse(backiter_ts, backiter_off);
+
+        SurpressClosingVSizeDeflator
+            <decltype(backiter_ts), bitmask_t, cmpr_token_t>
+            deflator(map->size + 1, backiter_ts);
+
+        parser.parse(deflator, backiter_off);
     }
     globalTicToc.stop_phase("03. tokenizer");
     destroy_map(map);
@@ -151,6 +163,7 @@ int main(int argc, char* argv[]) {
     globalTicToc.start_phase();
 #pragma omp parallel num_threads(n_threads) shared(multiDFA, matches, token_streams)
     {
+        
         int tid = omp_get_thread_num() % n_threads;
         MultiDFA::DFA* dfa = multiDFA.get_dfa(tid);
         MultiDFA::state_t q_cur = dfa->start_state();
@@ -163,10 +176,20 @@ int main(int argc, char* argv[]) {
         dfa_stack[stack_pos] = q_cur;
 
         for(uint32_t i = 0; i != token_streams.size(); ++i) {
-            vector<token_type_t> &cur_stream = token_streams[i];
-            for (uint32_t j = 0; j != cur_stream.size(); ++j) {
-                token_type_t cur_token = cur_stream[j];
-                if (cur_token < 0) {
+            //vector<token_type_t> &cur_stream = token_streams[i];
+            auto cur_stream_it = token_streams[i].begin();
+            
+            SupressClosingVSizeInflator
+                <decltype(cur_stream_it), bitmask_t, cmpr_token_t>
+                inflator(map->size + 1, cur_stream_it);
+            
+            //for (uint32_t j = 0; j != cur_stream.size(); ++j) {
+            //    token_type_t cur_token = cur_stream[j];
+            uint32_t j = 0;
+              for(token_type_t cur_token = *inflator;
+                      (cur_token = *inflator) != 0; inflator++) {
+                  j++;
+                  if (cur_token < 0) {
                     if (stack_pos > 0) {
                         if (((int) dfa_stack[stack_pos]) < 0) {
                             my_matches.push_back(Match {cur_token, i, j});
