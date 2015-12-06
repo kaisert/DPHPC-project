@@ -10,8 +10,7 @@ using namespace std;
 
 /* used test settings */
 
-
-// tiny memory span 512MB, tiny strides
+// tiny memory span 512MB, high resolution => tiny_strides.csv
 const long long MAX_SIZE = 512L*1024*1024;
 const long long MIN_SUPERCHUNKS = 1;
 const long long MAX_SUPERCHUNKS = 1;
@@ -23,7 +22,7 @@ const long long NUM_REPETITIONS = 6;
 // */
 
 
-/*/ small memory span 1GB, small strides
+/*/ small memory span 1GB => small_strides.csv
 const long long MAX_SIZE = 1L*1024*1024*1024;
 const long long MIN_SUPERCHUNKS = 1;
 const long long MAX_SUPERCHUNKS = 1;
@@ -35,7 +34,7 @@ const long long NUM_REPETITIONS = 6;
 // */
 
 
-/*/ huge memory span 10GB, superchunks and big strides
+/*/ huge memory span 10GB => big_strides.csv
 const long long MAX_SIZE = 10L*1024*1024*1024;
 const long long MIN_SUPERCHUNKS = 1;
 const long long MAX_SUPERCHUNKS = 8;
