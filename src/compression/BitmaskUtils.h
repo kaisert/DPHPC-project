@@ -9,20 +9,23 @@
 #include"../parser/token_list.h"
 
 #ifndef BIT_SIZE
-#define BIT_SIZE(x) ((int8_t) (sizeof(x) * 8))
+#define BIT_SIZE(x) ((int16_t) (sizeof(x) * 8))
 #endif
 
 template<typename type>
-inline void set_bit(type *word, uint8_t bit)
+inline void set_bit(type *word, int bit)
 {
-    type mask = ((type) 0x1) << bit;
+    type mask = 1;
+    mask <<= bit;
     *word |= mask;
 }
 
 template<typename type>
-inline void unset_bit(type *word, uint8_t bit)
+inline void unset_bit(type *word, int bit)
 {
-    type mask = ~ (((type) 0x1) << bit);
+    type mask = 1;
+    mask <<= bit;
+    mask = ~mask;
     *word &= mask;
 }
 
@@ -65,7 +68,7 @@ inline void push_back_one_token(src_t src,
                 trg,
                 *trg_offset);
         src_end = src_begin;
-        src_begin -= *trg_offset;
+        src_begin -= BIT_SIZE(trg_t);
         src_begin = src_begin < 0 ? 0 : src_begin;
         *trg_offset -= written_size;
         if(*trg_offset <= 0)

@@ -187,7 +187,8 @@ int main(int argc, char* argv[]) {
             //    token_type_t cur_token = cur_stream[j];
             uint32_t j = 0;
               for(token_type_t cur_token = *inflator;
-                      (cur_token = *inflator) != 0; inflator++) {
+                      *inflator != 0; inflator++) {
+                  cur_token = *inflator;
                   j++;
                   if (cur_token < 0) {
                     if (stack_pos > 0) {
