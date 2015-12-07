@@ -1,0 +1,33 @@
+//
+// Created by Stefan Dietiker on 07/12/15.
+//
+
+#include <omp.h>
+#include "SuperChunkTokenizer.h"
+#include "../parser/parser.h"
+
+void SuperChunkTokenizer::operator()(tokenstream_t &ts, offsetstream_t &os, Map* map, Chunker &chunker) {
+    size_t no_chunks = 0, chunk_offset = 0, n_threads;
+    no_chunks = chunker.no_chunks();
+    while (chunk_offset < no_chunks) {
+        n_threads = min(no_chunks - chunk_offset, n_threads);
+#pragma omp parallel num_threads(n_threads) shared(map, chunker, ts)
+        {
+            int tid;
+            char *chunk_begin, *chunk_end;
+
+
+            tid = omp_get_thread_num() % n_threads;
+            chunk_begin = chunker.get_chunk(chunk_offset + tid);
+            chunk_end = chunker.get_chunk(chunk_offset + tid + 1);
+
+            Parser parser(chunk_begin, chunk_end, map);
+
+            auto backiter_ts = back_inserter(ts.at(chunk_offset + tid));
+            auto backiter_off = back_inserter(os.at(chunk_offset + tid));
+            parser.parse(backiter_ts, backiter_off);
+        }
+
+        chunk_offset += n_threads;
+    }
+}

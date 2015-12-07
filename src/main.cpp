@@ -7,37 +7,19 @@
 #include<iostream>
 #include<fstream>
 
-#ifdef __APPLE__
-#define MAP_POPULATE 0
-#endif
-
-#include<fcntl.h>
 #include<unistd.h>
-#include<sys/stat.h>
-#include<sys/mman.h>
 #include <thread>
 
 #include"parser/token_list.h"
 #include"parser/parser.h"
-#include"chunker/bufsplit.h"
 
 #include"multi_dfa/MultiDFA.h"
 #include "timing/GlobalTicToc.h"
 #include "chunker/test/Chunker.h"
-
-#define STACK_SIZE 256
-
-#define MB ((unsigned long long) (1 << 20))
-#define DEFAULT_CHUNK_SIZE 8*MB
-#define STREAM_RESERVE_MEMORY (MB)
+#include "exceptions/GeneralException.h"
+#include"config_local.h"
 
 using namespace std;
-
-struct Match {
-    token_type_t token_type;
-    uint32_t chunk_index;
-    uint32_t token_index;
-};
 
 #define panic(msg) \
   do { perror(msg); exit(EXIT_FAILURE); } while (0)
@@ -52,10 +34,9 @@ int main(int argc, char* argv[]) {
 #define ARG_TOKENS argv[2]
 #define ARG_DFA argv[3]
 #define ARG_OUTPUT argv[4]
-    int fd_xml;
-    size_t no_chunks = 0, chunk_offset = 0, n_threads;
-    struct stat f_xml_stat;
-    off_t xml_len;
+    size_t xml_len, no_chunks;
+    int n_threads;
+    char* xml_buf;
 
     GlobalTicToc globalTicToc;
 
@@ -67,22 +48,17 @@ int main(int argc, char* argv[]) {
     string fname_dfas = string(ARG_DFA);
     MultiDFA multiDFA(fname_dfas);
 
-    fd_xml = open(ARG_XML, O_RDWR);
-    if(fd_xml < 0) panic("could not open xml file.");
-    fstat(fd_xml, &f_xml_stat);
-    xml_len = (off_t) f_xml_stat.st_size;
-
-    globalTicToc.start_phase();
-    char* xml_buf = static_cast<char*>(
-            mmap(   NULL,                  // address
-                    xml_len,               // length
-                    PROT_READ,             // prot flags
-                    MAP_PRIVATE | MAP_POPULATE, // flags
-                    fd_xml,                // file decriptor
-                    0)                     // offset in file
-    );
-    if(xml_buf == MAP_FAILED) panic("mmap failed: ");
-    globalTicToc.stop_phase("01. mmap");
+    shared_ptr<Loader> loader(config::loader);
+    // ############ LAODING
+    try {
+        globalTicToc.start_phase();
+        xml_buf = (*loader)(ARG_XML);
+        xml_len = loader->length();
+        globalTicToc.stop_phase("01. loading");
+    } catch(GeneralException& generalException) {
+        panic(generalException.what());
+    }
+    // ############
 
     n_threads = omp_get_max_threads();
 
@@ -91,7 +67,7 @@ int main(int argc, char* argv[]) {
     // ############ CHUNKING
     globalTicToc.start_phase();
     // chunk xml stream
-    size_t chunk_size = min(xml_len / n_threads, DEFAULT_CHUNK_SIZE);
+    size_t chunk_size = min( (xml_len / (static_cast<size_t>(n_threads))), static_cast<size_t>(DEFAULT_CHUNK_SIZE));
     Chunker chunker(xml_buf, xml_len, chunk_size);
     no_chunks = chunker.no_chunks();
     globalTicToc.stop_phase("02. chunking");
@@ -102,54 +78,32 @@ int main(int argc, char* argv[]) {
     if(no_chunks < n_threads) panic("your xml is too small!");
 
     // initialize token stream
-    vector<vector<token_type_t> > token_streams(no_chunks);
+    tokenstream_t token_streams(no_chunks);
     for(auto ts_iter = token_streams.begin(); ts_iter != token_streams.end();
             ++ts_iter) {
         ts_iter->reserve(STREAM_RESERVE_MEMORY);
     }
 
     // initialize offset stream
-    vector<vector<char*> > offset_streams(no_chunks);
+    offsetstream_t offset_streams(no_chunks);
     for(auto of_iter = offset_streams.begin(); of_iter != offset_streams.end();
             ++of_iter) {
         of_iter->reserve(STREAM_RESERVE_MEMORY);
     }
 
-
+    shared_ptr<Tokenizer> tokenizer(config::tokenizer);
     // ############ TOKENIZE
     Map * map = alloc_map(ARG_TOKENS);
     globalTicToc.start_phase();
-    while (chunk_offset < no_chunks) {
-        n_threads = min(no_chunks - chunk_offset, n_threads);
-        cout << n_threads << endl;
-#pragma omp parallel num_threads(n_threads) shared(map, chunker, token_streams)
-        {
-            int tid;
-            char *chunk_begin, *chunk_end;
-
-
-            tid = omp_get_thread_num() % n_threads;
-            chunk_begin = chunker.get_chunk(chunk_offset + tid);
-            chunk_end = chunker.get_chunk(chunk_offset + tid + 1);
-
-            Parser parser(chunk_begin, chunk_end, map);
-
-            auto backiter_ts = back_inserter(token_streams.at(chunk_offset + tid));
-            auto backiter_off = back_inserter(offset_streams.at(chunk_offset + tid));
-            parser.parse(backiter_ts, backiter_off);
-        }
-
-        chunk_offset += n_threads;
-    }
+    (*tokenizer)(token_streams, offset_streams, map, chunker);
     globalTicToc.stop_phase("03. tokenizer");
     destroy_map(map);
     // ############ END OF TOKENIZE
 
 
     n_threads = multiDFA.size();
-
     // initialize memory for matches
-    vector<vector<Match> > matches(n_threads);
+    matchstream_t matches(n_threads);
     for(auto it_match = matches.begin(); it_match != matches.end(); ++it_match) {
         it_match->reserve(STREAM_RESERVE_MEMORY);
     }
@@ -162,44 +116,11 @@ int main(int argc, char* argv[]) {
 
     cout << "#tokens: " << no_tokens << " (total)" << endl;
 
+    shared_ptr<Matcher> matcher(config::matcher);
     // run dfas
     // start measurements
     globalTicToc.start_phase();
-#pragma omp parallel num_threads(n_threads) shared(multiDFA, matches, token_streams)
-    {
-        int tid = omp_get_thread_num() % n_threads;
-        MultiDFA::DFA* dfa = multiDFA.get_dfa(tid);
-        MultiDFA::state_t q_cur = dfa->start_state();
-
-        auto& my_matches = matches.at(tid);
-
-        // allocate/initialize stack
-        int stack_pos = 0;
-        MultiDFA::state_t dfa_stack[STACK_SIZE];
-        dfa_stack[stack_pos] = q_cur;
-
-        for(uint32_t i = 0; i != token_streams.size(); ++i) {
-            vector<token_type_t> &cur_stream = token_streams[i];
-            for (uint32_t j = 0; j != cur_stream.size(); ++j) {
-                token_type_t cur_token = cur_stream[j];
-                if (cur_token < 0) {
-                    if (stack_pos > 0) {
-                        if (((int) dfa_stack[stack_pos]) < 0) {
-                            my_matches.push_back(Match {cur_token, i, j});
-                        }
-                        stack_pos--;
-                    }
-                } else if (cur_token > 0) {
-                    dfa_stack[stack_pos + 1] = (*dfa)(dfa_stack[stack_pos], cur_token);
-                    stack_pos++;
-                    if (dfa_stack[stack_pos] < 0) {
-                        my_matches.push_back(Match {cur_token, i, j});
-                    }
-                }
-            }
-        }
-        //matches[tid] = my_matches;
-    } // matcher
+    (*matcher)(matches, token_streams, multiDFA);
     globalTicToc.stop_phase("04. matcher");
 
     globalTicToc.start_phase();
@@ -218,7 +139,6 @@ int main(int argc, char* argv[]) {
     globalTicToc.stop_phase("05. write back");
 
     cout << "XML-File: " << ARG_XML << endl;
-
     cout << "Timing summary:" << endl;
     for(auto phase = globalTicToc.begin(); phase != globalTicToc.end(); ++phase) {
         cout << phase->first << ": " << globalTicToc.get_phase_period<chrono::milliseconds>(phase->first) <<
@@ -226,6 +146,4 @@ int main(int argc, char* argv[]) {
     }
     cout << "Total Time: " << globalTicToc.get_total_time<chrono::milliseconds>() << " ms" << endl;
 
-    close(fd_xml);
-    munmap(xml_buf, xml_len);
 }
