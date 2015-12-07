@@ -48,12 +48,12 @@ int main(int argc, char* argv[]) {
     string fname_dfas = string(ARG_DFA);
     MultiDFA multiDFA(fname_dfas);
 
-    shared_ptr<Loader> loader(config::loader);
+    config::Loader loader;
     // ############ LAODING
     try {
         globalTicToc.start_phase();
-        xml_buf = (*loader)(ARG_XML);
-        xml_len = loader->length();
+        xml_buf = loader(ARG_XML);
+        xml_len = loader.length();
         globalTicToc.stop_phase("01. loading");
     } catch(GeneralException& generalException) {
         panic(generalException.what());
@@ -78,24 +78,24 @@ int main(int argc, char* argv[]) {
     if(no_chunks < n_threads) panic("your xml is too small!");
 
     // initialize token stream
-    tokenstream_t token_streams(no_chunks);
+    vector<config::TokenContainerType> token_streams(no_chunks);
     for(auto ts_iter = token_streams.begin(); ts_iter != token_streams.end();
             ++ts_iter) {
         ts_iter->reserve(STREAM_RESERVE_MEMORY);
     }
 
     // initialize offset stream
-    offsetstream_t offset_streams(no_chunks);
+    vector<config::OffsetContainerType> offset_streams(no_chunks);
     for(auto of_iter = offset_streams.begin(); of_iter != offset_streams.end();
             ++of_iter) {
         of_iter->reserve(STREAM_RESERVE_MEMORY);
     }
 
-    shared_ptr<Tokenizer> tokenizer(config::tokenizer);
+    config::TokenizerType tokenizer;
     // ############ TOKENIZE
     Map * map = alloc_map(ARG_TOKENS);
     globalTicToc.start_phase();
-    (*tokenizer)(token_streams, offset_streams, map, chunker);
+    tokenizer(token_streams, offset_streams, map, chunker);
     globalTicToc.stop_phase("03. tokenizer");
     destroy_map(map);
     // ############ END OF TOKENIZE
@@ -103,7 +103,7 @@ int main(int argc, char* argv[]) {
 
     n_threads = multiDFA.size();
     // initialize memory for matches
-    matchstream_t matches(n_threads);
+    vector<config::MatchContainerType> matches(n_threads);
     for(auto it_match = matches.begin(); it_match != matches.end(); ++it_match) {
         it_match->reserve(STREAM_RESERVE_MEMORY);
     }
@@ -116,11 +116,11 @@ int main(int argc, char* argv[]) {
 
     cout << "#tokens: " << no_tokens << " (total)" << endl;
 
-    shared_ptr<Matcher> matcher(config::matcher);
+    config::Matcher matcher;
     // run dfas
     // start measurements
     globalTicToc.start_phase();
-    (*matcher)(matches, token_streams, multiDFA);
+    matcher(matches, token_streams, multiDFA);
     globalTicToc.stop_phase("04. matcher");
 
     globalTicToc.start_phase();
