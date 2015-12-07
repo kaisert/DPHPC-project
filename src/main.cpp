@@ -6,6 +6,7 @@
 
 #include<iostream>
 #include<fstream>
+#include<iterator>
 
 #ifdef __APPLE__
 #define MAP_POPULATE 0
@@ -68,6 +69,7 @@ int main(int argc, char* argv[]) {
     fstat(fd_xml, &f_xml_stat);
     xml_len = (off_t) f_xml_stat.st_size;
 
+    /*
     globalTicToc.start_phase();
     char* xml_buf = static_cast<char*>(
             mmap(   NULL,                  // address
@@ -77,8 +79,17 @@ int main(int argc, char* argv[]) {
                     fd_xml,                // file decriptor
                     0)                     // offset in file
     );
+
     if(xml_buf == MAP_FAILED) panic("mmap failed: ");
-    globalTicToc.stop_phase("01. mmap");
+    */
+    close(fd_xml);
+    ifstream is_xml(ARG_XML, std::ios::binary);
+    vector<char> vec_xml;
+    vec_xml.reserve(xml_len);
+    vec_xml.insert(vec_xml.begin(), istreambuf_iterator<char>(is_xml), (istreambuf_iterator<char>()));
+    char* xml_buf = vec_xml.data();
+
+    globalTicToc.stop_phase("01. read file");
 
     n_threads = omp_get_max_threads();
 
@@ -210,6 +221,6 @@ int main(int argc, char* argv[]) {
     }
     cout << "Total Time: " << globalTicToc.get_total_time<chrono::milliseconds>() << " ms" << endl;
 
-    close(fd_xml);
-    munmap(xml_buf, xml_len);
+    //close(fd_xml);
+    //munmap(xml_buf, xml_len);
 }
