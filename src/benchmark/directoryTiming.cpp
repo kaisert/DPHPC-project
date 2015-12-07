@@ -12,7 +12,7 @@ using namespace std;
 const bool PRINT_READ_SIZE_CHANGE_WARNING = false;
 
 
-// huge memory span 8GB => big_strides_simulating_matcher.csv
+// huge memory span 8GB => big_strides_simulating_tokenizer.csv
 const long long MAX_SIZE = 8L*1024*1024*1024+10240;
 const long long MIN_SUPERCHUNKS = 1;
 const long long MAX_SUPERCHUNKS = 64;
