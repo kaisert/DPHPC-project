@@ -80,29 +80,6 @@ inline void push_back_one_token(src_t src,
     }
 }
 
-template<typename cmpr_token_t, typename bitmask_t, typename iter>
-inline void push_back_tokens(bitmask_t bitmask, 
-    std::vector<token_type_t> &tokens,
-    iter &out_iterator, 
-    int16_t cmpr_token_size,
-    cmpr_token_t *remaining_token,
-    int16_t *remaining_token_os)
-{
-    push_back_one_token(bitmask,
-            BIT_SIZE(bitmask_t),
-            remaining_token,
-            remaining_token_os,
-            out_iterator);
-    for(auto it = tokens.begin(); it != tokens.end(); it++)
-    {
-       push_back_one_token(*it,
-               cmpr_token_size,
-               remaining_token,
-               remaining_token_os,
-               out_iterator);
-    }
-}
-
 template<typename cmpr_token_t, typename bitmask_t, typename in_iter>
 inline void extract_bitmask(
         in_iter &it,
@@ -130,6 +107,25 @@ inline void extract_bitmask(
             (BIT_SIZE(cmpr_token_t) - begin);
         *remaining_bit_count = begin;
     }
+}
+
+template<typename cmpr_token_t, typename in_iter>
+inline token_type_t extract_bit(
+        in_iter &it,
+        cmpr_token_t *remaining,
+        int16_t *remaining_bit_count)
+{
+    if(*remaining_bit_count == 0)
+    {
+        *remaining = *it++;
+        *remaining_bit_count = BIT_SIZE(cmpr_token_t);
+    }
+    token_type_t t = (*remaining) >> BIT_SIZE(cmpr_token_t);
+    token_type_t mask = 1;
+    t &= mask;
+    *remaining >>= 1;
+    *remaining_bit_count -= 1;
+    return t;
 }
 
 template<typename cmpr_token_t, typename in_iter>
