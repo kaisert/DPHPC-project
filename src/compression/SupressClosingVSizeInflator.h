@@ -24,7 +24,7 @@ template<typename cmpr_token_iter,
 class SupressClosingVSizeInflator {
 public:
     SupressClosingVSizeInflator(int k_token_count, cmpr_token_iter ct_it)
-        : ct_it(ct_it),
+        :ct_it(ct_it),
         cmpr_token_size(0),
         remaining(0),
         remaining_bit_count(0),
@@ -65,9 +65,8 @@ public:
                     &remaining_bit_count,
                     &bitmask);
             bitmask_remaining = BIT_SIZE(bitmask_t);
-            //std::cerr << "bitmask: 0x" << std::hex << bitmask << "\n";
         }
-
+        
         token_type_t token;
         if((bitmask >> (bitmask_remaining - 1)) & 1)
         {
@@ -83,6 +82,7 @@ public:
             token = CLOSING_TAG;
         }
         bitmask_remaining--;
+        
 
         current_token = token;
         return *this;

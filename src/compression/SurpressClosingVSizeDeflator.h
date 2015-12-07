@@ -8,13 +8,13 @@
 
 #include<iostream>
 
-#define NULL_TOKEN 0x0
+#define NULL_TOKEN ((cmpr_token_t) 0x0)
 
 template<typename iter, typename bitmask_t, typename cmpr_token_t>
 class SurpressClosingVSizeDeflator {
 public:
     SurpressClosingVSizeDeflator(int k_token_count, iter &it)
-        : current_cmpr_token_count(0),
+        :current_cmpr_token_count(0),
         token_size(0),
         current_bitmask_os(BIT_SIZE(bitmask_t) - 1),
         current_bitmask(0),
@@ -43,7 +43,6 @@ public:
     {
         set_bit(&current_bitmask, BIT_SIZE(bitmask_t) -1 - current_cmpr_token_count);
         compressed_tokens.push_back(NULL_TOKEN);
-        std::cerr << "flushing bitmask: 0x" << std::hex << current_bitmask << "\n";
         push_back_tokens(current_bitmask,
                 compressed_tokens,
                 out_iterator,
@@ -55,9 +54,19 @@ public:
 
     SurpressClosingVSizeDeflator& operator=(token_type_t t)
     {
+        std::cerr << "0x" << std::hex << unsigned(t) << "\n";
+        int pos = BIT_SIZE(bitmask_t) - 1 - current_cmpr_token_count;
+        if(t < 0)
+        {       
+            unset_bit(&current_bitmask, pos);
+        } else {
+            set_bit(&current_bitmask, pos); 
+            compressed_tokens.push_back(t);
+        }
+        current_cmpr_token_count++;
+
         if(current_cmpr_token_count == BIT_SIZE(bitmask_t))
         {
-            std::cerr << std::hex << "pushing bitmask: 0x" << unsigned(current_bitmask) << "\n";
             push_back_tokens(current_bitmask, 
                     compressed_tokens,
                     out_iterator,
@@ -69,20 +78,31 @@ public:
                     compressed_tokens.end());
             current_bitmask = 0;
         }
-        if(t < 0)
-        {       
-            unset_bit(&current_bitmask, 
-                    BIT_SIZE(bitmask_t) -1  - current_cmpr_token_count);
-        } else {
-            set_bit(&current_bitmask, 
-                    BIT_SIZE(bitmask_t) -1 - current_cmpr_token_count);
-            compressed_tokens.push_back(t);
-        }
-        current_cmpr_token_count++;
         return *this;
     }
 
 private:
+    inline void push_back_tokens(bitmask_t bitmask, 
+        std::vector<token_type_t> &tokens,
+        iter &out_iterator, 
+        int16_t cmpr_token_size,
+        cmpr_token_t *remaining_token,
+        int16_t *remaining_token_os)
+    {
+        push_back_one_token(bitmask,
+                BIT_SIZE(bitmask_t),
+                remaining_token,
+                remaining_token_os,
+                out_iterator);
+        for(auto it = tokens.begin(); it != tokens.end(); it++)
+        {
+           push_back_one_token(*it,
+                   cmpr_token_size,
+                   remaining_token,
+                   remaining_token_os,
+                   out_iterator);
+        }
+    }
     int current_cmpr_token_count; //number of token that are compressed but not
                                   //yet flushed
     int token_size; //size of the compressed tokens

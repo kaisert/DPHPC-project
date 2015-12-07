@@ -9,20 +9,23 @@
 #include"../parser/token_list.h"
 
 #ifndef BIT_SIZE
-#define BIT_SIZE(x) ((int8_t) (sizeof(x) * 8))
+#define BIT_SIZE(x) ((int16_t) (sizeof(x) * 8))
 #endif
 
 template<typename type>
-inline void set_bit(type *word, uint8_t bit)
+inline void set_bit(type *word, int bit)
 {
-    type mask = ((type) 0x1) << bit;
+    type mask = 1;
+    mask <<= bit;
     *word |= mask;
 }
 
 template<typename type>
-inline void unset_bit(type *word, uint8_t bit)
+inline void unset_bit(type *word, int bit)
 {
-    type mask = ~ (((type) 0x1) << bit);
+    type mask = 1;
+    mask <<= bit;
+    mask = ~mask;
     *word &= mask;
 }
 
@@ -65,7 +68,7 @@ inline void push_back_one_token(src_t src,
                 trg,
                 *trg_offset);
         src_end = src_begin;
-        src_begin -= *trg_offset;
+        src_begin -= BIT_SIZE(trg_t);
         src_begin = src_begin < 0 ? 0 : src_begin;
         *trg_offset -= written_size;
         if(*trg_offset <= 0)
@@ -74,29 +77,6 @@ inline void push_back_one_token(src_t src,
             *trg = 0;
             *trg_offset = BIT_SIZE(trg_t);
         }
-    }
-}
-
-template<typename cmpr_token_t, typename bitmask_t, typename iter>
-inline void push_back_tokens(bitmask_t bitmask, 
-    std::vector<token_type_t> &tokens,
-    iter &out_iterator, 
-    int16_t cmpr_token_size,
-    cmpr_token_t *remaining_token,
-    int16_t *remaining_token_os)
-{
-    push_back_one_token(bitmask,
-            BIT_SIZE(bitmask_t),
-            remaining_token,
-            remaining_token_os,
-            out_iterator);
-    for(auto it = tokens.begin(); it != tokens.end(); it++)
-    {
-       push_back_one_token(*it,
-               cmpr_token_size,
-               remaining_token,
-               remaining_token_os,
-               out_iterator);
     }
 }
 
@@ -127,6 +107,25 @@ inline void extract_bitmask(
             (BIT_SIZE(cmpr_token_t) - begin);
         *remaining_bit_count = begin;
     }
+}
+
+template<typename cmpr_token_t, typename in_iter>
+inline token_type_t extract_bit(
+        in_iter &it,
+        cmpr_token_t *remaining,
+        int16_t *remaining_bit_count)
+{
+    if(*remaining_bit_count == 0)
+    {
+        *remaining = *it++;
+        *remaining_bit_count = BIT_SIZE(cmpr_token_t);
+    }
+    token_type_t t = (*remaining) >> BIT_SIZE(cmpr_token_t);
+    token_type_t mask = 1;
+    t &= mask;
+    *remaining >>= 1;
+    *remaining_bit_count -= 1;
+    return t;
 }
 
 template<typename cmpr_token_t, typename in_iter>
