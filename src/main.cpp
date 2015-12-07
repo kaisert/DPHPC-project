@@ -25,6 +25,8 @@
 #include"multi_dfa/MultiDFA.h"
 #include "timing/GlobalTicToc.h"
 
+#include<sstream>
+
 #include"compression/SurpressClosingVSizeDeflator.h"
 #include"compression/SupressClosingVSizeInflator.h"
 
@@ -138,6 +140,7 @@ int main(int argc, char* argv[]) {
             deflator(map->size + 1, backiter_ts);
 
         parser.parse(deflator, backiter_off);
+        deflator.flush();
     }
     globalTicToc.stop_phase("03. tokenizer");
     destroy_map(map);
@@ -174,6 +177,9 @@ int main(int argc, char* argv[]) {
         int stack_pos = 0;
         MultiDFA::state_t dfa_stack[STACK_SIZE];
         dfa_stack[stack_pos] = q_cur;
+        
+        std::stringstream stream;
+        stream << "tid: " << tid << "\n";
 
         for(uint32_t i = 0; i != token_streams.size(); ++i) {
             //vector<token_type_t> &cur_stream = token_streams[i];
@@ -189,7 +195,9 @@ int main(int argc, char* argv[]) {
               for(token_type_t cur_token = *inflator;
                       *inflator != 0; inflator++) {
                   cur_token = *inflator;
-                  j++;
+                  stream << "0x" << std::hex << unsigned(cur_token) << "\n";
+                  if(tid == 1)
+                      cout << "0x" << std::hex << unsigned(cur_token) << "\n";
                   if (cur_token < 0) {
                     if (stack_pos > 0) {
                         if (((int) dfa_stack[stack_pos]) < 0) {
@@ -204,8 +212,10 @@ int main(int argc, char* argv[]) {
                         my_matches.push_back(Match {cur_token, i, j});
                     }
                 }
+                j++;
             }
         }
+        std::cout << stream.str();
         //matches[tid] = my_matches;
     } // matcher
     globalTicToc.stop_phase("04. matcher");
