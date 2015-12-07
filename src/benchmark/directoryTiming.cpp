@@ -9,8 +9,33 @@
 using namespace std;
 
 /* used test settings */
+const bool PRINT_READ_SIZE_CHANGE_WARNING = false;
 
-// tiny memory span 512MB, high resolution => tiny_strides.csv
+
+// huge memory span 8GB => big_strides_simulating_matcher.csv
+const long long MAX_SIZE = 8L*1024*1024*1024+10240;
+const long long MIN_SUPERCHUNKS = 1;
+const long long MAX_SUPERCHUNKS = 64;
+const long long READ_SIZE = 32L*1024*1024*1024;
+const long long SET_THREADS = 60;
+const long long INIT_STRIDE = 128L*1024*1024/60;
+const long long NUM_REPETITIONS = 1;
+#define next_stride(x) ((x)*2)
+// */
+
+/*/ huge memory span 10GB => big_strides_read_all.csv
+const long long MAX_SIZE = 10L*1024*1024*1024;
+const long long MIN_SUPERCHUNKS = 1;
+const long long MAX_SUPERCHUNKS = 8;
+const long long READ_SIZE = 32L*1024*1024*1024;
+const long long SET_THREADS = 60;
+const long long INIT_STRIDE = 16L*1024*1024;
+const long long NUM_REPETITIONS = 1;
+#define next_stride(x) ((x)+1048573)
+// */
+
+
+/*/ tiny memory span 512MB, high resolution => tiny_strides.csv
 const long long MAX_SIZE = 512L*1024*1024;
 const long long MIN_SUPERCHUNKS = 1;
 const long long MAX_SUPERCHUNKS = 1;
@@ -88,7 +113,7 @@ int main(int argc, char** argv)
                 TicToc parallelBenchmark(tid);
                 parallelBenchmark.start();
            
-                if (tid == 0 && stride < READ_SIZE)
+                if (PRINT_READ_SIZE_CHANGE_WARNING && tid == 0 && stride < READ_SIZE)
                     printf("Stride is smaller than READ_SIZE, adapting...\n");
 
                 long long blocksize = (READ_SIZE<stride?READ_SIZE:stride);
