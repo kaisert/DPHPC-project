@@ -86,7 +86,6 @@ public:
             token = CLOSING_TAG;
         }
         bitmask_remaining--;
-        
 
         current_token = token;
         return *this;

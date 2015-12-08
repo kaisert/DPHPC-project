@@ -96,7 +96,7 @@ inline void extract_bitmask(
         cmpr_token_t cmpr_token = *it++;
         int16_t begin = BIT_SIZE(cmpr_token_t) - 
             (BIT_SIZE(bitmask_t) - bits_read);
-        begin = begin < 0 ? 0 : begin;
+        begin = (begin < 0) ? 0 : begin;
         append_bits(cmpr_token,
                 begin,
                 BIT_SIZE(cmpr_token_t),

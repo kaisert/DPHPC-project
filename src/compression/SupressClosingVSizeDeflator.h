@@ -63,7 +63,7 @@ public:
     }
 
 
-    Inflator begin() const
+    Inflator begin()
     {
         return Inflator(token_count, cmpr_t_cont.begin());
     }
@@ -76,7 +76,6 @@ public:
    // SupressClosingVSizeDeflator& operator=(token_type_t t)
     void push_back(token_type_t t)
     {
-        std::cerr << "0x" << std::hex << unsigned(t) << "\n";
         int pos = BIT_SIZE(bitmask_t) - 1 - current_cmpr_token_count;
         if(t < 0)
         {       

@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "-fopenmp ${CMAKE_CXX_FLAGS} -O3 -std=c++11")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 set(SOURCE_FILES main.cpp compression/SupressClosingVSizeDeflator.h compression/SupressClosingVSizeInflator.h
-        compression/MyVector.h
+        compression/MyVector.h compression/BitmaskUtils.h
         parser/token_list.h parser/token_list.cpp parser/lexer.h parser/lexer.cpp parser/map.h parser/map.cpp
         parser/parser.cpp
         chunker/bufsplit.h chunker/bufsplit.cpp
