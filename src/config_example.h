@@ -1,7 +1,3 @@
-//
-// Created by Stefan Dietiker on 07/12/15.
-//
-
 #ifndef DPHPC15_CONFIG_LOCAL_H
 #define DPHPC15_CONFIG_LOCAL_H
 
@@ -14,7 +10,7 @@
 #define STREAM_RESERVE_MEMORY (MB)
 
 namespace config {
-    using TokenContainerType = vector<token_type_t>;
+    using TokenContainerType = VectorWrapper<token_type_t>;
     using OffsetContainerType = vector<char *>;
     using TokenizerType = SuperChunkTokenizer;
     using MatchContainerType = vector<Match>;
