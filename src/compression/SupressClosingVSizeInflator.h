@@ -11,18 +11,22 @@
 #endif
 
 #ifndef NULL_TOKEN
-#define NULL_TOKEN 0
+#define NULL_TOKEN ((cmpr_token_t) 0x0)
 #endif
 
 #ifndef CLOSING_TAG
 #define CLOSING_TAG -1
 #endif
 
-template<typename cmpr_token_iter, 
-    typename bitmask_t, 
+template<typename cmpr_token_iter,
+    typename bitmask_t,
     typename cmpr_token_t>
-class SupressClosingVSizeInflator {
+class SupressClosingVSizeInflator/*: public virtual std::iterator */{
 public:
+    SupressClosingVSizeInflator()
+        :current_token(NULL_TOKEN)
+    {}
+
     SupressClosingVSizeInflator(int k_token_count, cmpr_token_iter ct_it)
         :ct_it(ct_it),
         cmpr_token_size(0),

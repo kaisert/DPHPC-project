@@ -30,9 +30,12 @@ public:
             dfa_stack[stack_pos] = q_cur;
 
             for(uint32_t i = 0; i != ts.size(); ++i) {
-                vector<token_type_t> &cur_stream = ts[i];
-                for (uint32_t j = 0; j != cur_stream.size(); ++j) {
-                    token_type_t cur_token = cur_stream[j];
+                auto &cur_stream = ts[i];
+                uint32_t j = 0;
+                //for (uint32_t j = 0; j != cur_stream.size(); ++j) {
+                //    token_type_t cur_token = cur_stream[j];
+                for(auto t_it = cur_stream.begin(); t_it != cur_stream.end(); t_it++, ++j) {
+                    token_type_t cur_token = *t_it;
                     if (cur_token < 0) {
                         if (stack_pos > 0) {
                             if (((int) dfa_stack[stack_pos]) < 0) {

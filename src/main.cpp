@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
     MultiDFA multiDFA(fname_dfas);
 
     config::Loader loader;
-    // ############ LAODING
+    // ############ LOADING
     try {
         globalTicToc.start_phase();
         xml_buf = loader(ARG_XML);
@@ -111,6 +111,7 @@ int main(int argc, char* argv[]) {
     // count #tokens
     uint64_t no_tokens = 0;
     for(auto ts_iter = token_streams.begin(); ts_iter != token_streams.end(); ++ts_iter) {
+        cout << ts_iter->size() << "\n";
         no_tokens += ts_iter->size();
     }
 
