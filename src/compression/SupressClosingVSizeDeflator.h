@@ -25,7 +25,7 @@ private:
 public:
     SupressClosingVSizeDeflator()
         :current_cmpr_token_count(0),
-        token_size(0),
+        cmpr_token_size(0),
         current_bitmask_os(BIT_SIZE(bitmask_t) - 1),
         current_bitmask(0),
         remaining_token(0),
@@ -49,7 +49,7 @@ public:
 
     void init(int token_count) {
       int i = token_count + 1;
-      do{token_size++;} while(i >>= 1);
+      do{ cmpr_token_size++;} while(i >>= 1);
     }
     
     int size() { return token_count;}
@@ -65,7 +65,7 @@ public:
 
     Inflator begin()
     {
-        return Inflator(token_count, cmpr_t_cont.begin());
+        return Inflator(cmpr_token_size, cmpr_t_cont.begin());
     }
 
     Inflator& end()
@@ -110,16 +110,16 @@ private:
         for(auto it = t_buf.begin(); it != t_buf.end(); it++)
         {
            push_back_one_token(*it,
-                   token_size,
-                   &remaining_token,
-                   &remaining_token_os,
-                   cmpr_t_cont_bin);
+                               cmpr_token_size,
+                               &remaining_token,
+                               &remaining_token_os,
+                               cmpr_t_cont_bin);
         }
     }
 
     int current_cmpr_token_count; //number of token that are compressed but not
                                   //yet flushed
-    int token_size; //size of the compressed tokens
+    int16_t cmpr_token_size; //size of the compressed tokens
     int16_t current_bitmask_os; //current bit offset of bitmask
     bitmask_t current_bitmask; //current bitmask for (opening/closing)
     cmpr_token_t remaining_token;

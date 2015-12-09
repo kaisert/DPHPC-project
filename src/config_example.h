@@ -4,13 +4,20 @@
 #include "loader/MMapLoader.h"
 #include "tokenizer/SuperChunkTokenizer.h"
 #include "matcher/DFAMatcher.h"
+#include "compression/MyVector.h"
+#include "compression/SupressClosingVSizeDeflator.h"
 
 #define MB ((unsigned long long) (1 << 20))
 #define DEFAULT_CHUNK_SIZE 8*MB
 #define STREAM_RESERVE_MEMORY (MB)
 
 namespace config {
-    using TokenContainerType = VectorWrapper<token_type_t>;
+    typedef uint64_t Bitmask_t;
+    typedef uint8_t Cmpr_Token_t;
+
+//    using TokenContainerType = MyVector<token_type_t>;
+    using TokenContainerType = SupressClosingVSizeDeflator<Bitmask_t, Cmpr_Token_t>;
+
     using OffsetContainerType = vector<char *>;
     using TokenizerType = SuperChunkTokenizer;
     using MatchContainerType = vector<Match>;

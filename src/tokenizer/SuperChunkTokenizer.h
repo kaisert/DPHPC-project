@@ -30,14 +30,14 @@ public:
 
                 Parser parser(chunk_begin, chunk_end, map);
                 
-                tokenContainer ts_container = ts.at(chunk_offset + tid);
-//                ts_container.init(map->size);
+                tokenContainer& ts_container = ts.at(chunk_offset + tid);
+                ts_container.init(map->size);
 
                 auto backiter_ts = back_inserter(ts_container);
                 auto backiter_off = back_inserter(os.at(chunk_offset + tid));
                 parser.parse(backiter_ts, backiter_off);
-                cout << ts_container.size() << "\n";
-//                ts_container.flush();
+
+                ts_container.flush();
             }
 
             chunk_offset += n_threads;

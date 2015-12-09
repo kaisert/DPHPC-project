@@ -27,17 +27,15 @@ public:
         :current_token(NULL_TOKEN)
     {}
 
-    SupressClosingVSizeInflator(int k_token_count, cmpr_token_iter ct_it)
+    SupressClosingVSizeInflator(int16_t cmpr_token_size, cmpr_token_iter ct_it)
         :ct_it(ct_it),
-        cmpr_token_size(0),
+        cmpr_token_size(cmpr_token_size),
         remaining(0),
         remaining_bit_count(0),
         bitmask(0),
         bitmask_remaining(0),
         current_token(-1)
     {
-        int i = k_token_count + 1;
-        do{cmpr_token_size++;}while(i >>= 1);
         (*this)++;
     }
 
@@ -85,6 +83,7 @@ public:
         {
             token = CLOSING_TAG;
         }
+
         bitmask_remaining--;
 
         current_token = token;
@@ -93,7 +92,7 @@ public:
 
 private:
     cmpr_token_iter ct_it;
-    int cmpr_token_size;
+    int16_t cmpr_token_size;
     cmpr_token_t remaining;
     int16_t remaining_bit_count;
     bitmask_t bitmask;
