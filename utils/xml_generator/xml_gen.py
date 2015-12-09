@@ -11,7 +11,7 @@ UNKNOWN="X"
 root_elem = 'root'
 first_level = ['orange', 'apple', 'banana', 'strawberry']
 leaf_level = ['Munich', 'Zurich', 'Bern', 'Berlin', 'Rome',
-    'Stockholm', 'Oslo', UNKNOWN]
+   'Stockholm', 'Oslo', 'Amsterdam', 'Paris', 'Tokyo', 'NewYork', UNKNOWN]
 words = ['lorem', 'ipsum', 'foo', 'bar']
 
 
