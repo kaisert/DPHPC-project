@@ -141,11 +141,5 @@ int main(int argc, char* argv[]) {
     }
     globalTicToc.stop_phase("05. write back");
 
-    cout << "Timing summary:" << endl;
-    for(auto phase = globalTicToc.begin(); phase != globalTicToc.end(); ++phase) {
-        cout << phase->first << ": " << globalTicToc.get_phase_period<chrono::milliseconds>(phase->first) <<
-                " ms" << endl;
-    }
-    cout << "Total Time: " << globalTicToc.get_total_time<chrono::milliseconds>() << " ms" << endl;
-
+    globalTicToc.summary<chrono::milliseconds>(cout);
 }
