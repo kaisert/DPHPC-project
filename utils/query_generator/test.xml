@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?>
+<site>
+<header>
+<title>mini demo XML</title>
+some header <bold> meta </bold> info
+</header>
+<body>
+<incatalone />
+<incat>small</incat>
+<title>my title</title>
+with some more <bold> content</bold> and 
+<bold>another</bold> <emph>EMPH tag</emph>
+<keyword>Schinken</keyword>
+</body>
+</site>

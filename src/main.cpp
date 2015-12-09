@@ -38,11 +38,14 @@ int main(int argc, char* argv[]) {
     int n_threads;
     char* xml_buf;
 
-    GlobalTicToc globalTicToc;
 
-    globalTicToc.start_phase();
-    usleep(1000000);
-    globalTicToc.stop_phase("00. calibration ;-)");
+    cout << "XML-File: " << ARG_XML << endl;
+    cout << "DFA-File: " << ARG_DFA << endl;
+    cout << CONFIG_DESCRIPTION;
+    
+
+
+    GlobalTicToc globalTicToc;
 
     // init mdfa
     string fname_dfas = string(ARG_DFA);
@@ -138,7 +141,6 @@ int main(int argc, char* argv[]) {
     }
     globalTicToc.stop_phase("05. write back");
 
-    cout << "XML-File: " << ARG_XML << endl;
     cout << "Timing summary:" << endl;
     for(auto phase = globalTicToc.begin(); phase != globalTicToc.end(); ++phase) {
         cout << phase->first << ": " << globalTicToc.get_phase_period<chrono::milliseconds>(phase->first) <<

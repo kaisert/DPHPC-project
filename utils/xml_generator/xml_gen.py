@@ -9,9 +9,12 @@ MIN_DEPTH=3
 UNKNOWN="X"
 
 root_elem = 'root'
-first_level = ['orange', 'apple', 'banana', 'strawberry']
-leaf_level = ['Munich', 'Zurich', 'Bern', 'Berlin', 'Rome',
-   'Stockholm', 'Oslo', 'Amsterdam', 'Paris', 'Tokyo', 'NewYork', UNKNOWN]
+first_level = ['orange', 'apple', 'banana', 'strawberry', 'pineapple', 'lemon', 
+   'avocado', 'cherry', 'coconut', 'kiwi', 'mango', 'olive', 'passionfruit',
+   'peach', 'raspberry', 'tomato']
+leaf_level = ['Munich', 'Zurich', 'Bern', 'Berlin', 'Rome', 'Stockholm', 
+   'Oslo', 'Amsterdam', 'Paris', 'Tokyo', 'NewYork', 'Reykjavik', 'Helsinki',
+   'Vienna', 'Dublin', UNKNOWN]
 words = ['lorem', 'ipsum', 'foo', 'bar']
 
 
@@ -140,7 +143,7 @@ def main():
     except Exception as e:
         print("Exception: ", e) 
         print("usage: python script.py <xml-file>"+
-            "<target-size-in-MB>")
+            "<target-size-in-MiB>")
         exit(1)
 
     xml_file = XMLFile(f_xml)

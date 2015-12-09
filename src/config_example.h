@@ -11,9 +11,12 @@
 #define DEFAULT_CHUNK_SIZE 8*MB
 #define STREAM_RESERVE_MEMORY (MB)
 
+
 namespace config {
     typedef uint64_t Bitmask_t;
     typedef uint8_t Cmpr_Token_t;
+
+#define CONFIG_DESCRIPTION "";
 
 //    using TokenContainerType = MyVector<token_type_t>;
     using TokenContainerType = SupressClosingVSizeDeflator<Bitmask_t, Cmpr_Token_t>;
