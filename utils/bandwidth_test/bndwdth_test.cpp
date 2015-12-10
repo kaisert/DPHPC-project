@@ -19,7 +19,7 @@ struct BWTest {
         
         if(alignment != 1) {
             void* buf = reinterpret_cast<void*>(_buf_alloc);
-            _buf_aligned = reinterpret_cast<T*>(align(alignment, Bytes, buf,
+            _buf_aligned = reinterpret_cast<T*>(std::align(alignment, Bytes, buf,
                         _alloc_space));
         }
         _aligned_size = min(_alloc_space/elem_size, Bytes/elem_size);
@@ -93,9 +93,6 @@ struct BWTest {
             sum += v[k];
         }
         return sum;
-    }
-
-    T par_read() {
     }
 
     ~BWTest() {
