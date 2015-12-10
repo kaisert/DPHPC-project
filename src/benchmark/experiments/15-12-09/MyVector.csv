@@ -1,0 +1,25 @@
+XML,MDFA,TokenContainer,threads,tokens,loading,chunking,tokenizer,matcher,writeback,total time
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti1q1G.mdfa,MyVector,60,13847250,607,11167,418,669,0,12861
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti2q1G.mdfa,MyVector,60,13847250,620,11207,443,641,0,12911
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti4q1G.mdfa,MyVector,60,13847250,630,11186,454,626,0,12896
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti8q1G.mdfa,MyVector,60,13847250,623,11186,452,740,0,13001
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti16q1G.mdfa,MyVector,60,13847250,644,11184,1748,644,0,14220
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti32q1G.mdfa,MyVector,60,13847250,655,11185,458,687,0,12985
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti1q1G.mdfa,MyVector,60,13847250,649,11185,420,625,0,12879
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti2q1G.mdfa,MyVector,60,13847250,607,11183,421,609,0,12820
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti4q1G.mdfa,MyVector,60,13847250,619,11189,437,611,0,12856
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti8q1G.mdfa,MyVector,60,13847250,618,11185,438,654,0,12895
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti16q1G.mdfa,MyVector,60,13847250,624,11185,1717,687,0,14213
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti32q1G.mdfa,MyVector,60,13847250,625,11183,451,644,0,12903
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti1q1G.mdfa,MyVector,60,13847250,625,11186,429,608,0,12848
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti2q1G.mdfa,MyVector,60,13847250,619,11182,439,648,0,12888
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti4q1G.mdfa,MyVector,60,13847250,621,11185,442,630,0,12878
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti8q1G.mdfa,MyVector,60,13847250,623,11800,467,685,0,13575
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti16q1G.mdfa,MyVector,60,13847250,630,11185,1765,722,0,14302
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti32q1G.mdfa,MyVector,60,13847250,636,11185,436,635,0,12892
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti1q1G.mdfa,MyVector,60,13847250,643,11187,447,602,0,12879
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti2q1G.mdfa,MyVector,60,13847250,621,11184,424,627,0,12856
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti4q1G.mdfa,MyVector,60,13847250,628,11187,448,616,0,12879
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti8q1G.mdfa,MyVector,60,13847250,624,11185,459,725,0,12993
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti16q1G.mdfa,MyVector,60,13847250,646,11184,1707,710,0,14247
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti32q1G.mdfa,MyVector,60,13847250,618,11185,463,651,0,12917

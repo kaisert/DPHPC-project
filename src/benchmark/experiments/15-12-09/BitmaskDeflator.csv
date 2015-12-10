@@ -1,0 +1,25 @@
+XML,MDFA,TokenContainer,threads,tokens,loading,chunking,tokenizer,matcher,writeback,total time
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti1q1G.mdfa,BitmaskDeflator,60,13847250,640,11165,420,1303,0,13528
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti2q1G.mdfa,BitmaskDeflator,60,13847250,631,11169,407,1310,0,13517
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti4q1G.mdfa,BitmaskDeflator,60,13847250,653,11186,401,1325,0,13565
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti8q1G.mdfa,BitmaskDeflator,60,13847250,654,11185,398,1554,0,13791
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti16q1G.mdfa,BitmaskDeflator,60,13847250,608,11183,433,1545,0,13769
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti32q1G.mdfa,BitmaskDeflator,60,13847250,635,11184,438,1375,0,13632
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti1q1G.mdfa,BitmaskDeflator,60,13847250,627,11183,427,1303,0,13540
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti2q1G.mdfa,BitmaskDeflator,60,13847250,635,11184,409,1315,0,13543
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti4q1G.mdfa,BitmaskDeflator,60,13847250,641,11183,412,1321,0,13557
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti8q1G.mdfa,BitmaskDeflator,60,13847250,635,11182,397,1331,0,13545
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti16q1G.mdfa,BitmaskDeflator,60,13847250,645,11183,432,1349,0,13609
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti32q1G.mdfa,BitmaskDeflator,60,13847250,636,11186,419,1509,0,13750
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti1q1G.mdfa,BitmaskDeflator,60,13847250,609,11182,421,1362,0,13574
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti2q1G.mdfa,BitmaskDeflator,60,13847250,627,11183,401,1319,0,13530
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti4q1G.mdfa,BitmaskDeflator,60,13847250,650,11189,404,1324,0,13567
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti8q1G.mdfa,BitmaskDeflator,60,13847250,622,11183,405,1329,0,13539
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti16q1G.mdfa,BitmaskDeflator,60,13847250,634,11181,426,1527,0,13768
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti32q1G.mdfa,BitmaskDeflator,60,13847250,619,11184,419,1536,0,13758
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti1q1G.mdfa,BitmaskDeflator,60,13847250,627,11182,413,1305,0,13527
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti2q1G.mdfa,BitmaskDeflator,60,13847250,636,11183,445,1305,0,13569
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti4q1G.mdfa,BitmaskDeflator,60,13847250,615,11182,442,1508,0,13747
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti8q1G.mdfa,BitmaskDeflator,60,13847250,636,11182,434,1338,0,13590
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti16q1G.mdfa,BitmaskDeflator,60,13847250,645,11183,437,1349,0,13614
+/mnt/hostfs/bakadi/arti1G.xml,/mnt/hostfs/bakadi/arti32q1G.mdfa,BitmaskDeflator,60,13847250,642,11184,413,1347,0,13586
