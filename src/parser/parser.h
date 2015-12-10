@@ -7,7 +7,7 @@
 class Parser {
 private:
     Lexer lxr;
-    TagMap map;
+    TagMap& map;
 public:
     Parser(char * begin, char *, TagMap &map);
     
@@ -21,6 +21,7 @@ public:
                 case START_END_TAG: {
                     TagKey k(tag.begin + 1, tag.end_of_id);
                     token_type_t type = map.get_value(k);
+
                     *ts++ = type;
                     *os++ = tag.begin;
                     *ts++ = -type;

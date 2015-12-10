@@ -12,15 +12,17 @@ TagMap::TagMap(std::string path)
 
 		f_stream.seekg(0, std::ios_base::beg);
 		f_stream.read(&tokens[0], size);
+
 	}
 	char* begin = tokens.data();
     token_type_t i = 1;
 	for(char *it = tokens.data(); it < tokens.data() + tokens.size(); ++it) {
 		if(*it == '\n') {
-			TagKey new_key(begin, it - 1);
+			TagKey new_key(begin, it);
 			begin = it + 1;
-			map[new_key] = i++;
+			map[new_key] = i;
+            std::cout << map[new_key] << std::endl;
+            i++;
 		}
 	}
-
 }

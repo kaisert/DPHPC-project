@@ -11,8 +11,6 @@ set(SOURCE_FILES
         compression/SupressClosingVSizeInflator.h
         compression/MyVector.h
         compression/BitmaskUtils.h
-        compression/DecodeUKTokensDeflator.h
-        compression/DecodeUKTokensInflator.h
         parser/lexer.h
         parser/lexer.cpp
         parser/TagMap.h

@@ -19,9 +19,12 @@ public:
     template<typename MatchContainerType, typename TokenContainerType>
     void operator() (vector<MatchContainerType> &ms, vector<TokenContainerType> &ts, MultiDFA& multiDFA) {
         int n_threads = multiDFA.size();
-#pragma omp parallel num_threads(n_threads) shared(multiDFA, ms, ts)
+        cout << n_threads;
+#pragma omp parallel num_threads(n_threads) shared(multiDFA, ms, ts) firstprivate(n_threads)
         {
+            std::ostringstream ss;
             int tid = omp_get_thread_num() % n_threads;
+            ss<< tid << " " << endl; cout << ss.str();
             MultiDFA::DFA* dfa = multiDFA.get_dfa(tid);
             MultiDFA::state_t q_cur = dfa->start_state();
 

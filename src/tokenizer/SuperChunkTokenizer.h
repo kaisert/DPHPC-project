@@ -19,20 +19,23 @@ public:
         no_chunks = chunker.no_chunks();
         while (chunk_offset < no_chunks) {
             n_threads = min(no_chunks - chunk_offset, n_threads);
-#pragma omp parallel num_threads(n_threads) shared(map, chunker, ts)
+#pragma omp parallel num_threads(n_threads) shared(map, chunker, ts) firstprivate(n_threads)
             {
                 int tid;
                 char *chunk_begin, *chunk_end;
 
 
                 tid = omp_get_thread_num() % n_threads;
+
                 chunk_begin = chunker.get_chunk(chunk_offset + tid);
                 chunk_end = chunker.get_chunk(chunk_offset + tid + 1);
 
                 Parser parser(chunk_begin, chunk_end, map);
                 
                 tokenContainer& ts_container = ts.at(chunk_offset + tid);
+
                 ts_container.init(map.size());
+
 
                 auto backiter_ts = back_inserter(ts_container);
                 auto backiter_off = back_inserter(os.at(chunk_offset + tid));

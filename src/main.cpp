@@ -92,6 +92,7 @@ int main(int argc, char* argv[]) {
         of_iter->reserve(STREAM_RESERVE_MEMORY);
     }
 
+
     config::TokenizerType tokenizer;
     // ############ TOKENIZE
     //Map * map = alloc_map(ARG_TOKENS);
@@ -102,7 +103,7 @@ int main(int argc, char* argv[]) {
     //destroy_map(map);
     // ############ END OF TOKENIZE
 
-
+    cout << "matching..." << endl;
     n_threads = multiDFA.size();
     // initialize memory for matches
     vector<config::MatchContainerType> matches(n_threads);

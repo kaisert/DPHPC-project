@@ -16,10 +16,12 @@ public:
 
     token_type_t get_value(TagKey &k)
     {
-        return map[k];
+		token_type_t t = map[k];
+		//std::cout << t;
+        return t;
     }
 
-    unsigned long size() {
+    size_t size() {
         return map.size();
     }
 

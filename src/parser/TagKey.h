@@ -6,6 +6,7 @@
 #define DPHPC15_TAGKEY_H
 
 #include<cstring>
+#include <sstream>
 
 class TagKey {
 public:
@@ -18,10 +19,14 @@ public:
             : begin(begin),
               end(end)
     {
+        //std::ostringstream ss;
         std::size_t hash = 5381;
-        for(char* current = begin; current != end; ++current) {
+        for(char* current = begin; current < end; ++current) {
             hash = ((hash << 5) + hash) + *current;
+            //ss << *current;
         }
+        //ss << " " << (end-begin) << std::endl;
+        //std::cout << ss.str();
         hash_value = hash;
     }
 
@@ -29,8 +34,7 @@ public:
     std::size_t hash_value;
 
     bool operator==(const TagKey &other) const {
-        return hash_value == other.hash_value &&
-        strings_are_equal(*this, other);
+        return strings_are_equal(*this, other);
     }
 
 private:
@@ -38,7 +42,7 @@ private:
         std::size_t size_a = a.end - a.begin;
         std::size_t size_b = b.end - b.begin;
         int cmp = std::strncmp(a.begin, b.begin, std::min(size_a, size_b));
-        return cmp == 0;
+        return (cmp == 0);
     }
 
 };
