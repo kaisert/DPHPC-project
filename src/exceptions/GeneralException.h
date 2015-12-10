@@ -1,9 +1,5 @@
 //
 // Created by Stefan Dietiker on 07/12/15.
-//
-
-#include<exception>
-#include<string>
 
 #ifndef DPHPC15_GENERALEXCEPTION_H
 #define DPHPC15_GENERALEXCEPTION_H

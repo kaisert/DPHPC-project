@@ -4,19 +4,21 @@
 #define omp_get_thread_num() 0
 #endif
 
-#include<iostream>
-#include<fstream>
+#include <stddef.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <chrono>
 
-#include<unistd.h>
-#include <thread>
-
-#include"parser/parser.h"
-
-#include"multi_dfa/MultiDFA.h"
 #include "timing/GlobalTicToc.h"
-#include "chunker/test/Chunker.h"
+#include "multi_dfa/MultiDFA.h"
 #include "exceptions/GeneralException.h"
-#include"config_local.h"
+#include "chunker/test/Chunker.h"
+#include "parser/TagMap.h"
+#include "config_local.h"
 
 using namespace std;
 

@@ -1,8 +1,5 @@
 #ifndef VECTOR_WRAPPER
 #define VECTOR_WRAPPER
-
-#include<vector>
-
 template<typename T>
 class MyVector : public std::vector<T> {
 private:

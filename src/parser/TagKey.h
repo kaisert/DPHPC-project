@@ -5,9 +5,7 @@
 #ifndef DPHPC15_TAGKEY_H
 #define DPHPC15_TAGKEY_H
 
-#include<cstddef>
 #include<cstring>
-#include<algorithm>
 
 class TagKey {
 public:

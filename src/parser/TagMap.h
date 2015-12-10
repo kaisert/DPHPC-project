@@ -1,19 +1,27 @@
 #ifndef TAG_MAP_H
 #define TAG_MAP_H
-#include <unordered_map>
-#include <string>
-#include <fstream>
-#include <vector>
-#include <iterator>
 
-#include "TagKey.h"
-#include "../config_local.h"
+#include<vector>
+#include<string>
+#include<unordered_map>
+#include<iostream>
+#include<fstream>
+#include"TagKey.h"
+#include "../token_type.h"
+
 
 class TagMap {
 public:
 	TagMap(std::string path);
-	inline config::token_type_t get_value(TagKey &k);
-	inline unsigned long size();
+
+    token_type_t get_value(TagKey &k)
+    {
+        return map[k];
+    }
+
+    unsigned long size() {
+        return map.size();
+    }
 
 private:
 	struct KeyHasher
@@ -23,7 +31,7 @@ private:
 			return k.hash_value;
 		}
 	};
-	std::unordered_map<TagKey, config::token_type_t, KeyHasher> map;
+	std::unordered_map<TagKey, token_type_t, KeyHasher> map;
 };
 
 #endif

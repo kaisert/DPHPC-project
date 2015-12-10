@@ -1,8 +1,7 @@
 //
 // Created by Stefan Dietiker on 30/11/15.
 //
-
-#include "GlobalTicToc.h"
+#include"GlobalTicToc.h"
 
 void GlobalTicToc::start_phase() {
     _cur_phase = high_resolution_clock::now();

@@ -1,10 +1,7 @@
 #ifndef SUPRESS_CLOSING_V_SIZE_INFLATOR_H
 #define SUPRESS_CLOSING_V_SIZE_INFLATOR_H
 
-#include<cstdint>
-#include<iterator>
-#include"../config_local.h"
-#include"BitmaskUtils.h"
+
 
 #ifndef BIT_SIZE
 #define BIT_SIZE(x) (sizeof(x) * 8)
@@ -49,8 +46,8 @@ public:
         return !operator==(a,b); 
     }
     
-    inline token_type_t operator*(){return current_token;}
-    inline token_type_t * operator->(){return &current_token;}
+    inline config::token_type_t operator*(){return current_token;}
+    inline config::token_type_t * operator->(){return &current_token;}
 
     SupressClosingVSizeInflator& operator++(int)
     {
@@ -67,7 +64,7 @@ public:
             bitmask_remaining = BIT_SIZE(bitmask_t);
         }
         
-        token_type_t token;
+        config::token_type_t token;
         if((bitmask >> (bitmask_remaining - 1)) & 1)
         {
             token = extract_token(
@@ -95,7 +92,7 @@ private:
     int16_t remaining_bit_count;
     bitmask_t bitmask;
     int16_t bitmask_remaining;
-    token_type_t current_token;
+    config::token_type_t current_token;
 };
 
 #endif

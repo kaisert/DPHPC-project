@@ -14,7 +14,7 @@ TagMap::TagMap(std::string path)
 		f_stream.read(&tokens[0], size);
 	}
 	char* begin = tokens.data();
-    config::token_type_t i = 1;
+    token_type_t i = 1;
 	for(char *it = tokens.data(); it < tokens.data() + tokens.size(); ++it) {
 		if(*it == '\n') {
 			TagKey new_key(begin, it - 1);
@@ -23,13 +23,4 @@ TagMap::TagMap(std::string path)
 		}
 	}
 
-}
-
-inline config::token_type_t TagMap::get_value(TagKey &k)
-{
-    return map[k];
-}
-
-inline unsigned long TagMap::size() {
-    return map.size();
 }

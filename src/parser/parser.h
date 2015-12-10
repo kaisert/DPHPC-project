@@ -1,14 +1,8 @@
 #ifndef	PARSER_H
 #define PARSER_H
 
-#include<stdlib.h>
-#include<stdint.h>
-#include<stdio.h>
-#include<iterator>
-
-#include"lexer.h"
 #include "TagMap.h"
-#include"../config_local.h"
+#include "lexer.h"
 
 class Parser {
 private:
@@ -26,7 +20,7 @@ public:
             {
                 case START_END_TAG: {
                     TagKey k(tag.begin + 1, tag.end_of_id);
-                    config::token_type_t type = map.get_value(k);
+                    token_type_t type = map.get_value(k);
                     *ts++ = type;
                     *os++ = tag.begin;
                     *ts++ = -type;
@@ -35,14 +29,14 @@ public:
                    }
                 case START_TAG: {
                     TagKey k(tag.begin + 1, tag.end_of_id);
-                    config::token_type_t type = map.get_value(k);
+                    token_type_t type = map.get_value(k);
                     *ts++ = type;
                     *os++ = tag.begin;
                     break;
                  }
                 case END_TAG:{
                     TagKey k(tag.begin + 2, tag.end_of_id);
-                    config::token_type_t type = map.get_value(k);
+                    token_type_t type = map.get_value(k);
                     *ts++ = -type;
                     *os++ = tag.begin;
                     break;

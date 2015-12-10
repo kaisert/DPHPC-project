@@ -5,13 +5,16 @@
 #ifndef DPHPC15_DFAMATCHER_H
 #define DPHPC15_DFAMATCHER_H
 
-#include "../multi_dfa/MultiDFA.h"
-#include "Match.h"
+#include <vector>
+#include <omp.h>
+#include <stdint.h>
+#include "../token_type.h"
 
 #define STACK_SIZE 256
 
-class DFAMatcher {
+using namespace std;
 
+class DFAMatcher {
 public:
     template<typename MatchContainerType, typename TokenContainerType>
     void operator() (vector<MatchContainerType> &ms, vector<TokenContainerType> &ts, MultiDFA& multiDFA) {

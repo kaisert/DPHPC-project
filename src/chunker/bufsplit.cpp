@@ -1,4 +1,4 @@
-#include<stddef.h>
+#include"bufsplit.h"
 
 int bufsplit_split_xml_stream(
         char* stream,

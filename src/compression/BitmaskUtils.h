@@ -1,12 +1,5 @@
 #ifndef BITMASKUTILS_H
 #define BITMASKUTILS_H
-#include<vector>
-#include<iostream>
-#include<cstdint>
-
-#include<typeinfo>
-
-#include"../config_local.h"
 
 #ifndef BIT_SIZE
 #define BIT_SIZE(x) ((int16_t) (sizeof(x) * 8))
@@ -110,7 +103,7 @@ inline void extract_bitmask(
 }
 
 template<typename cmpr_token_t, typename in_iter>
-inline token_type_t extract_bit(
+inline config::token_type_t extract_bit(
         in_iter &it,
         cmpr_token_t *remaining,
         int16_t *remaining_bit_count)
@@ -120,8 +113,8 @@ inline token_type_t extract_bit(
         *remaining = *it++;
         *remaining_bit_count = BIT_SIZE(cmpr_token_t);
     }
-    token_type_t t = (*remaining) >> BIT_SIZE(cmpr_token_t);
-    token_type_t mask = 1;
+    config::token_type_t t = (*remaining) >> BIT_SIZE(cmpr_token_t);
+    config::token_type_t mask = 1;
     t &= mask;
     *remaining >>= 1;
     *remaining_bit_count -= 1;
@@ -129,7 +122,7 @@ inline token_type_t extract_bit(
 }
 
 template<typename cmpr_token_t, typename in_iter>
-inline token_type_t extract_token(
+inline config::token_type_t extract_token(
         in_iter &it,
         cmpr_token_t *remaining,
         int16_t *remaining_bit_count,

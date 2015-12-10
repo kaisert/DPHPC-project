@@ -2,16 +2,16 @@
 // Created by Stefan Dietiker on 30/11/15.
 //
 
-#include<string>
-#include<chrono>
-#include<map>
-#include<tuple>
-
-using namespace std;
-using namespace std::chrono;
 
 #ifndef DPHPC15_GLOBALTICTOC_H
 #define DPHPC15_GLOBALTICTOC_H
+
+#include<chrono>
+#include<string>
+#include<map>
+
+using namespace std;
+using namespace std::chrono;
 
 class GlobalTicToc {
     using timepoint_t = time_point<high_resolution_clock>;

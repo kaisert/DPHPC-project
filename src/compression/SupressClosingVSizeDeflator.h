@@ -1,15 +1,6 @@
 #ifndef DPHPC15_SURPRESSCLOSINGDEFLATOR_H
 #define DPHPC15_SURPRESSCLOSINGDEFLATOR_H
 
-#include <memory>
-#include <vector>
-#include <iterator>
-#include "../config_local.h"
-#include "BitmaskUtils.h"
-#include "SupressClosingVSizeInflator.h"
-
-#include<iostream>
-
 #ifndef NULL_TOKEN
 #define NULL_TOKEN ((cmpr_token_t) 0x0)
 #endif
