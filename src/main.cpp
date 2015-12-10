@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
     globalTicToc.stop_phase("02. chunking");
     // ############
 
-    // printf("%d\n", no_chunks);
+
     // we want at least as many (meaningful) chunks as threads
     if(no_chunks < n_threads) panic("your xml is too small!");
 
