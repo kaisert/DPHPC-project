@@ -7,30 +7,26 @@
 #include<iterator>
 
 #include"lexer.h"
-#include"map.h"
-#include"token_list.h"
+#include "TagMap.h"
+#include"../config_local.h"
 
 class Parser {
 private:
     Lexer lxr;
-    Map *map;
-    Token remaining_token;
-    bool remaining_token_exists;
+    TagMap map;
 public:
-    Parser(char * begin, char *, Map *map);
+    Parser(char * begin, char *, TagMap &map);
     
     template<typename ts_oiter,typename  off_oiter>
      void parse(ts_oiter &ts, off_oiter &os) {
         Tag tag;
         while(get_next_tag(& lxr, &tag) == 1)
         {
-            Key k;
             switch(tag.type)
             {
                 case START_END_TAG: {
-                    k.begin = tag.begin + 1;
-                    k.end = tag.end_of_id;
-                    token_type_t type = get_value(&k, map);
+                    TagKey k(tag.begin + 1, tag.end_of_id);
+                    config::token_type_t type = map.get_value(k);
                     *ts++ = type;
                     *os++ = tag.begin;
                     *ts++ = -type;
@@ -38,17 +34,15 @@ public:
                     break;
                    }
                 case START_TAG: {
-                    k.begin = tag.begin + 1;
-                    k.end = tag.end_of_id;
-                    token_type_t type = get_value(&k, map);
+                    TagKey k(tag.begin + 1, tag.end_of_id);
+                    config::token_type_t type = map.get_value(k);
                     *ts++ = type;
                     *os++ = tag.begin;
                     break;
                  }
                 case END_TAG:{
-                    k.begin = tag.begin + 2;
-                    k.end = tag.end_of_id;
-                    token_type_t type = (get_value(&k, map));
+                    TagKey k(tag.begin + 2, tag.end_of_id);
+                    config::token_type_t type = map.get_value(k);
                     *ts++ = -type;
                     *os++ = tag.begin;
                     break;
@@ -61,16 +55,4 @@ public:
     }
     
 };
-/*
-typedef struct Parser {
-	Lexer lxr;
-	Map map;
-	Token remaining_token;
-	uint16_t remaining_token_exists;
-} Parser;
-
-extern Parser * alloc_parser(char *, char *);
-extern int get_next_token(Parser *, Token *);
-extern void init_parser(Parser *, Map*);
-*/
 #endif

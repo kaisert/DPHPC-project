@@ -7,8 +7,7 @@
 
 #include<fstream>
 #include <vector>
-#include "../parser/token_list.h"
-
+#include "../config_local.h"
 
 using namespace std;
 
@@ -20,7 +19,7 @@ public:
         friend class MultiDFA;
     public:
         DFA(state_t start_state, size_t dfa_size, size_t alphabet_size);
-        state_t operator() (state_t q, token_type_t t);
+        state_t operator() (state_t q, config::token_type_t t);
         bool is_accepting(state_t q) { return q<0; }
         state_t start_state() { return _start_state; };
     private:

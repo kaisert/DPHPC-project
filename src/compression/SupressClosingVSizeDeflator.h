@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 #include <iterator>
-#include "../parser/token_list.h"
+#include "../config_local.h"
 #include "BitmaskUtils.h"
 #include "SupressClosingVSizeInflator.h"
 
@@ -15,7 +15,8 @@
 #endif
 
 template<typename bitmask_t, typename cmpr_token_t>
-class SupressClosingVSizeDeflator: public std::iterator<std::output_iterator_tag, token_type_t> {
+class SupressClosingVSizeDeflator:
+        public std::iterator<std::output_iterator_tag, config::token_type_t> {
 private:
     typedef typename std::vector<cmpr_token_t>::const_iterator cmpr_iterator;
     typedef SupressClosingVSizeInflator<
@@ -35,9 +36,10 @@ public:
     {
     }
 
-    using Token_Type = std::allocator<token_type_t>;
+    using Token_Type = std::allocator<config::token_type_t>;
     typedef Token_Type allocator_type;
-    //typedef typename Token_Type::value_type typedef typename Token_Type::reference reference;
+    typedef typename Token_Type::value_type value_type;
+    typedef typename Token_Type::reference reference;
     typedef typename Token_Type::const_reference const_reference;
     typedef typename Token_Type::difference_type difference_type;
     typedef typename Token_Type::size_type size_type;
@@ -51,8 +53,6 @@ public:
       int i = token_count + 1;
       do{ cmpr_token_size++;} while(i >>= 1);
     }
-    
-    int size() { return token_count;}
 
     void flush()
     {
@@ -62,6 +62,7 @@ public:
         *cmpr_t_cont_bin++ = remaining_token;
     }
 
+    int size() { return token_count;}
 
     Inflator begin()
     {
@@ -74,7 +75,7 @@ public:
     }
 
    // SupressClosingVSizeDeflator& operator=(token_type_t t)
-    void push_back(token_type_t t)
+    void push_back(config::token_type_t t)
     {
         int pos = BIT_SIZE(bitmask_t) - 1 - current_cmpr_token_count;
         if(t < 0)
@@ -97,9 +98,8 @@ public:
     }
 
     void reserve(std::size_t n) {cmpr_t_cont.reserve(n);}
-    //void push_back(token_type_t t){(*this) = t;}
-private:
 
+private:
     inline void push_back_tokens()
     {
         push_back_one_token(current_bitmask,
@@ -126,7 +126,7 @@ private:
     int16_t remaining_token_os;
     int token_count;
 
-    std::vector<token_type_t> t_buf;
+    std::vector<config::token_type_t> t_buf;
     std::vector<cmpr_token_t> cmpr_t_cont;
     std::back_insert_iterator< std::vector<cmpr_token_t> > cmpr_t_cont_bin;
     Inflator end_inflator;

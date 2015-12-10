@@ -3,7 +3,7 @@
 
 #include<cstdint>
 #include<iterator>
-#include"../parser/token_list.h"
+#include"../config_local.h"
 #include"BitmaskUtils.h"
 
 #ifndef BIT_SIZE
@@ -18,9 +18,7 @@
 #define CLOSING_TAG -1
 #endif
 
-template<typename cmpr_token_iter,
-    typename bitmask_t,
-    typename cmpr_token_t>
+template<typename cmpr_token_iter, typename bitmask_t, typename cmpr_token_t>
 class SupressClosingVSizeInflator/*: public virtual std::iterator */{
 public:
     SupressClosingVSizeInflator()

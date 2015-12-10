@@ -6,7 +6,7 @@
 
 #include<typeinfo>
 
-#include"../parser/token_list.h"
+#include"../config_local.h"
 
 #ifndef BIT_SIZE
 #define BIT_SIZE(x) ((int16_t) (sizeof(x) * 8))

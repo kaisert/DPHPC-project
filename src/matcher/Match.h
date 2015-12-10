@@ -5,10 +5,10 @@
 #ifndef DPHPC15_MATCH_H
 #define DPHPC15_MATCH_H
 
-#include "../parser/token_list.h"
+#include "../config_local.h"
 
 struct Match {
-    token_type_t token_type;
+    config::token_type_t token_type;
     unsigned long chunk_index;
     unsigned long token_index;
 };

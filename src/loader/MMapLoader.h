@@ -9,6 +9,7 @@
 #include <sys/fcntl.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
+#include <unistd.h>
 #include "../exceptions/GeneralException.h"
 
 #ifdef __APPLE__
@@ -18,7 +19,7 @@
 
 class MMapLoader {
 public:
-    virtual char *operator()(string fname) {
+    virtual char *operator()(std::string fname) {
         struct stat f_xml_stat;
 
         _fd_xml = open(fname.c_str(), O_RDWR);
