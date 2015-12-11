@@ -7,6 +7,7 @@
 
 #include<cstring>
 #include <sstream>
+#include<string>
 
 class TagKey {
 public:
@@ -19,25 +20,44 @@ public:
             : begin(begin),
               end(end)
     {
-        //std::ostringstream ss;
         std::size_t hash = 5381;
         for(char* current = begin; current < end; ++current) {
             hash = ((hash << 5) + hash) + *current;
-            //ss << *current;
         }
-        //ss << " " << (end-begin) << std::endl;
-        //std::cout << ss.str();
         hash_value = hash;
+        //print();
     }
 
     char *begin, *end;
     std::size_t hash_value;
 
     bool operator==(const TagKey &other) const {
+        std::ostringstream ss;
+        print(ss);
+        ss << " == ";
+        other.print(ss);
+        ss << std::endl;
+        //std::cout << ss.str();
         return strings_are_equal(*this, other);
     }
 
 private:
+    void print() const {
+        std::ostringstream ss;
+        print(ss);
+        ss << hash_value;
+        ss << " :: ";
+        std::cout << ss.str();
+    }
+
+    void print(std::ostringstream& ss) const {
+        for(char* current = begin; current < end; ++current) {
+            ss << *current;
+        }
+        ss << " " << (end-begin);
+        //std::cout << ss.str();
+    }
+
     bool strings_are_equal(const TagKey &a, const TagKey &b) const {
         std::size_t size_a = a.end - a.begin;
         std::size_t size_b = b.end - b.begin;

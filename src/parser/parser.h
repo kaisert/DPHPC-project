@@ -29,15 +29,31 @@ public:
                     break;
                    }
                 case START_TAG: {
+                    std::ostringstream ss;
                     TagKey k(tag.begin + 1, tag.end_of_id);
+                    if(*(tag.begin + 1) == 'N')
+//                    if(std::strncmp(tag.begin + 1, "N", 3) == 0)
+                        for(auto c = tag.begin + 1; c != tag.end_of_id; ++c)
+                            ss << *c;
                     token_type_t type = map.get_value(k);
+                    ss << " type: " << type;
+                    ss << std::endl;
+                    //ss << "<";
+                    //ss << type;
+                    //ss << "> ";
+                    std::cout << ss.str();
                     *ts++ = type;
                     *os++ = tag.begin;
                     break;
                  }
                 case END_TAG:{
+                    //std::ostringstream ss;
                     TagKey k(tag.begin + 2, tag.end_of_id);
                     token_type_t type = map.get_value(k);
+                    //ss << "</";
+                    //ss << type;
+                    //ss << "> ";
+//                    std::cout << ss.str();
                     *ts++ = -type;
                     *os++ = tag.begin;
                     break;

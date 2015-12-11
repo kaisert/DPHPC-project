@@ -131,6 +131,7 @@ int main(int argc, char* argv[]) {
         ofstream of_results(ARG_OUTPUT);
 
         for (uint32_t query = 0; query != matches.size(); ++query) {
+            cout << matches[query].size() << endl;
             for (auto match = matches[query].begin(); match != matches[query].end(); ++match) {
                 char *buf_offset = offset_streams[match->chunk_index][match->token_index];
                 uint64_t file_offset = reinterpret_cast<uint64_t>(buf_offset)

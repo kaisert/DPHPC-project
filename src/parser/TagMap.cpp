@@ -20,7 +20,7 @@ TagMap::TagMap(std::string path)
 		if(*it == '\n') {
 			TagKey new_key(begin, it);
 			begin = it + 1;
-			map[new_key] = i;
+			map[new_key] = static_cast<token_type_t >(i);
             std::cout << map[new_key] << std::endl;
             i++;
 		}

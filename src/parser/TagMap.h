@@ -16,9 +16,10 @@ public:
 
     token_type_t get_value(TagKey &k)
     {
-		token_type_t t = map[k];
-		//std::cout << t;
-        return t;
+		auto search = map.find(k);
+        if(search != map.end())
+            return search->second;
+        return map.size()+1;
     }
 
     size_t size() {
