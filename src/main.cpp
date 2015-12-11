@@ -41,9 +41,7 @@ int main(int argc, char* argv[]) {
 
     cout << "XML-File: " << ARG_XML << endl;
     cout << "DFA-File: " << ARG_DFA << endl;
-    cout << CONFIG_DESCRIPTION;
-    
-
+    //cout << CONFIG_DESCRIPTION;
 
     GlobalTicToc globalTicToc;
 
@@ -96,11 +94,10 @@ int main(int argc, char* argv[]) {
 
     config::TokenizerType tokenizer;
     // ############ TOKENIZE
-    Map * map = alloc_map(ARG_TOKENS);
+    TagMap map(ARG_TOKENS);
     globalTicToc.start_phase();
     tokenizer(token_streams, offset_streams, map, chunker);
     globalTicToc.stop_phase("03. tokenizer");
-    destroy_map(map);
     // ############ END OF TOKENIZE
 
 

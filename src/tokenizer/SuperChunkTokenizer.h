@@ -8,12 +8,13 @@
 #include <omp.h>
 #include "../parser/parser.h"
 #include "../chunker/test/Chunker.h"
+#include "../parser/TagMap.h"
 #include<iterator>
 
 class SuperChunkTokenizer {
 public:
     template<typename tokenContainer, typename offsetContainer>
-    void operator()(vector<tokenContainer> &ts, vector<offsetContainer> &os, Map* map, Chunker &chunker) {
+    void operator()(vector<tokenContainer> &ts, vector<offsetContainer> &os, TagMap map, Chunker &chunker) {
         size_t no_chunks = 0, chunk_offset = 0, n_threads;
         no_chunks = chunker.no_chunks();
         while (chunk_offset < no_chunks) {
@@ -31,7 +32,7 @@ public:
                 Parser parser(chunk_begin, chunk_end, map);
                 
                 tokenContainer& ts_container = ts.at(chunk_offset + tid);
-                ts_container.init(map->size);
+                ts_container.init(map.size());
 
                 auto backiter_ts = back_inserter(ts_container);
                 auto backiter_off = back_inserter(os.at(chunk_offset + tid));

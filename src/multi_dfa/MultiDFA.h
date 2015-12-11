@@ -7,7 +7,8 @@
 
 #include<fstream>
 #include <vector>
-#include "../parser/token_list.h"
+
+#include "../token_type.h"
 
 
 using namespace std;

@@ -9,6 +9,7 @@
 #include <sys/fcntl.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
+#include <sys/unistd.h>
 #include "../exceptions/GeneralException.h"
 
 #ifdef __APPLE__

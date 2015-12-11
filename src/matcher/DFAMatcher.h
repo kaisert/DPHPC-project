@@ -8,6 +8,10 @@
 #include "../multi_dfa/MultiDFA.h"
 #include "Match.h"
 
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #define STACK_SIZE 256
 
 class DFAMatcher {
