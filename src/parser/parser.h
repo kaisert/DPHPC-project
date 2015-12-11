@@ -7,7 +7,6 @@
 #include<iterator>
 
 #include"lexer.h"
-#include"token_list.h"
 #include"TagMap.h"
 
 class Parser {

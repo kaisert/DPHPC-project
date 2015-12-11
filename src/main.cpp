@@ -10,7 +10,6 @@
 #include<unistd.h>
 #include <thread>
 
-#include"parser/token_list.h"
 #include"parser/parser.h"
 
 #include"multi_dfa/MultiDFA.h"

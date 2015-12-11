@@ -6,7 +6,7 @@
 #define DPHPC15_TAGKEY_H
 
 #include<cstring>
-#include <sstream>
+#include<sstream>
 #include<string>
 
 class TagKey {
