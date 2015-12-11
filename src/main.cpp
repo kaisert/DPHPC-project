@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
     // ############ TOKENIZE
     TagMap map(ARG_TOKENS);
     globalTicToc.start_phase();
-    tokenizer(token_streams, offset_streams, map, chunker);
+    tokenizer(token_streams, offset_streams, map, chunker, n_threads);
     globalTicToc.stop_phase("03. tokenizer");
     // ############ END OF TOKENIZE
 
