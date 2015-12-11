@@ -31,6 +31,7 @@ public:
     }
 
 private:
+	std::vector<char> _token_data;
 	struct KeyHasher
 	{
 		std::size_t operator()(const TagKey& k) const

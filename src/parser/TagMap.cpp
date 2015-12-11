@@ -3,20 +3,20 @@
 TagMap::TagMap(std::string path)
 {
 	std::ifstream f_stream(path, std::ios::binary);
-	std::vector<char> tokens;
+
 
 	if(!f_stream.eof() && !f_stream.fail()) {
 		f_stream.seekg(0, std::ios_base::end);
 		std::streampos size = f_stream.tellg();
-		tokens.resize(size);
+		_token_data.resize(size);
 
 		f_stream.seekg(0, std::ios_base::beg);
-		f_stream.read(&tokens[0], size);
+		f_stream.read(&_token_data[0], size);
 
 	}
-	char* begin = tokens.data();
+	char* begin = _token_data.data();
     token_type_t i = 1;
-	for(char *it = tokens.data(); it < tokens.data() + tokens.size(); ++it) {
+	for(char *it = _token_data.data(); it < _token_data.data() + _token_data.size(); ++it) {
 		if(*it == '\n') {
 			TagKey new_key(begin, it);
 			begin = it + 1;

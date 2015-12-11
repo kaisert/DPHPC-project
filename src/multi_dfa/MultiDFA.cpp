@@ -40,8 +40,6 @@ MultiDFA::state_t MultiDFA::DFA::operator()(MultiDFA::state_t q, token_type_t t)
     if(t > 0) {
         t--;
     }
-    //cout << "delta(" << q << ", " << t << ") -> " << _state_table[q*static_cast<int>(_alphabet_size) + t]
-    //        << endl;
     return _state_table[q*static_cast<int>(_alphabet_size) + t];
 }
 
