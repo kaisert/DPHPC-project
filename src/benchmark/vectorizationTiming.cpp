@@ -11,16 +11,15 @@ using namespace std;
 
 #define MB (1024L*1024)
 #define GB (1024L*1024*1024)
-#define CODE_UNVECTORIZED
 
 /* used test settings */
 const bool PRINT_READ_SIZE_CHANGE_WARNING = false;
-const int VECTORIZATION_FACTOR = 16; // number of 32bit integers to vectorize
+const int VECTORIZATION_FACTOR = 256; // number of 32bit integers to vectorize
 
 // vectorization test
 const long long MAX_SIZE = 8L*GB+1;
 const long long MIN_SUPERCHUNKS = 1;
-const long long MAX_SUPERCHUNKS = 4;
+const long long MAX_SUPERCHUNKS = 64;
 const long long READ_SIZE = 32L*GB;
 const long long SET_THREADS = 60;
 const long long INIT_STRIDE = 128L*MB/60;
@@ -133,25 +132,20 @@ void do_experiment(char* buf, long long stride, bool use_vectorized_code) {
                         if (use_vectorized_code) {
                             uint32_t vcrc [VECTORIZATION_FACTOR];
                             memset(vcrc,0,sizeof(vcrc[0])*VECTORIZATION_FACTOR);
-                            for (long long i = start/4;i<end/4;i+=VECTORIZATION_FACTOR) {
-
-                                if (i+VECTORIZATION_FACTOR <= end/4) {
-                                    for (int vec=0;vec<VECTORIZATION_FACTOR;++vec) {
-                                        vcrc[vec] += buf32[i+vec];
-                                    }
+                            long long i;
+                            for (i = start/4;i<=end/4-VECTORIZATION_FACTOR;i+=VECTORIZATION_FACTOR) {
+                                for (int vec=0;vec<VECTORIZATION_FACTOR;++vec) {
+                                    vcrc[vec] += buf32[i+vec];
                                 }
+                            }
 
-                                if (i+VECTORIZATION_FACTOR >= end/4) {
-                                    for (int o=0;o<VECTORIZATION_FACTOR;++o)
-                                        crc += vcrc[o];
+                            for (int o=0;o<VECTORIZATION_FACTOR;++o)
+                                crc += vcrc[o];
 
-                                    if (i+VECTORIZATION_FACTOR > end/4) {
-                                        for (int o=i;o<end/4;++o)
-                                            crc += buf32[o];
-                                    }
 
-                                    break;
-                                }
+                            if (i < end/4) {
+                                for (int o=max(i,0LL);o<end/4;++o)
+                                    crc += buf32[o];
                             }
                         } else {
                             for (long long i = start/4;i<end/4;++i) {
