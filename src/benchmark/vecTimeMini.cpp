@@ -18,7 +18,7 @@ const bool PRINT_READ_SIZE_CHANGE_WARNING = false;
 const int VECTORIZATION_FACTOR = 16; // number of 32bit integers to vectorize
 
 // vectorization test
-const long long MAX_SIZE = 8L*GB;
+const long long MAX_SIZE = 4L*GB;
 const long long NUM_REPETITIONS = 10;
 
 

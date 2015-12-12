@@ -17,12 +17,12 @@ const bool PRINT_READ_SIZE_CHANGE_WARNING = false;
 const int VECTORIZATION_FACTOR = 256; // number of 32bit integers to vectorize
 
 // vectorization test
-const long long MAX_SIZE = 8L*GB+1;
+const long long MAX_SIZE = 4L*GB+1;
 const long long MIN_SUPERCHUNKS = 1;
 const long long MAX_SUPERCHUNKS = 64;
 const long long READ_SIZE = 32L*GB;
 const long long SET_THREADS = 60;
-const long long INIT_STRIDE = 128L*MB/60;
+const long long INIT_STRIDE = 64L*MB/60;
 const long long NUM_REPETITIONS = 10;
 #define next_stride(x) ((x)*2L)
 // */
