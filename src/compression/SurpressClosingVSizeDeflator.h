@@ -3,7 +3,6 @@
 
 #include <memory>
 #include <vector>
-#include "../parser/token_list.h"
 #include "BitmaskUtils.h"
 
 #include<iostream>
