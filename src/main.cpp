@@ -126,6 +126,14 @@ int main(int argc, char* argv[]) {
     matcher(matches, token_streams, multiDFA);
     globalTicToc.stop_phase("04. matcher");
 
+    //count matches
+    uint64_t no_matches = 0;
+    for(auto m = matches.begin(); m != matches.end(); ++m) {
+        no_matches += m->size();
+    }
+    cout << "#matches: " << no_matches << endl;
+    
+
     globalTicToc.start_phase();
     if(argc > 4) {
         ofstream of_results(ARG_OUTPUT);
