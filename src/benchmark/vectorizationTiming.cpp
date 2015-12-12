@@ -87,30 +87,11 @@ const long long NUM_REPETITIONS = 3;
 #define next_stride(x) ((x)+1048573)
 // */
 
+void do_experiment(char* buf, long long stride, bool use_vectorized_code) {
 
-int main(int argc, char** argv)
-{
     TicToc benchmark;
 
-
-    char* buf = new char[MAX_SIZE];
-    buf[0] = 42;
-
-    if (buf == NULL) {
-        printf("Unable to allocate buffer of size %lld bytes\n",MAX_SIZE);
-        return 1;
-    }
-
-    for (long long i=1;i<MAX_SIZE;++i)
-        buf[i] = buf[i-1]+1;
-    
-
-    long long stride = INIT_STRIDE;
-
-
-    #pragma omp barrier
     while (stride*SET_THREADS*MIN_SUPERCHUNKS < MAX_SIZE) {
-    
 
         long long cur_max_superchunks = MIN_SUPERCHUNKS-1;
 
@@ -124,12 +105,12 @@ int main(int argc, char** argv)
             #pragma omp parallel num_threads(SET_THREADS)
             {
                 int tid = omp_get_thread_num();
-             
-                TicToc parallelBenchmark(tid);
-                parallelBenchmark.start();
            
                 if (PRINT_READ_SIZE_CHANGE_WARNING && tid == 0 && stride < READ_SIZE)
                     printf("Stride is smaller than READ_SIZE, adapting...\n");
+             
+                TicToc parallelBenchmark(tid);
+                parallelBenchmark.start();
 
                 long long blocksize = (READ_SIZE<stride?READ_SIZE:stride);
 
@@ -145,39 +126,38 @@ int main(int argc, char** argv)
                 uint32_t crc = 0;
 
 
-                if (end+3 < MAX_SIZE) {
+                if (end < MAX_SIZE) {
 
                     for (long long e = 0;e<NUM_REPETITIONS;++e) {
                         crc += e;
+                        if (use_vectorized_code) {
+                            uint32_t vcrc [VECTORIZATION_FACTOR];
+                            memset(vcrc,0,sizeof(vcrc[0])*VECTORIZATION_FACTOR);
+                            for (long long i = start/4;i<end/4;i+=VECTORIZATION_FACTOR) {
 
-#ifndef CODE_UNVECTORIZED
-                        uint32_t vcrc [VECTORIZATION_FACTOR];
-                        memset(vcrc,0,sizeof(vcrc[0])*VECTORIZATION_FACTOR);
-                        for (long long i = start/4;i<end/4;i+=VECTORIZATION_FACTOR) {
-
-                            if (i+VECTORIZATION_FACTOR <= end/4) {
-                                for (int vec=0;vec<VECTORIZATION_FACTOR;++vec) {
-                                    vcrc[vec] += buf32[i+vec];
-                                }
-                            }
-
-                            if (i+VECTORIZATION_FACTOR >= end/4) {
-                                for (int o=0;o<VECTORIZATION_FACTOR;++o)
-                                    crc += vcrc[o];
-
-                                if (i+VECTORIZATION_FACTOR > end/4) {
-                                    for (int o=i;o<end/4;++o)
-                                        crc += buf32[o];
+                                if (i+VECTORIZATION_FACTOR <= end/4) {
+                                    for (int vec=0;vec<VECTORIZATION_FACTOR;++vec) {
+                                        vcrc[vec] += buf32[i+vec];
+                                    }
                                 }
 
-                                break;
+                                if (i+VECTORIZATION_FACTOR >= end/4) {
+                                    for (int o=0;o<VECTORIZATION_FACTOR;++o)
+                                        crc += vcrc[o];
+
+                                    if (i+VECTORIZATION_FACTOR > end/4) {
+                                        for (int o=i;o<end/4;++o)
+                                            crc += buf32[o];
+                                    }
+
+                                    break;
+                                }
+                            }
+                        } else {
+                            for (long long i = start/4;i<end/4;++i) {
+                                crc += buf32[i];
                             }
                         }
-#else
-                        for (long long i = start/4;i<end/4;++i) {
-                            crc += buf32[i];
-                        }
-#endif
                     }
 
                     //CRC is always the same for big power of two strides/READ_SIZE
@@ -190,10 +170,12 @@ int main(int argc, char** argv)
                     parallelBenchmark.printSummary();
             }
 
+
             if (a+1 >= MIN_SUPERCHUNKS) {
                 char bench_msg[300];
-                sprintf(bench_msg, 
-                    "Read %lld bytes with a stride of %lld (%lld threads, %lld superchunk(s), full size=%lld)", 
+                sprintf(bench_msg, (use_vectorized_code?
+                    "Read vectorized %lld bytes with a stride of %lld (%lld threads, %lld superchunk(s), full size=%lld)":
+                    "Read unvectorized %lld bytes with a stride of %lld (%lld threads, %lld superchunk(s), full size=%lld)"),
                          READ_SIZE, stride, SET_THREADS, (a+1), stride*SET_THREADS*(a+1));
 
                 benchmark.measure(bench_msg);
@@ -204,6 +186,34 @@ int main(int argc, char** argv)
 
         stride = next_stride(stride);
     }
+}
+
+int main(int argc, char** argv)
+{
+
+    char* buf = new char[MAX_SIZE];
+    buf[0] = 42;
+
+    if (buf == NULL) {
+        printf("Unable to allocate buffer of size %lld bytes\n",MAX_SIZE);
+        return 1;
+    }
+
+    for (long long i=1;i<MAX_SIZE;++i)
+        buf[i] = buf[i-1]+1;
+    
+
+
+
+    #pragma omp barrier
+    do_experiment(buf, INIT_STRIDE, false);
+
+    buf[0] = buf[256];
+    printf("\n\n");
+
+    #pragma omp barrier
+    do_experiment(buf, INIT_STRIDE, true);
+
 
     delete [] buf;
 
