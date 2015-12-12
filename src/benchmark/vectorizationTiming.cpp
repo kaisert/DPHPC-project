@@ -9,50 +9,54 @@
 
 using namespace std;
 
+#define MB (1024L*1024)
+#define GB (1024L*1024*1024)
+#define CODE_UNVECTORIZED
+
 /* used test settings */
 const bool PRINT_READ_SIZE_CHANGE_WARNING = false;
 const int VECTORIZATION_FACTOR = 16; // number of 32bit integers to vectorize
 
 // vectorization test
-const long long MAX_SIZE = 10L*1024*1024*1024+1;
+const long long MAX_SIZE = 8L*GB+1;
 const long long MIN_SUPERCHUNKS = 1;
-const long long MAX_SUPERCHUNKS = 64;
-const long long READ_SIZE = 32L*1024*1024*1024;
+const long long MAX_SUPERCHUNKS = 4;
+const long long READ_SIZE = 32L*GB;
 const long long SET_THREADS = 60;
-const long long INIT_STRIDE = 128L*1024*1024/60;
+const long long INIT_STRIDE = 128L*MB/60;
 const long long NUM_REPETITIONS = 10;
 #define next_stride(x) ((x)*2L)
 // */
 
 
 /*/ huge memory span 8GB => big_strides_simulating_tokenizer.csv
-const long long MAX_SIZE = 8L*1024*1024*1024+10240;
+const long long MAX_SIZE = 8L*GB+10240;
 const long long MIN_SUPERCHUNKS = 1;
 const long long MAX_SUPERCHUNKS = 64;
-const long long READ_SIZE = 32L*1024*1024*1024;
+const long long READ_SIZE = 32L*GB;
 const long long SET_THREADS = 60;
-const long long INIT_STRIDE = 128L*1024*1024/60;
+const long long INIT_STRIDE = 128L*MB/60;
 const long long NUM_REPETITIONS = 1;
 #define next_stride(x) ((x)*2)
 // */
 
 /*/ huge memory span 10GB => big_strides_read_all.csv
-const long long MAX_SIZE = 10L*1024*1024*1024;
+const long long MAX_SIZE = 10L*GB;
 const long long MIN_SUPERCHUNKS = 1;
 const long long MAX_SUPERCHUNKS = 8;
-const long long READ_SIZE = 32L*1024*1024*1024;
+const long long READ_SIZE = 32L*GB;
 const long long SET_THREADS = 60;
-const long long INIT_STRIDE = 16L*1024*1024;
+const long long INIT_STRIDE = 16L*MB;
 const long long NUM_REPETITIONS = 1;
 #define next_stride(x) ((x)+1048573)
 // */
 
 
 /*/ tiny memory span 512MB, high resolution => tiny_strides.csv
-const long long MAX_SIZE = 512L*1024*1024;
+const long long MAX_SIZE = 512L*MB;
 const long long MIN_SUPERCHUNKS = 1;
 const long long MAX_SUPERCHUNKS = 1;
-const long long READ_SIZE = 4L*1024*1024;
+const long long READ_SIZE = 4L*MB;
 const long long SET_THREADS = 60;
 const long long INIT_STRIDE = 8388593;
 const long long NUM_REPETITIONS = 6;
@@ -61,10 +65,10 @@ const long long NUM_REPETITIONS = 6;
 
 
 /*/ small memory span 1GB => small_strides.csv
-const long long MAX_SIZE = 1L*1024*1024*1024;
+const long long MAX_SIZE = 1L*GB;
 const long long MIN_SUPERCHUNKS = 1;
 const long long MAX_SUPERCHUNKS = 1;
-const long long READ_SIZE = 4L*1024*1024;
+const long long READ_SIZE = 4L*MB;
 const long long SET_THREADS = 60;
 const long long INIT_STRIDE = 8388593;
 const long long NUM_REPETITIONS = 6;
@@ -73,12 +77,12 @@ const long long NUM_REPETITIONS = 6;
 
 
 /*/ huge memory span 10GB => big_strides.csv
-const long long MAX_SIZE = 10L*1024*1024*1024;
+const long long MAX_SIZE = 10L*GB;
 const long long MIN_SUPERCHUNKS = 1;
 const long long MAX_SUPERCHUNKS = 8;
-const long long READ_SIZE = 8L*1024*1024;
+const long long READ_SIZE = 8L*MB;
 const long long SET_THREADS = 60;
-const long long INIT_STRIDE = 16L*1024*1024;
+const long long INIT_STRIDE = 16L*MB;
 const long long NUM_REPETITIONS = 3;
 #define next_stride(x) ((x)+1048573)
 // */
@@ -138,13 +142,15 @@ int main(int argc, char** argv)
 
                 char msg[100];
                 uint32_t * buf32 = reinterpret_cast<uint32_t*>(buf);
+                uint32_t crc = 0;
 
 
                 if (end+3 < MAX_SIZE) {
-                    uint32_t crc = 0;
 
                     for (long long e = 0;e<NUM_REPETITIONS;++e) {
                         crc += e;
+
+#ifndef CODE_UNVECTORIZED
                         uint32_t vcrc [VECTORIZATION_FACTOR];
                         memset(vcrc,0,sizeof(vcrc[0])*VECTORIZATION_FACTOR);
                         for (long long i = start/4;i<end/4;i+=VECTORIZATION_FACTOR) {
@@ -167,16 +173,11 @@ int main(int argc, char** argv)
                                 break;
                             }
                         }
-                        
-
-                        /* check computed results
-                        uint32_t seqcrc = 0;
+#else
                         for (long long i = start/4;i<end/4;++i) {
-                            seqcrc += buf32[i];
+                            crc += buf32[i];
                         }
-                        if (crc != seqcrc)
-                            printf("%lld %lld -> VCRC 0x%x vs. CRC 0x%x\n",start,end,crc, seqcrc);
-                        // */
+#endif
                     }
 
                     //CRC is always the same for big power of two strides/READ_SIZE
@@ -185,7 +186,8 @@ int main(int argc, char** argv)
                     sprintf(msg, "ERROR: CRC beyond MAX_SIZE");
 
                 parallelBenchmark.measure(msg);
-                //parallelBenchmark.printSummary();./
+                if (crc == 0x42424242)
+                    parallelBenchmark.printSummary();
             }
 
             if (a+1 >= MIN_SUPERCHUNKS) {
