@@ -3,7 +3,6 @@
 
 #include<cstdint>
 #include<iterator>
-#include"../parser/token_list.h"
 #include"BitmaskUtils.h"
 
 #ifndef BIT_SIZE

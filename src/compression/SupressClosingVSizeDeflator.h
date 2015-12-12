@@ -4,7 +4,6 @@
 #include <memory>
 #include <vector>
 #include <iterator>
-#include "../parser/token_list.h"
 #include "BitmaskUtils.h"
 #include "SupressClosingVSizeInflator.h"
 
