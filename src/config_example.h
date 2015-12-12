@@ -16,10 +16,10 @@ namespace config {
     typedef uint64_t Bitmask_t;
     typedef uint8_t Cmpr_Token_t;
 
-#define CONFIG_DESCRIPTION "";
+#define CONFIG_DESCRIPTION "TokenContainer=MyVector\n";
 
-//    using TokenContainerType = MyVector<token_type_t>;
-    using TokenContainerType = SupressClosingVSizeDeflator<Bitmask_t, Cmpr_Token_t>;
+    using TokenContainerType = MyVector<token_type_t>;
+//    using TokenContainerType = SupressClosingVSizeDeflator<Bitmask_t, Cmpr_Token_t>;
 
     using OffsetContainerType = vector<char *>;
     using TokenizerType = SuperChunkTokenizer;

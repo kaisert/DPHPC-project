@@ -14,7 +14,7 @@ class SuperChunkTokenizer {
 public:
     template<typename tokenContainer, typename offsetContainer>
     void operator()(vector<tokenContainer> &ts, vector<offsetContainer> &os, Map* map, Chunker &chunker) {
-        size_t no_chunks = 0, chunk_offset = 0, n_threads;
+        size_t no_chunks = 0, chunk_offset = 0, n_threads = omp_get_max_threads();
         no_chunks = chunker.no_chunks();
         while (chunk_offset < no_chunks) {
             n_threads = min(no_chunks - chunk_offset, n_threads);
