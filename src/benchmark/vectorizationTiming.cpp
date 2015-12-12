@@ -14,13 +14,13 @@ const bool PRINT_READ_SIZE_CHANGE_WARNING = false;
 const int VECTORIZATION_FACTOR = 16; // number of 32bit integers to vectorize
 
 // vectorization test
-const long long MAX_SIZE = 8L*1024*1024*1024+1;
+const long long MAX_SIZE = 10L*1024*1024*1024+1;
 const long long MIN_SUPERCHUNKS = 1;
-const long long MAX_SUPERCHUNKS = 1;
+const long long MAX_SUPERCHUNKS = 64;
 const long long READ_SIZE = 32L*1024*1024*1024;
-const long long SET_THREADS = 4;
-const long long INIT_STRIDE = 16L*1024*1024;
-const long long NUM_REPETITIONS = 1;
+const long long SET_THREADS = 60;
+const long long INIT_STRIDE = 128L*1024*1024/60;
+const long long NUM_REPETITIONS = 10;
 #define next_stride(x) ((x)*2L)
 // */
 
@@ -140,12 +140,11 @@ int main(int argc, char** argv)
                 uint32_t * buf32 = reinterpret_cast<uint32_t*>(buf);
 
 
-                uint32_t crc = 0;
-
-
                 if (end+3 < MAX_SIZE) {
+                    uint32_t crc = 0;
+
                     for (long long e = 0;e<NUM_REPETITIONS;++e) {
-                
+                        crc += e;
                         uint32_t vcrc [VECTORIZATION_FACTOR];
                         memset(vcrc,0,sizeof(vcrc[0])*VECTORIZATION_FACTOR);
                         for (long long i = start/4;i<end/4;i+=VECTORIZATION_FACTOR) {
@@ -186,7 +185,7 @@ int main(int argc, char** argv)
                     sprintf(msg, "ERROR: CRC beyond MAX_SIZE");
 
                 parallelBenchmark.measure(msg);
-                //parallelBenchmark.printSummary();
+                //parallelBenchmark.printSummary();./
             }
 
             if (a+1 >= MIN_SUPERCHUNKS) {
