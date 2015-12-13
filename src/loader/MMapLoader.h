@@ -15,6 +15,8 @@
 #define MAP_POPULATE 0
 #endif
 
+#define MMAP_LOADER_ACTIVE
+
 
 class MMapLoader {
 public:
@@ -37,11 +39,12 @@ public:
                         0)                     // offset in file
         );
 
+        if(_buf == MAP_FAILED)
+            throw GeneralException("mmap failed");
+
 #ifdef __APPLE__
         mlock(_buf, _length);
 #endif
-        if(_buf == MAP_FAILED)
-            throw GeneralException("mmap failed");
 
         return _buf;
     }
