@@ -119,3 +119,33 @@ src/bin/*
 
 *.mdfa
 *.tokens
+
+
+# latex shit
+*.aux
+*.glo
+*.idx
+*.log
+*.toc
+*.ist
+*.acn
+*.acr
+*.alg
+*.bbl
+*.blg
+*.dvi
+*.glg
+*.gls
+*.ilg
+*.ind
+*.lof
+*.lot
+*.maf
+*.mtc
+*.mtc1
+*.out
+*.synctex.gz
+
+# report
+
+doc/report/report.pdf
