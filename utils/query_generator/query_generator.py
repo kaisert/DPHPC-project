@@ -16,12 +16,12 @@ import random
 #
 
 if len(sys.argv) > 1:
-    numQueries = sys.argv[1]
+    numQueries = int(sys.argv[1])
 else:
     numQueries = 240
 
 if len(sys.argv) > 2:
-    stopEarly = sys.argv[1]
+    stopEarly = int(sys.argv[2])
 else:
     stopEarly = 1000
 
