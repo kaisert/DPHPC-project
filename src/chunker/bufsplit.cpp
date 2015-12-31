@@ -16,6 +16,9 @@ int bufsplit_split_xml_stream(
             if(((size_t) (cur - cur_chunk)) >= min_chunk_len) {
                 offsets[chunk_count++] = cur;
                 cur_chunk = cur;
+#ifndef __APPLE__
+                cur += min_chunk_len;
+#endif
             }
         }
         cur++;     
