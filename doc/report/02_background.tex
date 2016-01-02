@@ -27,53 +27,52 @@ the same node.
 /a/b/c
 /a/*/c
 
-\mypar{Problem Definition (informal).} Given an XML Document and a set of path
-XPath expressions (as defined above), report all nodes that match any of the
-given path expressions.
+\mypar{Problem Definition (informal).} Given an XML Document and a set of XPath
+expressions (as defined above), report all nodes that match any of the given
+path expressions. The goal is to maximize the throughput at which the XML
+Document is processed.
 
 % TODO syntax description
 
 \subsection{Parallel XPath Query Matching}
 
-In general, three approaches for XML query processing can be distinguished:
+To provide the necessary context, we give a very brief summary over the existing
+approaches, discussing their advantages and disadvantages with respect to
+parallelization. We refer the reader to \todo{pptranducer} for a more elaborate
+discussion.
 
-\begin{enumerate}
-\item XML parsing and querying,
-\item XML-capable DBMS, and
-\item XML stream processing using automatons.
-\end{enumerate}
-
-\mypar{XML parsing and querying.} First parsing the document, generating a DOM
-tree, and then querying the resulting DOM tree seems like a natural choice. The
-XML document can be split into chunks and which are then parsed in parallel.
-However, in order for these chunks to be independent of each other, they must be
-well-formed. This, in turn, requires a sequential pre-parsing step, which
-eventually becomes a bottleneck.
+\mypar{XML parsing and querying.} As XML is a context-free language, XML
+documents can be parsed and represented as parse trees. There exist approaches
+to parallelize parse tree querying \todo{35 in pptranducer}. However, parsing an
+XML document in parallel requires the document to be split into well-formed
+chunks, each containing a subtree of the whole parse tree. This can only be
+achieved through a sequential pre-parsing step.
 
 Approaches for parallel DOM Tree parsers have been discussed in the literature.
 For instance, in \todo{cite this other paper where they have created a tree
-parser for open office documents}, ... However, this approach is only suitable
-for comparatively small documents, according to the authors.
+parser for open office documents}, ... However, according to its authors, this
+approach is only suitable for comparatively small documents, according to the
+authors.
 
 \mypar{XML-capable DBMS.}
 
 Some relational DBMS-engines (MSQL, MySQL, MonetDB) have support for indexing
-over XML documents. Using indices, the querying can be parallelized. However,
-generating these indices takes up...
+XML documents. While indexing enables efficient querying, creating the index
+structures imposes a comparatively large overhead, which renders this method
+unsuitable for high-throughput applications.
 
-\mypar{XML processing with automatons.} The general structure of this approach
-is simple. A parser (e.g. a SAX-parser) reads the XML document and triggers
-parsing events that are handled by a (pushdown) automaton. The pushdown
-automaton transitions into an accepting state if one the path expressions of the
-input query matches.
+\mypar{XML processing with automatons.} 
+
+A parser (e.g. a SAX-parser) reads the
+XML document and triggers parsing events that are handled by a (pushdown)
+automaton. The pushdown automaton transitions into an accepting state if one the
+path expressions of the input query matches.
 
 One advantage of this approach is that both the parser and the automaton need to
 maintain only comparatively little state. Indeed, the authors of \todo{citation}
 which is the inspiration for this project, claim that it is the low memory
 bandwidth requirements that make their approach better than the alternative
 DOM-tree approach which they compare against.
-
-\mypar{XML Parsing.} 
 
 \subsection{XPath Query Matching}
 
