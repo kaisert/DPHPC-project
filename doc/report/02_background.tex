@@ -1,17 +1,81 @@
 \section{Background}\label{sec:background}
-In the following, we will give a brief overview over three general approaches
-for parallel XML processing. For a more elaborate discussion we refer the read
-to the background section of
-%TODO: Citation.
+In this section, we first give the problem definition while simultaneously
+introducing the (subset of the) XML Path Language–or XPath for short–
+%TODO:Ref Xpath.
+by giving small running examples.
+We then give a general overview over three main design approaches for XPath
+Query Processors and briefly discuss how our solution relates to these
+approaches (TODO maybe not). Finally, we provide a formal description of the
+push-down automatons that we use in our approach.
 
-\subsection{Parallel XML Querying}
+\subsection{XML Querying using XPath}
+
+XPath models an XML document as a tree of nodes. Each node of an XML document
+can be addressed by an path expressions. A path expression might \emph{match}
+multiple nodes in an XML document.
+
+For the purposes of this project we only consider a limited subset of path
+expressions. However, we believe that the methods and concepts provided in this
+report can be extended in a canonical way to support a more expressive path
+expressions. The grammar rules for the subset we chose are as follows:
+
+% TODO: syntax
+
+Figure TODO shows two examples of XPath queries. The first and second both match
+the same node.
+
+/a/b/c
+/a/*/c
+
+\mypar{Problem Definition (informal).} Given an XML Document and a set of path
+XPath expressions (as defined above), report all nodes that match any of the
+given path expressions.
+
+% TODO syntax description
+
+\subsection{Parallel XPath Query Matching}
+
 In general, three approaches for XML query processing can be distinguished:
 
 \begin{enumerate}
-\item XML stream processing using automatons,
-\item XML parsing and querying, and
-\item XML-capable DBMS.
+\item XML parsing and querying,
+\item XML-capable DBMS, and
+\item XML stream processing using automatons.
 \end{enumerate}
+
+\mypar{XML parsing and querying.} First parsing the document, generating a DOM
+tree, and then querying the resulting DOM tree seems like a natural choice. The
+XML document can be split into chunks and which are then parsed in parallel.
+However, in order for these chunks to be independent of each other, they must be
+well-formed. This, in turn, requires a sequential pre-parsing step, which
+eventually becomes a bottleneck.
+
+Approaches for parallel DOM Tree parsers have been discussed in the literature.
+For instance, in \todo{cite this other paper where they have created a tree
+parser for open office documents}, ... However, this approach is only suitable
+for comparatively small documents, according to the authors.
+
+\mypar{XML-capable DBMS.}
+
+Some relational DBMS-engines (MSQL, MySQL, MonetDB) have support for indexing
+over XML documents. Using indices, the querying can be parallelized. However,
+generating these indices takes up...
+
+\mypar{XML processing with automatons.} The general structure of this approach
+is simple. A parser (e.g. a SAX-parser) reads the XML document and triggers
+parsing events that are handled by a (pushdown) automaton. The pushdown
+automaton transitions into an accepting state if one the path expressions of the
+input query matches.
+
+One advantage of this approach is that both the parser and the automaton need to
+maintain only comparatively little state. Indeed, the authors of \todo{citation}
+which is the inspiration for this project, claim that it is the low memory
+bandwidth requirements that make their approach better than the alternative
+DOM-tree approach which they compare against.
+
+\mypar{XML Parsing.} 
+
+\subsection{XPath Query Matching}
 
 
 
