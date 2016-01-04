@@ -2,7 +2,6 @@
 %   spconf.sty  - LaTeX style file, and
 %   IEEEbib.bst - IEEE bibliography style file.
 % --------------------------------------------------------------------------
-
 \documentclass[letterpaper]{article}
 \usepackage{spconf,amsmath,amssymb,graphicx,listings,hyperref,array,float,epstopdf,tikz}
 \lstset{basicstyle=\ttfamily\footnotesize,numbers=left,stepnumber=2,frame=single,language=c,captionpos=b}
@@ -16,6 +15,9 @@
 % nice symbols for real and complex numbers
 \newcommand{\R}[0]{\mathbb{R}}
 \newcommand{\C}[0]{\mathbb{C}}
+
+% make document compile with \todo comments
+\newcommand{\todo}{\\}
 
 % bold paragraph titles
 \newcommand{\mypar}[1]{{\bf #1.}}
@@ -41,7 +43,7 @@
 %  {A. Author-one, B. Author-two\sthanks{Thanks to XYZ agency for funding.}}
 %		 {School A-B\\
 %		 Department A-B\\
-%		 Address A-B}
+%		 Address A-B}todo
 %  {C. Author-three, D. Author-four\sthanks{The fourth author performed the work
 %		 while at ...}}
 %		 {School C-D\\
