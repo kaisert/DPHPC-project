@@ -11,7 +11,12 @@ int bufsplit_split_xml_stream(
     size_t min_chunk_len = len/no_chunks;
     
     offsets[0] = stream;
+#ifndef __APPLE__
+    //hack for relative comparison of pointers
+    while((long long) cur < (long long) end) {
+#else
     while(cur != end) {
+#endif
         if(*cur == '<') {
             if(((size_t) (cur - cur_chunk)) >= min_chunk_len) {
                 offsets[chunk_count++] = cur;
@@ -21,7 +26,7 @@ int bufsplit_split_xml_stream(
 #endif
             }
         }
-        cur++;     
+        cur++;
     }
     offsets[chunk_count] = end;
     return chunk_count;
