@@ -13,7 +13,7 @@ int bufsplit_split_xml_stream(
     offsets[0] = stream;
 #ifndef __APPLE__
     //hack for relative comparison of pointers
-    while((long long) cur < (long long) end) {
+    while((unsigned long long) cur < (unsigned long long) end) {
 #else
     while(cur != end) {
 #endif
