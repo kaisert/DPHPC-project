@@ -19,11 +19,19 @@ public:
         char* cur = buffer, *cur_chunk = buffer, *end = buffer + len;
 
         _chunks.push_back(buffer);
-        while(cur != end) {
+#ifndef __APPLE__
+    //hack for relative comparison of pointers
+    while((unsigned long long) cur < (unsigned long long) end) {
+#else
+    while(cur != end) {
+#endif
             if(*cur == '<') {
                 if(((size_t) (cur - cur_chunk)) >= min_chunk_len) {
                     _chunks.push_back(cur);
                     cur_chunk = cur;
+#ifndef __APPLE__
+                    cur += min_chunk_len;
+#endif
                 }
             }
             cur++;
