@@ -21,7 +21,7 @@ TagMap::TagMap(std::string path)
 			TagKey new_key(begin, it);
 			begin = it + 1;
 			map[new_key] = static_cast<token_type_t >(i);
-            std::cout << map[new_key] << std::endl;
+            //debug std::cout << map[new_key] << std::endl;
             i++;
 		}
 	}

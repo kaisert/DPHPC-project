@@ -19,7 +19,7 @@ public:
         size_t no_chunks = 0, chunk_offset = 0;
         no_chunks = chunker.no_chunks();
         while (chunk_offset < no_chunks) {
-            cout << "n_threads is " << n_threads << endl;
+            //debug cout << "n_threads is " << n_threads << endl;
             n_threads = min(no_chunks - chunk_offset, n_threads);
 #pragma omp parallel num_threads(n_threads) shared(map, chunker, ts)
             {

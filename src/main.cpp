@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 
     cout << "XML-File: " << ARG_XML << endl;
     cout << "DFA-File: " << ARG_DFA << endl;
-    //cout << CONFIG_DESCRIPTION;
+    cout << CONFIG_DESCRIPTION;
 
     GlobalTicToc globalTicToc;
 
