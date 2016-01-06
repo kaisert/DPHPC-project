@@ -1,0 +1,28 @@
+Used XMark xmlgen.Linux in version 0.92
+(-o does not work for xml data >= 2GiB)
+
+./xmlgen.Linux -f 73.151907248 > test8G.xml
+./xmlgen.Linux -f 36.565266415 > test4G.xml
+./xmlgen.Linux -f 18.282573707 > test2G.xml
+
+
+in utils/xml_generator (Master branch):
+python xml_gen.py arti2G.xml 2048
+python xml_gen.py arti4G.xml 4096
+python xml_gen.py arti8G.xml 8192
+
+
+The originally used XML files for the benchmarks will be available for some time under the link:
+https:// mega (dot) nz (slash) #!acAyQC6C!t13e27RPylINxmGnh3fGBI9as7U3SIxPnni7KpowOyk
+respectively on the our Xeon Phi in /micfs/bakadi/
+
+
+
+Compiled with:
+Intel Compiler version 15.0.0 20140723
+and flags: -fopenmp -std=c++11 -mmic -Wall -qopt-report3 -qopt-report-phase=vec -O3 
+
+
+Coprocessor: Intel® Xeon Phi™ Coprocessor 7120 (16GB, 1.238 GHz, 61 cores)
+
+

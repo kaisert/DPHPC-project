@@ -1,0 +1,106 @@
+Test-XML statistics and other information
+-----------------------------------------
+Number of unique tags:
+arti    31(=15+16)
+test    72
+
+2^n threads = {1,2,4,8,16,32,60,120,180,240} threads
+
+
+Tokenizer
+---------
+Strong scaling and Hashmap vs. BinarySearch
+
+Used xpath files for the tokenizer benchmark:
+arti??t.xpath and test??t.xpath
+
+
+Branch:
+origin/master
+
+Binary:
+bin_tokenizer.mic
+
+Code:
+Config_local    change CONFIG_DESCRIPTION: "TokenContainer=MyVector__Tokenizer=BinarySearch__Experiment=Tokenizer\n"
+stest.sh        arti   2G
+                test   2G
+queries         1 query* with all tokens lined up (ranging from 1 token and from 1/4 to 4/4 of maximum #tokens)
+threads         2^n
+
+* if possible select a longest existing leaf query as prefix
+
+
+
+Branch:
+origin/reimplementation/Tagmap
+
+Binary:
+hash_tokenizer.mic
+
+Code:
+Config_local    change CONFIG_DESCRIPTION: "TokenContainer=MyVector__Tokenizer=Hashmap__Experiment=Tokenizer\n"
+stest.sh        arti   2G
+                test   2G
+queries         1 query* with all tokens lined up (ranging from 1 token and from 1/4 to 4/4 of maximum #tokens)
+threads         2^n
+
+* if possible select a longest existing leaf query as prefix
+
+
+2 experiments * 2 files * 5 queries * 10 threads = 200 combinations per run
+
+
+
+Matcher
+-------
+Weak scaling with number of queries for different filesizes
+
+Used xpath files for the matcher benchmark:
+arti??q.xpath and test??q.xpath
+
+Branch:
+origin/master
+
+Binary:
+matcher.mic
+
+Code:
+Config_local    change CONFIG_DESCRIPTION: "TokenContainer=MyVector__Tokenizer=BinarySearch__Experiment=Matcher\n"
+stest.sh        arti   2G,4G,8G
+                test   2G,4G,8G
+queries/threads 2^n, first query with all tokens lined up (maximum #tokens) followed by (all) other standard queries
+         
+
+6 files * 10 queries (threads) = 60 combinations per run
+
+
+State Table
+-----------
+size = queries*(unique tokens from ALL queries)
+
+In the Matcher experiments a non-linear slowdown due to non-linearly increasing FSM state table size is prevented through the first query. The state table only grows linearly with the number of queries.
+
+
+The effects of increasing the #unique tokens (while keeping the #queries fixed), MIGHT be observed in the Tokenizer experiments. But use the obtained results with care since the single query probably only goes through very FEW different states.
+
+
+The effects of increasing the #queries (while keeping the #unique tokens fixed), can be observed in the Matcher experiment.
+
+
+
+Post processing
+---------------
+Modify the output file of mainToCSV.sh with:
+sed "s/__/,/g" experiments.csv | sed "s/,TokenContainer,/,TokenContainer,TokenizerVariant,Experiment,/g" | sed "s/Tokenizer=//g" | sed "s/Experiment=//g" > new_experiments.csv
+
+For the Hashmap Tokenizer, the number of matches has not been written to the log and is replaced -1 (missing value) in the CSV file
+
+
+
+
+
+
+
+
+
