@@ -34,18 +34,22 @@ Document is processed.
 
 % TODO syntax description
 
-\subsection{Parallel XPath Query Matching}
+\subsection{Parallel XML Query Matching}
+To decide the whether a node matches an XPath expression, all characters of the
+XML stream up to that node must be read. This is the major challenge in
+processing XML data.
 
-To provide the necessary context, we give a very brief summary over the existing
-approaches, discussing their advantages and disadvantages with respect to
-parallelization. We refer the reader to \todo{pptranducer} for a more elaborate
+In the following we briefly mention three common techniques for processing XML
+data. The idea is not to provide detailed technical insight, but rather to
+demonstrate how the aforementioned fact is accommodated for in different
+setups. We refer the reader to \todo{pptranducer} for a more elaborate
 discussion.
 
-\mypar{XML parsing and querying.} As XML is a context-free language, XML
-documents can be parsed and represented as parse trees. There exist approaches
-to parallelize parse tree querying \todo{35 in pptranducer}. However, parsing an
-XML document in parallel requires the document to be split into well-formed
-chunks, each containing a subtree of the whole parse tree. This can only be
+\mypar{XML parsing and querying.} As XML is a context-free language, an XML
+document can be parsed and represented as a parse tree. There exist approaches
+to parallelize parse tree querying \todo{35 in pptranducer}. However, parsing
+an XML document in parallel requires the document to be split into well-formed
+chunks, each containing a subtree of the parse tree. This, in turn, can only be
 achieved through a sequential pre-parsing step.
 
 Approaches for parallel DOM Tree parsers have been discussed in the literature.
@@ -59,14 +63,13 @@ authors.
 Some relational DBMS-engines (MSQL, MySQL, MonetDB) have support for indexing
 XML documents. While indexing enables efficient querying, creating the index
 structures imposes a comparatively large overhead, which renders this method
-unsuitable for high-throughput applications.
+unsuitable for stream processing.
 
 \mypar{XML processing with automatons.} 
 
-A parser (e.g. a SAX-parser) reads the
-XML document and triggers parsing events that are handled by a (pushdown)
-automaton. The pushdown automaton transitions into an accepting state if one the
-path expressions of the input query matches.
+A parser (e.g. a SAX-parser) reads the XML document and triggers parsing events
+that are handled by a (pushdown) automaton. The pushdown automaton transitions
+into an accepting state if one the path expressions of the input query matches.
 
 One advantage of this approach is that both the parser and the automaton need to
 maintain only comparatively little state. Indeed, the authors of \todo{citation}
