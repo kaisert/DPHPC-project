@@ -5,13 +5,15 @@
 \subsection{Overview}
 
 The method that we propose can be viewed as a batch processing system consisting
-of four components (Figure \todo{Figure}):
+of four components (Figure \ref{fig:methodoverview}):
+
+\begin{figure}[tb]\centering
+	\includegraphics[width=.5\textwidth]{img/methodoverview.eps}
+  \caption{Diagram showing the different components.\label{fig:methodoverview}}
+\end{figure}
 
 \begin{enumerate}
-\item The query transformer,
-\item the chunker,
-\item the tokenizer, and
-\item the matcher.
+\item The query transformer, \item the chunker, \item the tokenizer, and \item the matcher.
 \end{enumerate}
 
 First, a \emph{Query Transformer} analyzes the query and produces a \emph{token
