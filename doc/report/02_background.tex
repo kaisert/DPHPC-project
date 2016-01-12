@@ -1,12 +1,12 @@
 \section{Background}\label{sec:background}
-In this section, we first give the problem definition while simultaneously
-introducing the (subset of the) XML Path Language–or XPath for short–
-%TODO:Ref Xpath.
-by giving small running examples.
-We then give a general overview over three main design approaches for XPath
-Query Processors and briefly discuss how our solution relates to these
-approaches (TODO maybe not). Finally, we provide a formal description of the
-push-down automatons that we use in our approach.
+We start this section by defining the problem while also introducing the (subset
+of the) XML Path Language–or XPath for short–\todo{ref xpath} by giving small
+running examples.
+
+We continue by giving a brief overview over three general approaches for XPath
+Query processing and discuss how our solution relates to these approaches (TODO
+maybe not). Finally, we provide a formal description of the push-down automatons
+that we use in our approach.
 
 \subsection{XML Querying using XPath}
 
@@ -15,19 +15,23 @@ can be addressed by an path expressions. A path expression might \emph{match}
 multiple nodes in an XML document.
 
 For the purposes of this project we only consider a limited subset of path
-expressions. However, we believe that the methods and concepts provided in this
-report can be extended in a canonical way to support a more expressive path
 expressions. The grammar rules for the subset we chose are as follows:
 
 % TODO: syntax
 
-Figure TODO shows two examples of XPath queries. The first and second both match
-the same node.
+The expressiveness of this language is fairly limited compared to the
+capabilities of full XPath. However, we believe that the methods and concepts
+provided in this report can be extended in a canonical way to support more
+expressive queries. Figure TODO shows two examples of XPath queries.
 
-/a/b/c
-/a/*/c
+\begin{figure}[htb]
+\centering
+\texttt{/a/b/c}\\
+\texttt{/a/*/c}
+\caption{An XPath Query consisting of two path expression.}
+\end{figure}
 
-\mypar{Problem Definition (informal).} Given an XML Document and a set of XPath
+\mypar{Problem Definition (informal)} Given an XML Document and a set of XPath
 expressions (as defined above), report all nodes that match any of the given
 path expressions. The goal is to maximize the throughput at which the XML
 Document is processed.
@@ -35,15 +39,14 @@ Document is processed.
 % TODO syntax description
 
 \subsection{Parallel XML Query Matching}
-To decide the whether a node matches an XPath expression, all characters of the
-XML stream up to that node must be read. This is the major challenge in
-processing XML data.
+To decide whether a node matches an XPath expression, all characters of the XML
+stream up to that node must be read. This is the major challenge in processing
+XML data.
 
 In the following we briefly mention three common techniques for processing XML
 data. The idea is not to provide detailed technical insight, but rather to
-demonstrate how the aforementioned fact is accommodated for in different
-setups. We refer the reader to \todo{pptranducer} for a more elaborate
-discussion.
+demonstrate how the aforementioned challenge is met in these scenarios. We refer
+the reader to \todo{pptranducer} for a more elaborate discussion.
 
 \mypar{XML parsing and querying.} As XML is a context-free language, an XML
 document can be parsed and represented as a parse tree. There exist approaches
@@ -79,7 +82,54 @@ DOM-tree approach which they compare against.
 
 \subsection{XPath Query Matching}
 
+We used the same methods to construct the \emph{deterministic pushdown automata}
+as in \todo{cite pptransducer paper}: A query is turned into a deterministic
+finite state automaton (dFSA) using the methods \todo{whoever et al} presented
+in \todo{cite 17 from pp transducer paper}. The dFSA is then turned into a
+pushdown automaton (or pushdown transducer).
 
+A deterministic pushdown automaton is defined as a 6-tuple $(Q, q_0, \Sigma,
+\Gamma, \delta, F)$ where $Q$ is the set of states, $q_0$ is the initial state,
+$\Sigma$ is the input alphabet (the opening and closing XML tags), $\Gamma$ is
+the pushdown alphabet, $\delta$ is the transition function, and $F \subseteq Q$ is
+the set of accepting states.
+
+In our case, the pushdown alphabet $\Gamma$ is equal to the set of states $Q$.
+Each opening tag leads to a push transition, i.e. the current state is pushed
+onto the stack. Conversely, each closing tag corresponds to a pop transition
+where the new state is the former top of the stack.
+
+% Thus, the transition
+% function consists of two parts, $\delta_{\text{push}}: Q \times \Sigma
+% \rightarrow Q \times \Gamma$ and $\delta_{\text{pop}}: Q \times \Sigma \times
+% \Gamma \rightarrow Q$.
+
+Figure \todo{ } shows the state diagram of a pushdown automaton corresponding the
+path expression \verb;/a/b/c;. The state $0$ corresponds to the \emph{illegal
+state}. It is reached when no subsequent lead to a match (e.g., when a opening
+tag \verb;<d>; is read in this case). The transitions labeled \verb;[o]; match
+all input characters for which there are no specific transitions. The pop
+transitions are omitted for brevity.
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[shorten >=1pt,node distance=1.5cm,on grid,auto] 
+   \node[state,initial] (q_1)   {$1$};
+   \node[state] (q_2) [right=of q_1] {$2$}; 
+   \node[state] (q_3) [right=of q_2] {$3$}; 
+   \node[state,accepting](q_4) [right=of q_3] {$4$};
+   \node[state] (q_0) [below=2.5cm of q_2] {$0$};
+    \path[->] 
+    (q_1) edge  node {a}   (q_2)
+    (q_2) edge  node {b}   (q_3)
+    (q_3) edge  node {c}   (q_4) 
+    (q_1) edge  node {[o]} (q_0)
+    (q_2) edge  node {[o]} (q_0)
+    (q_3) edge  node {[o]} (q_0)
+    (q_4) edge  node {[o]} (q_0);
+\end{tikzpicture}
+\caption{State Diagram of a dPDA for path expression \texttt{/a/b/c}}
+\end{figure}
 
 %ive a short, self-contained summary of necessary
 %ackground information. For example, assume you present an
