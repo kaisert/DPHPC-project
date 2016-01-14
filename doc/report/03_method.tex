@@ -9,7 +9,7 @@ of four components (Figure \ref{fig:methodoverview}):
 
 \begin{figure}[tb]\centering
 	\includegraphics[width=.5\textwidth]{img/methodoverview.eps}
-  \caption{Diagram showing the different components.\label{fig:methodoverview}}
+  \caption{Batch view of the system.\label{fig:methodoverview}}
 \end{figure}
 
 \begin{enumerate}
@@ -34,7 +34,7 @@ entire tokenstream to identify matching nodes.
 The aim of our method is to reduce memory traffic in the matching phase, as the
 tokenstream takes up less memory than the original XML stream. Workloads are
 divided differently in the tokenizer and in the matcher. Our method is
-successful if we can show \emph{strong scaling} for the tokenizer and \emph{weak
+successful if we achieve \emph{strong scaling} for the tokenizer and \emph{weak
 scaling} for the matcher.
 
 \subsection{Query Transformer}
@@ -70,9 +70,9 @@ assume that the effects of this are negligible for our considerations.
 
 Similar to \todo{transducer} we ignore \texttt{CDATA}-sections and comments for
 simplicity. The authors of \todo{transducer} suggest extending the transducer to
-accommodate the possibility that a chunk starts withing a comment or a
-\texttt{CDATA}-section. Similarly, in our case, the tokenizer would just have to
-produce tokens for the start and end of comments and \texttt{CDATA}-sections.
+accommodate the possibility that a chunk starts within a comment or a
+\texttt{CDATA}-section. Similarly, in our case, the tokenizer could just output
+tokens for the start and end of comments and \texttt{CDATA}-sections.
 
 \subsection{Tokenizer and Tokenstream}
 
@@ -91,7 +91,7 @@ aforementioned XML chunk would be translated into the token stream $1, 3, -3,
 
 In our implementation, the token numbers are encoded as 16-bit wide signed
 integers. This seemed to be reasonable trade-off between the number of different
-tag names ($2^15-2$) that can be represented and encoding size. Note that the
+tag names ($2^{15}-2$) that can be represented and encoding size. Note that the
 token size can in principle also be decided dynamically based on the size of the
 token mapping.
 
