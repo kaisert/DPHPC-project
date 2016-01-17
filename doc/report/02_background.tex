@@ -1,92 +1,120 @@
 \section{Background}\label{sec:background}
-We start this section by defining the problem while also introducing the (subset
-of the) XML Path Language–or XPath for short–\todo{ref xpath} by giving small
-running examples.
-
-We continue by giving a brief overview over three general approaches for XPath
-Query processing and discuss how our solution relates to these approaches (TODO
-maybe not). Finally, we provide a formal description of the push-down automatons
-that we use in our approach.
+We start this section by giving a brief introduction to the XML Path Language,
+or XPath for short \cite{xpathSpec}. We continue by providing a brief overview
+over three general approaches for XPath Query processing and discuss how our
+solution relates to these approaches. Finally, we present a formal description
+of the push-down automatons that we use in our approach.
 
 \subsection{XML Querying using XPath}
 
-XPath models an XML document as a tree of nodes. Each node of an XML document
-can be addressed by an path expressions. A path expression might \emph{match}
-multiple nodes in an XML document.
+For the purposes of this project we only considered a small subset of XPath.
+The expressiveness of this subset is fairly limited compared to full XPath.
+However, we believe that the concepts presented in this report can be extended
+in a canonical way to support more expressive queries.
 
-For the purposes of this project we only consider a limited subset of path
-expressions. The grammar rules for the subset we chose are as follows:
+XPath models an XML document as a tree of nodes. An XPath path expression
+describes a path in this tree. In our case, the path always starts at the root
+node and, also, a path expression might match multiple nodes of a tree.
 
-% TODO: syntax
+The grammar rules for the subset of XPath we chose are as follows:
 
-The expressiveness of this language is fairly limited compared to the
-capabilities of full XPath. However, we believe that the methods and concepts
-provided in this report can be extended in a canonical way to support more
-expressive queries. Figure TODO shows two examples of XPath queries.
+\begin{align*}
+    P &::= /N\ |\ //N\ |\ P\ P\\
+    N &::= E\ |\ *
+\end{align*}
+where $E$ is an element name. In our terminology, a \emph{query} is a set of
+path expressions. The following is an example of a query containing two path
+expressions:
 
 \begin{figure}[htb]
 \centering
 \texttt{/a/b/c}\\
-\texttt{/a/*/c}
-\caption{An XPath Query consisting of two path expression.}
+\texttt{//*/d}
 \end{figure}
 
-\mypar{Problem Definition (informal)} Given an XML Document and a set of XPath
-expressions (as defined above), report all nodes that match any of the given
-path expressions. The goal is to maximize the throughput at which the XML
-Document is processed.
+We can now give a formal definition of the problem we aim to solve and state
+the goal of our enterprise. 
+
+\mypar{Problem Definition and Goal} Given an XML Document and a XPath query (as
+defined above), find all nodes that match any of the path expression contained
+in the query and report the character offsets in the XML Document of the
+opening and closing tags of these nodes. The goal is to maximize the throughput
+at which the XML Document is processed.
+
+Consider the example XML Document in Figure \ref{src:exampleXML}. Using the
+above query, the matcher would return the character offsets of \verb;<c>; and
+\verb;</c>;, and \verb;<d>; and \verb;</d>; for the first and second path
+expression, respectively.
+
+\lstset{
+         numbers=left
+ }
+
+\begin{figure}[htb]
+\begin{lstlisting}
+    <a>
+        <b>
+            <c>
+            </c>
+        </b>
+        <b>
+            <d>
+            </d>
+        </b>
+    </a>
+\end{lstlisting}
+\caption{Example XML Document}
+\label{src:exampleXML}
+\end{figure}
 
 % TODO syntax description
 
 \subsection{Parallel XML Query Matching}
-To decide whether a node matches an XPath expression, all characters of the XML
+To decide whether a node matches an path expression, all characters of the XML
 stream up to that node must be read. This is the major challenge in processing
 XML data.
 
-In the following we briefly mention three common techniques for processing XML
-data. The idea is not to provide detailed technical insight, but rather to
-demonstrate how the aforementioned challenge is met in these scenarios. We refer
-the reader to \todo{pptranducer} for a more elaborate discussion.
+In the following we briefly discuss three commonly available techniques for
+processing XML data. The idea is not to provide detailed technical insight, but
+rather to demonstrate how the aforementioned challenge is met in these
+scenarios. We refer the reader to \cite{Ogden2013} for a more elaborate
+discussion.
 
-\mypar{XML parsing and querying.} As XML is a context-free language, an XML
-document can be parsed and represented as a parse tree. There exist approaches
-to parallelize parse tree querying \todo{35 in pptranducer}. However, parsing
-an XML document in parallel requires the document to be split into well-formed
-chunks, each containing a subtree of the parse tree. This, in turn, can only be
-achieved through a sequential pre-parsing step.
+\mypar{XML parsing and querying} As XML is a context-free language, an XML
+document can be parsed and represented as a parse tree. The actual query
+matching is then performed on the parse tree.
 
-Approaches for parallel DOM Tree parsers have been discussed in the literature.
-For instance, in \todo{cite this other paper where they have created a tree
-parser for open office documents}, ... However, according to its authors, this
-approach is only suitable for comparatively small documents, according to the
-authors.
+There exist approaches to parallelize parse tree querying \cite{You11}. However,
+in general, parsing an XML document in parallel requires the document to be
+split into well-formed chunks, each containing a subtree of the parse tree.
+This, in turn, can only be achieved through a sequential pre-parsing step.
 
-\mypar{XML-capable DBMS.}
+An example for a parallel DOM tree parser that works on malformed XML chunks is
+discussed in \cite{Shah09}. However, they only considered XML documents of
+comparatively small size.
 
-Some relational DBMS-engines (MSQL, MySQL, MonetDB) have support for indexing
-XML documents. While indexing enables efficient querying, creating the index
-structures imposes a comparatively large overhead, which renders this method
-unsuitable for stream processing.
+\mypar{XML-capable DBMS} Some relational DBMS-engines (among them are MSQL,
+MySQL, MonetDB) have support for indexing XML documents. While indexing enables
+efficient and parallel querying, creating the index structures imposes a large
+overhead, as the XML Document must first be read into the database and then
+indexed.
 
-\mypar{XML processing with automatons.} 
-
+\mypar{XML processing with automatons} 
 A parser (e.g. a SAX-parser) reads the XML document and triggers parsing events
 that are handled by a (pushdown) automaton. The pushdown automaton transitions
 into an accepting state if one the path expressions of the input query matches.
 
 One advantage of this approach is that both the parser and the automaton need to
-maintain only comparatively little state. Indeed, the authors of \todo{citation}
-which is the inspiration for this project, claim that it is the low memory
-bandwidth requirements that make their approach better than the alternative
-DOM-tree approach which they compare against.
+maintain only comparatively little state. Indeed, the authors of
+\cite{Ogden2013} which is the inspiration for this project, claim that it is the
+low memory bandwidth requirements that make their approach better than the
+alternative DOM-tree approach which they compare against.
 
 \subsection{XPath Query Matching}
-
 We used the same methods to construct the \emph{deterministic pushdown automata}
-as in \todo{cite pptransducer paper}: A query is turned into a deterministic
-finite state automaton (dFSA) using the methods \todo{whoever et al} presented
-in \todo{cite 17 from pp transducer paper}. The dFSA is then turned into a
-pushdown automaton (or pushdown transducer).
+as in \cite{Ogden2013}: A query is turned into a deterministic finite state
+automaton (dFSA) using the methods presented in \cite{Green2014}. The dFSA is
+then turned into a pushdown automaton (or pushdown transducer).
 
 A deterministic pushdown automaton is defined as a 6-tuple $(Q, q_0, \Sigma,
 \Gamma, \delta, F)$ where $Q$ is the set of states, $q_0$ is the initial state,
@@ -104,13 +132,6 @@ where the new state is the former top of the stack.
 % \rightarrow Q \times \Gamma$ and $\delta_{\text{pop}}: Q \times \Sigma \times
 % \Gamma \rightarrow Q$.
 
-Figure \todo{ } shows the state diagram of a pushdown automaton corresponding the
-path expression \verb;/a/b/c;. The state $0$ corresponds to the \emph{illegal
-state}. It is reached when no subsequent lead to a match (e.g., when a opening
-tag \verb;<d>; is read in this case). The transitions labeled \verb;[o]; match
-all input characters for which there are no specific transitions. The pop
-transitions are omitted for brevity.
-
 \begin{figure}
 \centering
 \begin{tikzpicture}[shorten >=1pt,node distance=1.5cm,on grid,auto] 
@@ -118,18 +139,27 @@ transitions are omitted for brevity.
    \node[state] (q_2) [right=of q_1] {$2$}; 
    \node[state] (q_3) [right=of q_2] {$3$}; 
    \node[state,accepting](q_4) [right=of q_3] {$4$};
-   \node[state] (q_0) [below=2.5cm of q_2] {$0$};
+   \node[state] (q_0) [below=2.5cm of q_2, xshift=0.75cm] {$0$};
     \path[->] 
     (q_1) edge  node {a}   (q_2)
     (q_2) edge  node {b}   (q_3)
     (q_3) edge  node {c}   (q_4) 
-    (q_1) edge  node {[o]} (q_0)
+    (q_1) edge[bend right]  node {[o]} (q_0)
     (q_2) edge  node {[o]} (q_0)
     (q_3) edge  node {[o]} (q_0)
-    (q_4) edge  node {[o]} (q_0);
+    (q_4) edge[bend left]  node {[o]} (q_0);
 \end{tikzpicture}
 \caption{State Diagram of a dPDA for path expression \texttt{/a/b/c}}
+\label{fig:exampleFSA}
 \end{figure}
+
+Figure \ref{fig:exampleFSA} shows the state diagram of a pushdown automaton
+matching nodes of the path expression \verb;/a/b/c;. The state $0$ corresponds
+to the \emph{illegal state}. It is reached when no subsequent input characters
+can lead to a match (e.g., when a opening tag \verb;<d>; is read in this case).
+The transitions labeled \verb;[o]; match all input characters for which there
+are no specific transitions. The pop transitions are omitted for brevity.
+
 
 %ive a short, self-contained summary of necessary
 %ackground information. For example, assume you present an
