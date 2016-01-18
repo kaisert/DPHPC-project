@@ -1,12 +1,7 @@
 \section{Conclusions}
 
-Here you need to summarize what you did and why this is
-important. {\em Do not take the abstract} and put it in the past
-tense. Remember, now the reader has (hopefully) read the report, so it
-is a very different situation from the abstract. Try to highlight
-important results and say the things you really want to get across
-such as high-level statements (e.g., we believe that .... is the right
-approach to .... Even though we only considered x, the
-.... technique should be applicable ....) You can also formulate next
-steps if you want. Be brief. After the conclusions there are only the references.
+We implemented a parallel and high performance XPath query matcher using compression to minimize data usage. Our goal was to reach strong scaling within the tokenizer and weak scaling of the matcher. As mentioned before, both of these goals were reached. Even though only a subset of XPath was considered, the experiments are still meaningful, as our system can be extended to, such that the full XPath query language can be processed with similar results. Also our approach is not limited to XML, but can also be used for different context free languages, such as JSON, in combination with a similar query language, like JSONPath.
 
+When comparing our results to other, similar, approaches, such as \cite{Ogden2013}, one must consider, that the priorities were set differently. While Ogden et al focus on data parallelism and trade it for the complexity and number of queries, our implementation emphasizes query parallelism. Also a direct comparison with the same data is not meaningful, as the used architecture differ entirely.
+
+To enhance performance, different techniques for the compression could be used, which might result in a higher throughput of the system. Also the system has still a high potential on being optimized for the underlying hardware.
