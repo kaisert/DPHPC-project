@@ -28,15 +28,15 @@ only becomes possible by leveraging the power of multi processor systems. As
 parsing is an inherently sequential process, this requires the careful
 orchestration of parallel processors.
 
-Ideally, the data can be split into chunks than can be processed independently.
+Ideally, the data can be split into chunks, such that it can be processed independently.
 In our approach we achieve this by using a compression that is agnostic of the
 internal structure of the XML data. The XPath query matching is done using the
 compressed data.
 
 Our implementation focuses on XML query matching, using XPath. It is written in
-C/C++ and our platform of choice is the Intel's Xeon Phi, incorporating 61 cores
+C/C++ and our platform of choice is the Intel's Xeon Phi \cite{IntelXeon}, incorporating 61 cores
 and 16 GB of memory. We found a scalable approach to process queries on large
-XML files. Our implementation reaches a throughput of about 0.93 GB/s and offers
+XML files. Our implementation reaches a throughput of about 0.29 GB/s and offers
 a big potential for optimization to the architecture at use. 
 
 \mypar{Related work} Main inspiration of our work was \cite{Ogden2013}. Ogden et

@@ -101,8 +101,8 @@ indexed.
 
 \mypar{XML processing with automatons} 
 A parser (e.g. a SAX-parser) reads the XML document and triggers parsing events
-that are handled by a (pushdown) automaton. The pushdown automaton transitions
-into an accepting state if one the path expressions of the input query matches.
+that are handled by a (pushdown) automaton. The automaton transitions
+into an accepting state if one of the path expressions of the input query matches.
 
 One advantage of this approach is that both the parser and the automaton need to
 maintain only comparatively little state. Indeed, the authors of
@@ -156,7 +156,7 @@ where the new state is the former top of the stack.
 Figure \ref{fig:exampleFSA} shows the state diagram of a pushdown automaton
 matching nodes of the path expression \verb;/a/b/c;. The state $0$ corresponds
 to the \emph{illegal state}. It is reached when no subsequent input characters
-can lead to a match (e.g., when a opening tag \verb;<d>; is read in this case).
+can lead to a match (e.g., when an opening tag \verb;<d>; is read in this case).
 The transitions labeled \verb;[o]; match all input characters for which there
 are no specific transitions. The pop transitions are omitted for brevity.
 
