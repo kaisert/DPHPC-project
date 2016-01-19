@@ -1,7 +1,23 @@
 \section{Conclusions}
+The state mappings of the parallel transducer approach can be considered to
+constitute a compressed representation of the original XML stream, similar to
+our tokenstream. Analogous to the generation of the state mapping, our approach
+scales linearly with the number of processors.
 
-We implemented a parallel and high performance XPath query matcher using compression to minimize data usage. Our goal was to reach strong scaling within the tokenizer and weak scaling of the matcher. As mentioned before, both of these goals were reached. Even though only a subset of XPath was considered, the experiments are still meaningful, as our system can be extended to, such that the full XPath query language can be processed with similar results. Also our approach is not limited to XML, but can also be used for different context free languages, such as JSON, in combination with a similar query language, like JSONPath.
+The effectiveness of the parallel transducer stems from the fact that the state
+mappings can be efficiently traversed in the joining phase, which is necessarily
+sequential. Likewise, we try to reduce memory traffic in the matching phase.
 
-When comparing our results to other, similar, approaches, such as \cite{Ogden2013}, one must consider, that the priorities were set differently. While Ogden et al focus on data parallelism and trade it for the complexity and number of queries, our implementation emphasizes query parallelism. Also a direct comparison with the same data is not meaningful, as the used architecture differ entirely.
+It is virtually impossible to make a direct comparison, as both a
+reimplementation of the parallel transducer approach was outside of the scope of
+this project and the experimental results stem from different hardware setups.
+It can be argued, though, that our approach is less effective for a small number
+of queries. However, we could demonstrate weak scalability for the query matcher
+allowing for up to 60 queries (the number of cores) to run in parallel.
 
-To enhance performance, different techniques for the compression could be used, which might result in a higher throughput of the system. Also the system has still a high potential on being optimized for the underlying hardware.
+Furthermore, its straight-forward design lowers the cost of extensions to the
+system and also makes it easier to analyze. For example, supporting a larger
+subset of XPath merely introduces new tokens. Also, to further enhance
+performance, different techniques to compress the tokenstream could be employed.
+
+

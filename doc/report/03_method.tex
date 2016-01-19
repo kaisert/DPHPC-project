@@ -9,13 +9,13 @@ Figure \ref{fig:methodoverview} provides an overview.
 
 \begin{figure}[tb]\centering
 	\includegraphics[width=.5\textwidth]{img/methodoverview.eps}
-  \caption{Batch view of the system.}
+  \caption{An instance of the system with 4 chunks and 3 queries.}
   \label{fig:methodoverview}
 \end{figure}
 
 First, the \emph{query transformer} analyzes the query and produces a
 \emph{token mapping} and set of state tables. Each state table corresponds to
-one dPDA which in turn correspond to the individual path expressions.
+one dPDA which in turn correspond to the individual queries.
 
 The \emph{chunker} splits the XML streams into chunks of approximately equal
 size. Individual opening or closing tag (e.g. \verb;<a>;, or \verb;</a>;) are
@@ -39,16 +39,16 @@ scaling} for the matcher.
 The query transformer takes as input an XPath query which takes the form of a
 text file containing one or more XPath expression. The query transformer outputs
 two text files: a token mapping and a file containing the state tables of
-the dPDAs, one for each path expression in the input file.
+the dPDAs, one for each query in the input file.
 
 A token mapping is simply a list containing all tag names that appear in any of
-the path expressions. The line number corresponds to the token ID for the tag
+the queries. The line number corresponds to the token id for the tag
 name on that particular line. These token numbers serve as input alphabet of
 the dPDAs.
 
 The dPDAs are generated using the methods presented in \cite{Green2004}: Each
-path expression is turned into a query tree. However, as opposed to
-\cite{Green2004}, we build a query tree for each individual path expression.
+query is turned into an query tree. However, as opposed to
+\cite{Green2004}, we build a query tree for each individual query.
 Based upon the query tree a non-deterministic automaton is generated which is
 then transformed into a deterministic automaton using the standard power set
 method described in \cite{Hopcroft2006}.
@@ -98,13 +98,13 @@ synchronization between the threads when the threads are running.
 
 \subsection{Matcher}
 
-The matcher runs each push down automaton in a separate thread. Hence, the
-number of threads is equal to the number of path expressions in the original
-XPath query. As soon as a push-down automaton transitions into an accepting
-state, the offset of the matching token in the token stream is written into an
-output stream. Hence, the character offset of a matching tag in the original
-XML, can be found by reading the value in the offset stream at the position
-found in the output stream.
+The matcher runs each pushdown automaton in a separate thread. Hence, the
+number of threads is equal to the number of queries in the original XPath
+query. As soon as a push-down automaton transitions into an accepting state,
+the offset of the matching token in the token stream is written into an output
+stream. Hence, the character offset of a matching tag in the original XML, can
+be found by reading the value in the offset stream at the position found in the
+output stream.
 
 Similar to \cite{Ogden2013} we ignore \texttt{CDATA}-sections and comments for
 simplicity. The authors of \cite{Ogden2013} suggest extending the transducer to
