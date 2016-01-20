@@ -3,13 +3,14 @@ We start this section by giving a brief introduction to the XML Path Language,
 or XPath for short \cite{xpathSpec}. We continue by providing a brief overview
 over three general approaches for XPath Query processing and discuss how our
 solution relates to these approaches. Finally, we present a formal description
-of the push-down automatons that we use in our approach.
+of the pushdown automatons that we use in our approach.
 
 \subsection{XML Querying using XPath}
-XPath models an XML document as a tree of nodes. An XPath query describes set
-of paths in this tree. In our case, the path always starts at the root node.
+XPath models an XML document as a tree of nodes. An XPath query describes a set
+of paths in this tree. We say a node in the tree \emph{matches} a query if the
+path from the root to the node is contained in this set.
 
-For our project we only considered a small subset of XPath.  The expressiveness
+For our project we only considered a small subset of XPath. The expressiveness
 of this subset is fairly limited compared to full XPath. However, we believe
 that the concepts presented in this report can be extended in a canonical way
 to support more expressive queries.
@@ -72,7 +73,7 @@ To decide whether a node matches query (list), all characters of the XML stream
 up to the corresponding tag must be read. In the following we briefly discuss
 three commonly available techniques for processing XML data. The idea is not to
 provide detailed technical insight, but rather to demonstrate the effect of the
-aforementioned challenge in these scenarios. We refer the reader to
+aforementioned interdependence in these scenarios. We refer the reader to
 \cite{Ogden2013} for a more elaborate discussion.
 
 \mypar{XML parsing and querying} As XML is a context-free language, an XML
@@ -103,7 +104,7 @@ project, each XML chunk is processed independently and a state mapping is
 generated that maps each possible start state of the matching automaton to the
 corresponding finishing state for this chunk. Only the start state of the first
 chunk is known at the beginning. In a final sequential step, the mapping are
-\emph{connected} to find all matchings.
+connected to find all matchings.
 
 One advantage of this approach is that both the parser and the automaton need
 to maintain only comparatively little state. The authors of \cite{Ogden2013}
@@ -113,10 +114,10 @@ only scales up to 30 cores, as DOM tree parsing induces a higher memory
 bandwidth. 
 
 \subsection{XPath Query Matching}
-We used the same procedure to construct the \emph{deterministic pushdown
-automata} as in \cite{Ogden2013}: A query is turned into a deterministic finite
-state automaton (dFSA) using the methods presented in \cite{Green2014}. The
-dFSA is then turned into a pushdown automaton (or pushdown transducer).
+We used the same procedure to construct the deterministic pushdown automata as
+in \cite{Ogden2013}: A query is turned into a deterministic finite state
+automaton (dFSA) using the methods presented in \cite{Green2004}. The dFSA is
+then turned into a pushdown automaton (or pushdown transducer).
 
 A deterministic pushdown automaton is defined as a 6-tuple $(Q, q_0, \Sigma,
 \Gamma, \delta, F)$ where $Q$ is the set of states, $q_0$ is the initial state,
@@ -157,10 +158,10 @@ where the new state is the former top of the stack.
 
 Figure \ref{fig:exampleFSA} shows the state diagram of a pushdown automaton
 matching nodes of the query \verb;/a/b/c;. The state $0$ corresponds
-to the \emph{illegal state}. It is reached when no subsequent input characters
-can lead to a match (e.g., when an opening tag \verb;<d>; is read in this case).
-The transitions labeled \verb;[o]; match all input characters for which there
-are no specific transitions. The pop transitions are omitted for brevity.
+to the illegal state. This state is reached when no subsequent input characters
+can lead to a match (e.g., when an opening tag \verb;<d>; is read in this
+case). The transitions labeled \verb;[o]; match all input characters for which
+there are no specific transitions. The pop transitions are omitted for brevity.
 
 %ive a short, self-contained summary of necessary
 %ackground information. For example, assume you present an
