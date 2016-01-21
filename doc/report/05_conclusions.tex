@@ -1,23 +1,38 @@
 \section{Conclusions}
-The state mappings of the parallel transducer approach can be considered to
-constitute a compressed representation of the original XML stream, similar to
-our tokenstream. Analogous to the generation of the state mapping, our approach
-scales linearly with the number of processors.
 
-The effectiveness of the parallel transducer stems from the fact that the state
-mappings can be efficiently traversed in the joining phase, which is necessarily
-sequential. Likewise, we try to reduce memory traffic in the matching phase.
+The state mappings of the parallel pushdown transducer approach by Ogden et al
+\cite{Ogden2013}  works on chunked XML data and produces state mappings from
+all possible start states to their finishing states for each chunk individually. This 
+introduces some overhead/additional computation although this enables strong
+scaling during this step.
 
-It is virtually impossible to make a direct comparison, as both a
-reimplementation of the parallel transducer approach was outside of the scope of
-this project and the experimental results stem from different hardware setups.
-It can be argued, though, that our approach is less effective for a small number
-of queries. However, we could demonstrate weak scalability for the query matcher
-allowing for up to 60 queries (the number of cores) to run in parallel.
 
-Furthermore, its straight-forward design lowers the cost of extensions to the
-system and also makes it easier to analyze. For example, supporting a larger
-subset of XPath merely introduces new tokens. Also, to further enhance
-performance, different techniques to compress the tokenstream could be employed.
+%WORK IN PROGRESS
+
+
+
+
+% Original text:
+
+%The state mappings of the parallel transducer approach can be considered to
+%constitute a compressed representation of the original XML stream, similar to
+%our tokenstream. Analogous to the generation of the state mapping, our approach
+%scales linearly with the number of processors.
+%
+%The effectiveness of the parallel transducer stems from the fact that the state
+%mappings can be efficiently traversed in the joining phase, which is necessarily
+%sequential. Likewise, we try to reduce memory traffic in the matching phase.
+%
+%It is virtually impossible to make a direct comparison, as both a
+%reimplementation of the parallel transducer approach was outside of the scope of
+%this project and the experimental results stem from different hardware setups.
+%It can be argued, though, that our approach is less effective for a small number
+%of queries. However, we could demonstrate weak scalability for the query matcher
+%allowing for up to 60 queries (the number of cores) to run in parallel.
+%
+%Furthermore, its straight-forward design lowers the cost of extensions to the
+%system and also makes it easier to analyze. For example, supporting a larger
+%subset of XPath merely introduces new tokens. Also, to further enhance
+%performance, different techniques to compress the tokenstream could be employed.
 
 

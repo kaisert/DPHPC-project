@@ -1,8 +1,8 @@
 \section{Background}\label{sec:background}
 We start this section by giving a brief introduction to the XML Path Language,
-or XPath for short \cite{xpathSpec}. We continue by providing a brief overview
+or XPath for short \cite{xpathSpec}. We continue by providing an overview
 over three general approaches for XPath Query processing and discuss how our
-solution relates to these approaches. Finally, we present a formal description
+solution relates to these approaches. In the end, we present a formal description
 of the pushdown automatons that we use in our approach.
 
 \subsection{XML Querying using XPath}
@@ -34,13 +34,13 @@ XPath queries:
 We can now give a formal definition of the problem we aim to solve and state
 the goal of our enterprise. 
 
-\mypar{Problem Definition and Goal} Given an XML Document and a query list (as
-defined above), find all nodes that match any of the queries contained in the
-query and report the character offsets in the XML Document of the opening and
+\mypar{Problem Definition and Goal} Given an XML document and a query list as
+defined above, find all nodes that match any of the queries contained in the
+query and report the character offsets in the XML document of the opening and
 closing tags of these nodes. The goal is to maximize the throughput at which
-the XML Document is processed.
+the XML document is processed.
 
-Consider the example XML Document in Figure \ref{src:exampleXML}. Using the
+Consider the example XML document in Figure \ref{src:exampleXML}. Using the
 above query, the matcher would return the character offsets of \verb;<c>; and
 \verb;</c>;, and \verb;<d>; and \verb;</d>; for the first and second query,
 respectively.
@@ -62,42 +62,44 @@ respectively.
         </b>
     </a>
 \end{lstlisting}
-\caption{Example XML Document}
+\caption{Example XML document}
 \label{src:exampleXML}
 \end{figure}
 
 % TODO syntax description
 
 \subsection{Parallel XML Query Matching}
-To decide whether a node matches a query (list), all characters of the XML stream
-up to the corresponding tag must be read. In the following we briefly discuss
+To decide whether a node matches a query, all characters of the XML stream
+up to the corresponding tag must be read. In the following paragraphs, we briefly discuss
 three commonly available techniques for processing XML data. The idea is not to
 provide detailed technical insight, but rather to demonstrate the effect of the
 aforementioned interdependence in these scenarios. We refer the reader to
 \cite{Ogden2013} for a more elaborate discussion.
 
-\mypar{XML parsing and querying} As XML is a context-free language, an XML
+\mypar{XML parsing and querying} 
+As XML is a context-free language, an XML
 document can be parsed and represented as a parse tree. The actual query
 matching is then performed on the parse tree.
 
 There exist approaches to parallelize parse tree querying \cite{You11}. However,
 in general, parsing an XML document in parallel requires the document to be
-split into well-formed chunks, each containing a subtree of the parse tree.
+split into well-formed chunks, each containing a subtree of the complete parse tree.
 This, in turn, can only be achieved through a sequential pre-parsing step.
 
 An example for a parallel DOM tree parser that works on malformed XML chunks is
 discussed in \cite{Shah09}. However, they only considered XML documents of
 comparatively small size.
 
-\mypar{XML-capable DBMS} Some relational DBMS-engines (among them are MSQL,
+\mypar{XML capable DBMS}
+Some relational DBMS engines (among them are MSQL,
 MySQL, MonetDB) have support for indexing XML documents. While indexing enables
 parallelized querying, creating the index structures imposes a large overhead,
-as the XML Document must first be read into the database and then indexed.
+as the XML document must first be read into the database and indexed.
 
 \mypar{XML processing with automatons} 
 A parser (e.g. a SAX-parser) reads the XML document and triggers parsing events
 that are handled by a pushdown automaton. The pushdown automaton transitions
-into an accepting state if one the queries of the query list matches.
+into an accepting state if one of the queries from the query list matches.
 
 In the work of Ogden et al. \cite{Ogden2013}, which is the inspiration for this
 project, each XML chunk is processed independently and a state mapping is
@@ -106,9 +108,10 @@ corresponding finishing state for this chunk. Only the start state of the first
 chunk is known at the beginning. In a final sequential step, the mappings are
 connected to find all matchings.
 
-One advantage of this approach is that both the parser and the automaton need
-to maintain only comparatively little state. The authors of \cite{Ogden2013}
-compare their transducer-based approach to a PugiXML-based DOM tree parser:
+One advantage of this approach is that both, the parser and the automaton, need
+to maintain only a comparatively small amount of state information. The authors of 
+\cite{Ogden2013} compare their transducer-based approach to a PugiXML-based 
+DOM tree parser:
 While the transducer-based approach scales up to 64 cores, the DOM tree parser
 only scales up to 30 cores, as DOM tree parsing induces a higher memory
 bandwidth. 
@@ -121,9 +124,9 @@ then turned into a pushdown automaton (or pushdown transducer).
 
 A deterministic pushdown automaton is defined as a 6-tuple $(Q, q_0, \Sigma,
 \Gamma, \delta, F)$ where $Q$ is the set of states, $q_0$ is the initial state,
-$\Sigma$ is the input alphabet (the opening and closing XML tags), $\Gamma$ is
-the pushdown alphabet, $\delta$ is the transition function, and $F \subseteq Q$ is
-the set of accepting states.
+$\Sigma$ is the input alphabet (the queried opening and closing XML tags and  
+[unknown] for all other tags), $\Gamma$ is the pushdown alphabet, $\delta$ 
+is the transition function, and $F \subseteq Q$ is the set of accepting states.
 
 In our case, the pushdown alphabet $\Gamma$ is equal to the set of states $Q$.
 Each opening tag leads to a push transition, i.e. the current state is pushed
