@@ -33,7 +33,7 @@ In our approach we achieve this by using a compression that is agnostic of the
 internal structure of the XML data. The XPath query matching is done using the
 compressed data.
 
-Our implementation focuses on XML query matching, using XPath. It is written in
+Our implementation focuses on XML query matching using XPath. It is written in
 C/C++ and our platform of choice is the Intel's Xeon Phi \cite{IntelXeon}, incorporating 61 cores
 and 16 GB of memory. We found a scalable approach to process queries on large
 XML files. Our implementation reaches a throughput of about 0.29 GB/s and offers
@@ -41,10 +41,7 @@ a big potential for optimization to the architecture at use.
 
 \mypar{Related work} Main inspiration of our work was \cite{Ogden2013}. Ogden et
 al describe an approach to query XML data with the help of pushdown transducers.
-Its core idea is to generate mappings of a start state and an end state. For
-each chunk one mapping is being computed and then, when each core has finished
-processing its part, they are merged according to the matching end and start
-states of each chunk.
+Its core idea is to split the data stream into different chunks, then for every chunk to generate state mappings. These states correspond to the states in the transducer. As the XML chunks are not well-formed, each potential starting and ending state of the snippet must be estimated. These mappings must then be merged into one sequence of states, which then forms the state transition order of the transducer. In this sequence all accepting states are being extracted, which correspond to the queries matching a certain part of the XML.
 
 Optimally to process XML streams, deterministic automatons are used. The
 compilation of XPath queries into automatons is discussed in \cite{Green2004}.

@@ -69,7 +69,7 @@ respectively.
 % TODO syntax description
 
 \subsection{Parallel XML Query Matching}
-To decide whether a node matches query (list), all characters of the XML stream
+To decide whether a node matches a query (list), all characters of the XML stream
 up to the corresponding tag must be read. In the following we briefly discuss
 three commonly available techniques for processing XML data. The idea is not to
 provide detailed technical insight, but rather to demonstrate the effect of the
@@ -103,7 +103,7 @@ In the work of Ogden et al. \cite{Ogden2013}, which is the inspiration for this
 project, each XML chunk is processed independently and a state mapping is
 generated that maps each possible start state of the matching automaton to the
 corresponding finishing state for this chunk. Only the start state of the first
-chunk is known at the beginning. In a final sequential step, the mapping are
+chunk is known at the beginning. In a final sequential step, the mappings are
 connected to find all matchings.
 
 One advantage of this approach is that both the parser and the automaton need
