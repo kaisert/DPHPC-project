@@ -232,7 +232,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4142136"
-     inkscape:cx="458.8888"
+     inkscape:cx="355.65121"
      inkscape:cy="830.94072"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -710,7 +710,7 @@
            sodipodi:role="line"
            x="539.43921"
            y="193.88737"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.55120182px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'">mapping</tspan></text>
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.55120182px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue'">Mapping</tspan></text>
     </g>
     <g
        id="g4331"
@@ -835,7 +835,7 @@
            y="432.90845"
            x="539.43921"
            sodipodi:role="line"
-           id="tspan15263">tables</tspan></text>
+           id="tspan15263">Tables</tspan></text>
     </g>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#cbcbcb;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -927,15 +927,15 @@
     <text
        sodipodi:linespacing="125%"
        id="text15300"
-       y="66.844559"
-       x="540.77448"
+       y="66.951454"
+       x="535.24127"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
          style="font-size:15px;fill:#000000;fill-opacity:1"
-         y="66.844559"
-         x="540.77448"
+         y="66.951454"
+         x="535.24127"
          sodipodi:role="line"
-         id="tspan15304">Query</tspan></text>
+         id="tspan15304">Queries</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker15329)"
        d="m 561.23106,72.13201 0,14.14214"
@@ -959,19 +959,19 @@
          sodipodi:linespacing="125%"
          id="text15271"
          y="104.30622"
-         x="502.84372"
+         x="500.33884"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          xml:space="preserve"><tspan
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue Bold';fill:#ffffff;fill-opacity:1"
            y="104.30622"
-           x="502.84372"
+           x="500.33884"
            id="tspan15273"
            sodipodi:role="line">Query</tspan><tspan
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue Bold';fill:#ffffff;fill-opacity:1"
            y="123.05622"
-           x="502.84372"
+           x="500.33884"
            sodipodi:role="line"
-           id="tspan15275">Transormer</tspan></text>
+           id="tspan15275">Transformer</tspan></text>
     </g>
   </g>
 </svg>
