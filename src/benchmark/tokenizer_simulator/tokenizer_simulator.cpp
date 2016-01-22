@@ -75,13 +75,17 @@ int main(int argc, char* argv[]) {
             short sum = 0;
             auto& my_token_stream = token_stream_ref.at(tid);
             auto& my_offset_stream = offset_stream_ref.at(tid);
+            size_t idx = offsets.at(tid);
+            int stride_offset = idx % output_ratio;
 
             for(size_t idx = offsets.at(tid); idx < end; ++idx) {
                 sum += stream[idx];
-                if((idx % output_ratio) == 0) {
+                if(output_ratio == stride_offset) {
                     my_token_stream.push_back(static_cast<short>(sum));
                     my_offset_stream.push_back(static_cast<size_t>(sum));
+                    stride_offset = 0;
                 }
+                stride_offset++;
             }
 
         }
