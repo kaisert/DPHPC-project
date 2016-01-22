@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
     char* stream = static_cast<char*>(malloc(total_size));
     if(!stream) {
         cout << "failed to initialize memory" << endl;
-        return -1;
+        return -2;
     }
 
     // init memory
@@ -65,13 +65,16 @@ int main(int argc, char* argv[]) {
     for(size_t run = 0; run < runs; ++run) {
         // start timer
         auto _start = chrono::high_resolution_clock::now();
-#pragma omp parallel num_threads(n_threads) shared(offsets, stream, token_stream, offset_stream)
+        auto& token_stream_ref = token_stream;
+        auto& offset_stream_ref = offset_stream;
+#pragma omp parallel num_threads(n_threads) \
+        shared(n_threads, offsets, stream, token_stream_ref, offset_stream_ref)
         {
             int tid = omp_get_thread_num() % n_threads;
             size_t end = offsets.at(tid+1);
             short sum = 0;
-            auto& my_token_stream = token_stream.at(tid);
-            auto& my_offset_stream = offset_stream.at(tid);
+            auto& my_token_stream = token_stream_ref.at(tid);
+            auto& my_offset_stream = offset_stream_ref.at(tid);
 
             for(size_t idx = offsets.at(tid); idx < end; ++idx) {
                 sum += stream[idx];
@@ -88,8 +91,9 @@ int main(int argc, char* argv[]) {
         results.at(run) = duration;
     }
 
+    cout << "threads:" << n_threads << ",total_size:" << total_size << endl;
+
     // output results
-   
     if(results.size() > 0) {
         cout << results.at(0);
     }
