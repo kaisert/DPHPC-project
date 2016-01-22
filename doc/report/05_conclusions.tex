@@ -1,12 +1,12 @@
 \section{Conclusions}
 
-From a high-level viewpoint the parallel transducer approach by Ogden et 
+From a high-level viewpoint the parallel transducer approach by Ogden et
 al.\cite{Ogden2013} and our approach are similar. In a first step, the input is
 divided into equally sized chunks which are then processed independently. In the
-case of Ogden et al., a state mapping is generated for each chunk by speculatively
-executing the deterministic transducer in each possible starting state. In our case, 
-the tokenizer compresses each XML chunk into a tokenstream chunk by mapping 
-tag names to token IDs.
+case of Ogden et al., a state mapping is generated for each chunk by
+speculatively executing the deterministic transducer in each possible starting
+state. In our case, the tokenizer compresses each XML chunk into a tokenstream
+chunk by mapping tag names to token IDs.
 
 We could demonstrate strong scalability for the tokenizer, i.e., the throughput
 increases almost linearly with the number of threads.
@@ -18,20 +18,31 @@ mappings are joined in a single-threaded process. In our case, the state
 machines process the entire tokenstream.
 
 It can be argued that our approach is less effective for a small number of
-queries, as each state machine needs to process the entire tokenstream
-sequentially. However, we could demonstrate weak scalability of our matcher:
-For up to 60 queries (the number of cores), the per-thread throughput does
-decline less than 20\% when compared to a single query. In the case where
-a large number of queries must be executed, this is a clear advantage over the
-parallel transducer approach, as for the latter the set of states potentially
-grows exponentially with the size of the query list.
+queries than the transducer approach, as each state machine needs to process the
+entire tokenstream sequentially. However, we could demonstrate weak scalability
+of our matcher: For up to 60 queries (the number of cores), the per-thread
+throughput declines less than 20\% when compared to a single query. In the case
+where a large number of queries must be executed, this is a clear advantage over
+the parallel transducer approach, as for the latter the set of states
+potentially grows exponentially with the size of the query list.
 
-It is virtually impossible to make a direct comparison, as both a reimplementation 
-of the parallel transducer approach was outside of the scope of this project and 
-the experimental results stem from different hardware setups.
+It is virtually impossible to make a direct comparison, as both, a
+reimplementation of the parallel transducer approach was outside of the scope of
+this project and the experimental results stem from different hardware setups.
 
-We conclude by pointing out that the straight-forward, modular design of our
-system allows for extensions in many directions. For instance, as the structure
-of most XML files is highly repetitive, pattern based compression schemes could
-be used to further compress the tokenstream. Also, there exist efficient integer
-compression algorithms which could be employed to compress the offset stream.
+In our experiments we reached a maximal throughput of a approximately 1.2 GBps
+for the tokenizer running with 240 threads. As this is far below the maximal
+memory bandwidth of 352 Gbps specified for the Xeon phi\cite{IntelXeon},
+architectural optimization must be used to explore the limits of our system
+design.
+
+Furthermore, since we are dealing with an inherently memory bound problem, it is
+likely that our system would profit from further compressing intermediate data.
+For instance, as the structure of most XML files is highly repetitive, pattern
+based compression schemes could be used to further compress the tokenstream.
+Also, there exist efficient integer compression algorithms which could be
+employed to compress the offset stream\cite{Lemire2014}.
+
+The straight-forward, modular design of our system also allows for conceptual
+enhancements. For instance, the tokenstream could be adapted to contain forward
+pointers to sibling nodes that would allow a matcher to skip entire subtrees.
