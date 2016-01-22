@@ -23,7 +23,14 @@ void calc_offsets(vector<size_t> &offsets, size_t total_size, size_t chunks) {
     offsets.push_back(total_size);
 }
 
-// <total_size> <output_ratio> <runs>
+// args: <total_size> <output_ratio> <runs>
+
+// <total_size>: total size of the memory to be read
+//
+// <output_ratio>: after each <output_ratio> bytes some output will be generated
+// the token_stream and offset_stream will be written to
+//
+// <runs> the number of runs
 int main(int argc, char* argv[]) {
     vector<size_t> offsets;
     vector<unsigned long> results;
