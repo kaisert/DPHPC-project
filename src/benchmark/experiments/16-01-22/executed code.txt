@@ -1,0 +1,39 @@
+2GB
+---
+sbatch atest.sh 2048 1
+sbatch atest.sh 2048 2
+sbatch atest.sh 2048 4
+sbatch atest.sh 2048 8
+sbatch atest.sh 2048 16
+sbatch atest.sh 2048 32
+sbatch atest.sh 2048 60
+sbatch atest.sh 2048 120
+sbatch atest.sh 2048 180
+sbatch atest.sh 2048 240
+
+4GB
+---
+sbatch atest.sh 4096 1
+sbatch atest.sh 4096 2
+sbatch atest.sh 4096 4
+sbatch atest.sh 4096 8
+sbatch atest.sh 4096 16
+sbatch atest.sh 4096 32
+sbatch atest.sh 4096 60
+sbatch atest.sh 4096 120
+sbatch atest.sh 4096 180
+sbatch atest.sh 4096 240
+
+8GB (unused)
+------------
+sbatch atest.sh 8192 1
+sbatch atest.sh 8192 2
+sbatch atest.sh 8192 4
+sbatch atest.sh 8192 8
+sbatch atest.sh 8192 16
+sbatch atest.sh 8192 32
+sbatch atest.sh 8192 60
+sbatch atest.sh 8192 120
+sbatch atest.sh 8192 180
+sbatch atest.sh 8192 240
+

@@ -1,75 +1,36 @@
 \section{Conclusions}
 
-The state mappings of the parallel pushdown transducer approach by Ogden et 
-al\cite{Ogden2013}  works on chunked XML data and produces state mappings from
-all possible start states to their finishing states for each chunk individually. This 
-introduces some overhead/additional computation although this enables strong
-scaling during this step.
+From a high-level viewpoint the parallel transducer approach by Ogden et 
+al.\cite{Ogden2013} and our approach are similar. In a first step, the input is
+divided into equally sized chunks which are then processed independently. In the
+case of Ogden et al., a state mapping is generated for each chunk by speculatively
+executing the deterministic transducer in each possible starting state. In our case, 
+the tokenizer compresses each XML chunk into a tokenstream chunk by mapping 
+tag names to token IDs.
 
-The state mapping generation can be seen as a form of compressing the XML stream.
-Our tokenizer also performs a compressing step but does not introduce potentially 
-unnecessary computation. 
-From the results, we can conclude, that the tokenizer shows strong scaling. In addition, 
-this step could easily be performed in a distributed system, thus allowing for much larger 
-amounts of XML being compressed than currently limited through memory bandwidth or 
-the amount of RAM of one Xeon Phi.
+We could demonstrate strong scalability for the tokenizer, i.e., the throughput
+increases almost linearly with the number of threads.
 
-In both approaches a necessarily sequential step comes next. Ogden et al's algorithm
-joins all the computed state mappings and throws away those, which do not correspond 
-to the given XML file. This way, only the valid matches are returned. 
-In contrast, we aimed at also parallelizing our second step with the number of queries.
-Thanks to the great compression ratio (e.g. an XMark 2 GB becomes 110 MB) we don't run into
-problems with neither memory bandwidth nor other limits, due Xeon Phi's special caching
-architecture,  during the matching phase for up to \todo{60?} threads and can even get an 
-additional small improvement for up to \todo{240?} threads. 
-\todo{60 queries/threads, 2GB = 120GB raw XML queried in ?? seconds} 
+Both, the tokenstream and the state mappings, can be viewed as a transformed
+representation of the original XML data which is suitable for a following,
+necessarily sequential analysis: In the case of the parallel transducer, the
+mappings are joined in a single-threaded process. In our case, the state
+machines process the entire tokenstream.
 
+It can be argued that our approach is less effective for a small number of
+queries, as each state machine needs to process the entire tokenstream
+sequentially. However, we could demonstrate weak scalability of our matcher:
+For up to 60 queries (the number of cores), the per-thread throughput does
+decline less than 20\% when compared to a single query. In the case where
+a large number of queries must be executed, this is a clear advantage over the
+parallel transducer approach, as for the latter the set of states potentially
+grows exponentially with the size of the query list.
 
-With achieving strong scaling for the tokenizer and weak scaling for the matcher, we 
-reached our initial goals. Unfortunately, a numerical comparison of the performance
-between Ogden et al's and our approach is not possible, since we neither have their 
-source code, nor exact XML files nor access to their hardware setup and a 
-reimplementation of their approach is outside the scope of this project.
+It is virtually impossible to make a direct comparison, as both a reimplementation 
+of the parallel transducer approach was outside of the scope of this project and 
+the experimental results stem from different hardware setups.
 
-It can be argued though, that our approach is less effective for a small number
-of queries. However, we could demonstrate weak scalability for the query matcher,
-which works for up to 60 queries (the number of cores) to be run in parallel on the 
-Xeon Phi. 
-This behavior is one big advantage of our implementation: It grows at most linearly
-with the number of tags respectively complexity of the queries, whereas Ogden et al's 
-automaton can grow exponentially.
-
-Furthermore, our straight-forward design lowers the cost of extensions to the
-system and also makes it easier to analyze. For example, supporting a larger
-subset of XPath merely introduces new tokens. To further enhance
-performance, different techniques to compress the tokenstream could be 
-employed. Also, architectural optimizations like vectorization with the \todo{512-bit?} 
-registers or (pre-)fetching and thread synchronization with respect to the special 
-caching architecture of the Xeon Phi could still be done.
-
-
-
-% Original text:
-
-%The state mappings of the parallel transducer approach can be considered to
-%constitute a compressed representation of the original XML stream, similar to
-%our tokenstream. Analogous to the generation of the state mapping, our approach
-%scales linearly with the number of processors.
-%
-%The effectiveness of the parallel transducer stems from the fact that the state
-%mappings can be efficiently traversed in the joining phase, which is necessarily
-%sequential. Likewise, we try to reduce memory traffic in the matching phase.
-%
-%It is virtually impossible to make a direct comparison, as both a
-%reimplementation of the parallel transducer approach was outside of the scope of
-%this project and the experimental results stem from different hardware setups.
-%It can be argued, though, that our approach is less effective for a small number
-%of queries. However, we could demonstrate weak scalability for the query matcher
-%allowing for up to 60 queries (the number of cores) to run in parallel.
-%
-%Furthermore, its straight-forward design lowers the cost of extensions to the
-%system and also makes it easier to analyze. For example, supporting a larger
-%subset of XPath merely introduces new tokens. Also, to further enhance
-%performance, different techniques to compress the tokenstream could be employed.
-
-
+We conclude by pointing out the straight-forward design of our system which
+makes it easier to extend. For instance, new compression schemes for both
+the tokenstream and the offset stream could be employed to further reduce
+memory traffic.

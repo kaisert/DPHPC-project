@@ -81,8 +81,8 @@ integers. This seemed to be reasonable trade-off between the number of different
 tag names ($2^{15}-2$) that can be represented and encoding size. Note that the
 token size can in principle also be decided dynamically based on the size of the
 token mapping. This allows to reduce a 2 GB XMark XML file (with 70 unique tag 
-names) down to approximately 55 MB, since all tag IDs fit into one byte, respectively 
-down to 110 MB in the current implementation.
+names) down to approximately 61 MB, since all tag IDs fit into one byte, respectively 
+down to 122 MB in the current implementation.
 
 Each thread also outputs a chunk of the \emph{offset stream} which contains the
 character offset for each tag. The offset stream is generated analogous to the
