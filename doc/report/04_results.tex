@@ -1,6 +1,31 @@
 
 \section{Experimental Results}\label{sec:exp}
 
+\begin{minipage}{0.45\linewidth}
+      \centering
+    \begin{figure}
+    %	\includegraphics[scale=.45]{img/def/tokenizer_tp_total.eps}
+      \subfloat{\rule{3cm}{2cm}\label{fig:sub1}}%
+	%	\includegraphics[scale=.45]{img/def/tokenizer_tp_per_thread.eps}
+      \subfloat{\rule{3cm}{2cm}\label{fig:sub2}}
+	%	\includegraphics[scale=.45]{img/def/tokenizer_sim.eps} 
+      \subfloat{\rule{3cm}{2cm}\label{fig:sub3}}
+      \caption{}%
+    \end{figure}
+\end{minipage}\qquad
+\begin{minipage}{0.45\linewidth}
+         \centering
+            \begin{figure}
+   %         \includegraphics[scale=.45]{img/def/matcher_tp_total.eps}
+      \subfloat{\rule{3cm}{2cm}\label{fig:sub1a}}%
+	%		\includegraphics[scale=.45]{img/def/matcher_tp_per_thread.eps}
+      \subfloat{\rule{3cm}{2cm}\label{fig:sub2a}}
+	%		\includegraphics[scale=.45]{img/def/matcher_tp_compare.eps
+      \subfloat{\rule{3cm}{2cm}\label{fig:sub3a}}
+      \caption{}%
+    \end{figure}
+\end{minipage}
+
 Here we present the results of our experiment conducted to measure the performance of the main parts of the system, the tokenizer and the matcher. First a description of the setup to run the benchmarks followed by a short explanation of the experiments and finally the results.
 
 \mypar{Experimental Setup} The experiments were executed on an Intel Xeon Phi 7120 coprocessor. It consists of 61 cores and 16 GB of GDDR5 memory with a theoretical bandwidth of 352 GB/s. According to the documentation the Xeon Phi's optimal computational power can be reached running two threads per core, i.e. 120 threads.
