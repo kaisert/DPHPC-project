@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
         results.at(run) = duration;
     }
 
-    cout << "threads:" << n_threads << ",total_size:" << total_size << endl;
+    cout << "threads:," << n_threads << ", total_size:," << total_size << ", timing results:, ";
 
     // output results
     if(results.size() > 0) {
