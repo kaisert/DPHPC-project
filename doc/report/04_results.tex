@@ -21,7 +21,7 @@ In figure~\ref{matcher_throughput} the throughput of the matcher against the num
 
 \begin{figure}[h]\centering
   \includegraphics[scale=.66]{img/matcher_throughput_2.eps}
-  \caption{Throughput of the matcher in tokens/s comparing different input sizes. \label{matcher_throughput}}
+  \caption{Throughput of the matcher in tokens/(s*number of threads) comparing different input sizes. \label{matcher_throughput}}
 \end{figure}
 
 A direct comparison of the processing time of the tokenizer and the matcher is plotted in figure ~\ref{matcher_tokenizer_pt}. The numbers represent the absolute processing time of a XML file of 2 GB. One can see, that the processing time of the matcher stays practically the same, even when increasing the numbers of queries being processed, while decreasing drastically for the tokenizer when more threads are provided.
