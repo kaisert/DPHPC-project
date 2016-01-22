@@ -97,14 +97,10 @@ int main(int argc, char* argv[]) {
 
     cout << "threads:," << n_threads << ", total_size:," << total_size << ", timing results:, ";
 
-    // output results
-    if(results.size() > 0) {
-        cout << results.at(0);
+    for(auto result: results) {
+        cout << ", " << result;
     }
 
-    for(int i = 1; i < runs; ++i) {
-        cout << ", " << results.at(i);
-    }
 
     cout << endl;
 }
