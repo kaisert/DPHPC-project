@@ -30,7 +30,8 @@
 
 
 In the following we present our experimental results. We only measured the
-performance of the tokenizer and the matcher, as all other tasks are I/O bound.
+performance of the tokenizer and the matcher, as all other parts of the system
+are I/O bound.
 
 \mypar{Experimental Setup} The experiments were conducted on an Intel Xeon Phi
 7120 coprocessor. This model contains 61 cores and 16 GB of GDDR5 memory with a
@@ -87,4 +88,8 @@ provided.
 
 The total throughput of the tokenizer and matcher running with 120 threads is
 0.29 GBpss. This is far below the specified maximum memory bandwidth of 352
-GBps. 
+GBps. To make a realistic assessment of the maximally achievable throughput
+we conducted an experiment with a dummy program which has a similar memory
+access pattern as our tokenizer: A contiguous block of memory is read byte-wise
+and every 80 bytes (based on the average number of tags per file) 10 bytes are
+written to memory. The results are shown in Figure \ref{fig:tokenizersim}.
