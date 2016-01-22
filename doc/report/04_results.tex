@@ -54,15 +54,14 @@ total throughput and the throughput per thread.
 The experiments reveal clearly, that the throughput of the tokenizer increases
 with the number of threads. While the benefits of more threads are significant
 up to 120 threads, i.e. two threads per core, less performance can be gained
-from 120 up to 240 threads. These results confirm the optimal use of processors,
-which is at two threads per core, as we mentioned earlier.
+from 120 up to 240 threads.
 
 Similarly, the matcher was tested with files of the sizes 2, 4 GB and 8 GB. For
-each file 10 different experiments were run. The first experiment matched 1
-query, i.e. running with 1 thread, the second matched 2 queries and the
-following experiments matched 4, 8, 16, 32, 60, 120, 180 and 240 queries.
-Again, the result is the average of the runs. Figure \ref{fig:matchertp}
-shows the corresponding results.
+each file 10 different experiments were run. In the first experiment one query
+was used, corresponding to one thread, in the second 2 queries and the following
+experiments 4, 8, 16, 32, 60, 120, 180 and 240 queries.  Again, the result is
+the average of the runs. Figure \ref{fig:matchertp} shows the corresponding
+results.
 
 Since the file size alone does not reveal enough information about the
 complexity, or the number of tokens in the XML data, the throughput for the
@@ -71,11 +70,16 @@ to 60 queries there is no significant drop of the performance, while with 120
 queries and more the throughput decreases significantly. Weak scaling is
 observable for up to 60 threads. When the number of threads exceeds the number
 of cores the performance suffers. This is in line with the observation Fang et
-al. made in \cite{Fang14}. This is in sync with the finding of  The sudden
-decrease of performance for 8 GB might be due to the memory access pattern on
-the Xeon Phi, which becomes apparent, when more threads operate at the same time
-on larger amount of data.  Pursuing experiments that confirm this hypothesis
-would exceed the format of this report. 
+al. made in \cite{Fang14}.
+
+
+To further asses the performance of the matcher, we included different file
+sizes.
+
+The sudden decrease of performance for 8 GB might be
+due to the memory access pattern on the Xeon Phi, which becomes apparent, when
+more threads operate at the same time on larger amount of data.  Pursuing
+experiments that confirm this hypothesis would exceed the format of this report. 
 
 A direct comparison of the processing time of the tokenizer and the matcher is
 plotted in figure ~\ref{fig:tkmatchercomp}. The numbers represent the absolute
