@@ -31,6 +31,7 @@ of the parallel transducer approach was outside of the scope of this project and
 the experimental results stem from different hardware setups.
 
 We conclude by pointing out the straight-forward design of our system which
-makes it easier to extend. For instance, new compression schemes for both
-the tokenstream and the offset stream could be employed to further reduce
-memory traffic.
+makes it easier to extend. For instance, as the structure of most XML files is
+highly repetitive, pattern based compression schemes could be used to further
+compress the tokenstream. Also, there exist efficient integer compression
+algorithms which could be used for the offset stream.
