@@ -153,7 +153,9 @@ where the new state is the former top of the stack.
     (q_1) edge[bend right]  node {[o]} (q_0)
     (q_2) edge  node {[o]} (q_0)
     (q_3) edge  node {[o]} (q_0)
-    (q_4) edge[bend left]  node {[o]} (q_0);
+    (q_4) edge[bend left]  node {[o]} (q_0)
+    (q_0) edge[loop below] node {[o]} (q_0);
+
 \end{tikzpicture}
 \caption{State Diagram of a dPDA for query \texttt{/a/b/c}}
 \label{fig:exampleFSA}
