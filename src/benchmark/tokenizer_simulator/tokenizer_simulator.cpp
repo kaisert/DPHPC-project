@@ -37,7 +37,6 @@ int main(int argc, char* argv[]) {
     size_t total_size = atol(argv[1]) * MB;
     size_t output_ratio = atol(argv[2]);
     size_t runs = atol(argv[3]);
-    cout << total_size<<","<<output_ratio<<","<<runs<<endl;
     vector<vector<short>> token_stream(n_threads);
     vector<vector<size_t>> offset_stream(n_threads);
 
