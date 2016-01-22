@@ -1,11 +1,12 @@
 \section{Conclusions}
 
-From a high-level viewpoint the parallel transducer approach by Ogden et al.
-\cite{Ogden2013} and our approach are similar. In a first step, the input is
+From a high-level viewpoint the parallel transducer approach by Ogden et 
+al.\cite{Ogden2013} and our approach are similar. In a first step, the input is
 divided into equally sized chunks which are then processed independently. In the
-case of Ogden et al., a state mapping is generated for chunk by speculatively
-executing the deterministic transducer. In our case, the tokenizer compresses
-each XML chunk into a tokenstream chunk by mapping tag names to token numbers.
+case of Ogden et al., a state mapping is generated for each chunk by speculatively
+executing the deterministic transducer in each possible starting state. In our case, 
+the tokenizer compresses each XML chunk into a tokenstream chunk by mapping 
+tag names to token IDs.
 
 We could demonstrate strong scalability for the tokenizer, i.e., the throughput
 increases almost linearly with the number of threads.
@@ -18,18 +19,18 @@ machines process the entire tokenstream.
 
 It can be argued that our approach is less effective for a small number of
 queries, as each state machine needs to process the entire tokenstream
-sequentially. However, we could demonstrate weak scalability for our matcher:
+sequentially. However, we could demonstrate weak scalability of our matcher:
 For up to 60 queries (the number of cores), the per-thread throughput does
 decline less than 20\% when compared to a single query. In the case where
 a large number of queries must be executed, this is a clear advantage over the
 parallel transducer approach, as for the latter the set of states potentially
 grows exponentially with the size of the query list.
 
-It is virtually impossible to make a direct comparison, as both a
-reimplementation of the parallel transducer approach was outside of the scope of
-this project and the experimental results stem from different hardware setups.
+It is virtually impossible to make a direct comparison, as both a reimplementation 
+of the parallel transducer approach was outside of the scope of this project and 
+the experimental results stem from different hardware setups.
 
 We conclude by pointing out the straight-forward design of our system which
-makes it easier to extend. For instance, differed compression schemes for both
-the tokenstream and the offset stream could be employed to further reduced
+makes it easier to extend. For instance, new compression schemes for both
+the tokenstream and the offset stream could be employed to further reduce
 memory traffic.
