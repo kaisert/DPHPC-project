@@ -4,28 +4,30 @@
 \begin{figure}
     \includegraphics[scale=.45]{img/def/tokenizer_tp_total.eps}
     \includegraphics[scale=.45]{img/def/tokenizer_tp_per_thread.eps}
-    \caption{Tokenizer Total Throughput and Throughput per Thread.}%
+    \caption{Total throughput and throughput per thread of tokenizer
+    for 2GB input file.}
     \label{fig:tokenizertp}
 \end{figure}
 
 \begin{figure}
       \includegraphics[scale=.45]{img/def/matcher_tp_total.eps}
       \includegraphics[scale=.45]{img/def/matcher_tp_per_thread.eps}
+    \caption{Total throughput and throughput per thread of matcher 
+    for 2GB input file.}
       \label{fig:matchertp}%
-      \caption{Matcher: Total Throughput and Throughput per Thread.}
 \end{figure}
 
 \begin{figure}
     \includegraphics[scale=.45]{img/def/matcher_tp_compare.eps}
-    \label{fig:tkmatchercomp}
     \caption{Throughput of matcher for different filesizes.}
+    \label{fig:tkmatchercomp}
 \end{figure}
 
 \begin{figure}
     \includegraphics[scale=.45]{img/def/tokenizer_sim.eps} 
-    \label{fig:tokenizersim}
     \caption{Experimental program simulating memory access pattern of the
     tokenizer.}
+    \label{fig:tokenizersim}
 \end{figure}
 
 
@@ -34,7 +36,7 @@ performance of the tokenizer and the matcher, as all other parts of the system
 are I/O bound.
 
 \mypar{Experimental Setup} The experiments were conducted on an Intel Xeon Phi
-7120 coprocessor. This model contains 61 cores and 16 GB of GDDR5 memory with a
+7120 coprocessor, containing 61 cores and 16 GB of GDDR5 memory with a
 theoretical bandwidth of 352 GBps. According to the documentation the Xeon Phi's
 optimal computational power can be reached running two threads per core, i.e.
 120 threads. For compilation the Intel Compiler version 15.0.0 20140723 was used
@@ -71,7 +73,7 @@ number of cores the performance suffers. This is in line with the observation
 Fang et al. made in \cite{Fang14}.
 
 To further asses the performance of the matcher, we included different file
-sizes (see Figure \ref{fig:tkmatchercomp}. We assume that the decrease in
+sizes (see Figure \ref{fig:tkmatchercomp}). We assume that the decrease in
 performance for 8 GB is due to the fact that is more likely for large files that
 different threads access different memory areas while using the same cache
 directory.
@@ -82,4 +84,4 @@ GBps. To make a realistic assessment of the maximally achievable throughput
 we conducted an experiment with a dummy program which has a similar memory
 access pattern as our tokenizer: A contiguous block of memory is read byte-wise
 and every 80 bytes (based on the average number of tags per file) 10 bytes are
-written to memory. The results are shown in Figure \ref{fig:tokenizersim}.
+written to memory. The results are shown in Figure ~\ref{fig:tokenizersim}.
