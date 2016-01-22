@@ -25,10 +25,11 @@ void calc_offsets(vector<size_t> &offsets, size_t total_size, size_t chunks) {
 
 // args: <total_size> <output_ratio> <runs>
 
-// <total_size>: total size of the memory to be read
+// <total_size>: total size of the memory to be read (in MiB)
 //
-// <output_ratio>: after each <output_ratio> bytes some output will be generated
-// the token_stream and offset_stream will be written to
+// <output_ratio>: after each <output_ratio> bytes some output will be generated 
+//                 and written to memory (equivalent amount/location as with the
+//                 real token_stream and offset_stream)
 //
 // <runs> the number of runs
 int main(int argc, char* argv[]) {
@@ -36,7 +37,7 @@ int main(int argc, char* argv[]) {
     vector<unsigned long> results;
 
     if(argc < 4) {
-        cout << "too few arguments" << endl;
+        cout << "too few arguments, see code ..." << endl;
         return -1;
     }
 
