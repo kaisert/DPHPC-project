@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
 
     // init memory
     for(size_t i = 0; i < total_size; ++i) {
-        stream[i] = i%256;
+        stream[i] = (char) i;
     } 
 
     for(size_t run = 0; run < runs; ++run) {
