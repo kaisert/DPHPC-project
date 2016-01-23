@@ -5,7 +5,7 @@
     \includegraphics[scale=.45]{img/def/tokenizer_tp_total.eps}
     \includegraphics[scale=.45]{img/def/tokenizer_tp_per_thread.eps}
     \caption{Total throughput and throughput per thread of the tokenizer
-    for 2GB input file.}
+    for a 2GB input file.}
     \label{fig:tokenizertp}
 \end{figure}
 
@@ -13,13 +13,13 @@
       \includegraphics[scale=.45]{img/def/matcher_tp_total.eps}
       \includegraphics[scale=.45]{img/def/matcher_tp_per_thread.eps}
     \caption{Total throughput and throughput per thread of the matcher 
-    for 2GB input file.}
+    for a 2GB input file.}
       \label{fig:matchertp}%
 \end{figure}
 
 \begin{figure}
     \includegraphics[scale=.45]{img/def/matcher_tp_compare.eps}
-    \caption{Throughput of matcher for different filesizes.}
+    \caption{Throughput of the matcher for different file sizes.}
     \label{fig:tkmatchercomp}
 \end{figure}
 
@@ -60,8 +60,8 @@ For the matcher, the number of threads is equal to the number of queries. Hence,
 to asses the performance, we tested on the same 2GB file with 1, 2, 4, 8, 16,
 32, 60, 120, 180 and 240 queries. Since the performance of the matcher depends
 solely on the tokenstream and not on the original input data, the throughput for
-the matcher is stated tokens per second. Again, the result is the average of ten
-runs (see Figure \ref{fig:matchertp}).
+the matcher is stated in tokens per second. Again, the result is the average of
+ten runs (see Figure \ref{fig:matchertp}).
 
 Until up to 60 queries the decrease in throughput is less than 20\%, while with
 120 queries and more the throughput decreases significantly. Hence, weak scaling
