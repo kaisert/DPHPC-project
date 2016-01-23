@@ -58,17 +58,17 @@
 %
 
 \begin{abstract}
-In the age of big data, real time data processing becomes more and more
-relevant. Many data sources, such as the Twitter Firehose, rely on context-free
-languages, such as XML, to provide an interface for developers. Since such a 
-data stream can reach a throughput, which is not feasible to process
-on a single commercial computer, there exists a demand for a high performance 
-computating system in combination with a well parallelizable method to parse and query
-the XML data in real time. This paper presents an approach on parallelized XPath 
-query matching using Intel's Xeon Phi. The key idea is to compress the XML data 
-into a tokenstream and then run, depending on the XPath query, multiple DFA's on this
-tokenstream. Our implementation reaches a maximum throughput of 0.29 GB/s and
-with its simple and modular design enables high extensibility.
+In the age of big data real time information processing becomes ever more
+relevant. E.g., Twitter relies on a structured language, such as XML, to make
+information about user activities available through a single interface.
+High-throughput processing of such data streams requires high performance
+computation systems in combination with a well parallelizable method to parse
+and query the XML data in real time. This paper presents a parallelized XPath
+query matcher implemented on Intel's Xeon Phi multi core architecture. The key
+idea is to compress the XML data into a tokenstream and run, depending on the
+XPath query, multiple DFA's on this tokenstream. Our implementation reaches a
+maximum throughput of 0.29 GB/s and with its simple and modular design enables
+high extensibility.
 \end{abstract}
 
 
