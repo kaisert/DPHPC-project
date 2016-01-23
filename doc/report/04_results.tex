@@ -4,7 +4,7 @@
 \begin{figure}
     \includegraphics[scale=.45]{img/def/tokenizer_tp_total.eps}
     \includegraphics[scale=.45]{img/def/tokenizer_tp_per_thread.eps}
-    \caption{Total throughput and throughput per thread of tokenizer
+    \caption{Total throughput and throughput per thread of the tokenizer
     for 2GB input file.}
     \label{fig:tokenizertp}
 \end{figure}
@@ -12,7 +12,7 @@
 \begin{figure}
       \includegraphics[scale=.45]{img/def/matcher_tp_total.eps}
       \includegraphics[scale=.45]{img/def/matcher_tp_per_thread.eps}
-    \caption{Total throughput and throughput per thread of matcher 
+    \caption{Total throughput and throughput per thread of the matcher 
     for 2GB input file.}
       \label{fig:matchertp}%
 \end{figure}
@@ -37,21 +37,19 @@ are I/O bound.
 
 \mypar{Experimental Setup} The experiments were conducted on an Intel Xeon Phi
 7120 coprocessor, containing 61 cores and 16 GB of GDDR5 memory with a
-theoretical bandwidth of 352 GBps. According to the documentation the Xeon Phi's
-optimal computational power can be reached running two threads per core, i.e.
-120 threads. For compilation the Intel Compiler version 15.0.0 20140723 was used
-with the following flags: \verb;-fopenmp; \verb;-std=c++11; \verb;-mmic;
-\verb;-Wall; \verb;-qopt-report3; \\ \verb;-qopt-report-phase=vec; \verb;-O3;.
+theoretical bandwidth of 352 GBps. For compilation the Intel Compiler version
+15.0.0 20140723 was used with the following flags: \verb;-fopenmp;
+\verb;-std=c++11; \verb;-mmic; \verb;-Wall; \verb;-qopt-report3; \\
+\verb;-qopt-report-phase=vec; \verb;-O3;.
 
 To generate test data, we used the XML benchmark project XMark
 \cite{Schmidt2002}. As input a 2 GB XML file was used containing 61'113'640
 tags. 
 
-\mypar{Results} First, we measured the performance of the tokenizer working
-with 1 thread. Then we increased the number of threads to 2, 4, 8, 16, 32, 60,
-120, 180 and 240. Each experiment was run ten times. The results were built
-with the average of these runs. Figure \ref{fig:tokenizertp} shows both, the
-total throughput and the throughput per thread.
+\mypar{Results} We measured the performance of the tokenizer for 1, 2, 4, 8, 16,
+32, 60, 120, 180 and 240. Each experiment was run ten times. The results were
+built with the average of these runs. Figure \ref{fig:tokenizertp} shows both,
+the total throughput and the throughput per thread.
 
 The experiments reveal clearly, that the throughput of the tokenizer increases
 with the number of threads. While the benefits of more threads are significant
@@ -60,26 +58,25 @@ from 120 up to 240 threads.
 
 For the matcher, the number of threads is equal to the number of queries. Hence,
 to asses the performance, we tested on the same 2GB file with 1, 2, 4, 8, 16,
-32, 60, 120, 180 and 240 queries. Since the file size alone does not reveal
-enough information about the complexity, or the number of tokens in the XML
-data, the throughput for the matcher is given in the number of tokens that are
-processed per second. Again, the result is the average of the runs.  Figure
-\ref{fig:matchertp} shows the corresponding results.
+32, 60, 120, 180 and 240 queries. Since the performance of the matcher depends
+solely on the tokenstream and not on the original input data, the throughput for
+the matcher is stated tokens per second. Again, the result is the average of ten
+runs (see Figure \ref{fig:matchertp}).
 
 Until up to 60 queries the decrease in throughput is less than 20\%, while with
 120 queries and more the throughput decreases significantly. Hence, weak scaling
-is observable for up to 60 threads. When the number of threads exceeds the
-number of cores the performance suffers. This is in line with the observation
-Fang et al. made in \cite{Fang14}.
+is observable for up to 60 threads. If the number of threads exceeds the number
+of cores, the performance suffers. This is in line with the observation Fang et
+al. made in \cite{Fang14}.
 
 To further asses the performance of the matcher, we included different file
 sizes (see Figure \ref{fig:tkmatchercomp}). We assume that the decrease in
-performance for 8 GB is due to the fact that is more likely for large files that
-different threads access different memory areas while using the same cache
+performance for 8 GB is due to the fact that it is more likely for large files
+that different threads access different memory areas while using the same cache
 directory.
 
 The total throughput of the tokenizer and matcher running with 120 threads is
-0.29 GBpss. This is far below the specified maximum memory bandwidth of 352
+0.29 GBps. This is far below the specified maximum memory bandwidth of 352
 GBps. To make a realistic assessment of the maximally achievable throughput
 we conducted an experiment with a dummy program which has a similar memory
 access pattern as our tokenizer: A contiguous block of memory is read byte-wise
